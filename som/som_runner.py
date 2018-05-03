@@ -55,7 +55,7 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-model = SOM(dim, rows, cols, inputs)
+model = Som(dim, rows, cols, inputs)
 model.train(inputs, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
             lambda_f=1, eps=500, in3d=dim > 2, trace=True, trace_interval=20)
 
@@ -67,14 +67,14 @@ model.train(inputs, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, la
 # sns.heatmap(model.distances_between_adjacent_neurons_vertical())
 # plt.show()
 
-class1_x, class1_y, class2_x, class2_y, class3_x, class3_y = model.neuron_activations_data(np.loadtxt('data/seeds_dataset.txt').T)
+class1_x, class1_y, class2_x, class2_y, class3_x, class3_y = model.neuron_activations_data(
+    np.loadtxt('data/seeds_dataset.txt').T)
 
 plt.scatter(class1_x, class1_y, c='red')
 plt.scatter(class2_x, class2_y, c='blue')
 plt.scatter(class3_x, class3_y, c='green')
 
 plt.show()
-
 
 # heatmaps for attributes values
 # for i in range(7):
@@ -83,4 +83,3 @@ plt.show()
 
 
 # print(sns.heatmap(model.generate_umatrix_data()))
-

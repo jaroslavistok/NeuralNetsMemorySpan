@@ -1,5 +1,5 @@
 import numpy as np
-from plotting_helpers.util import *
+from plotting_helpers.plot_utils import *
 
 
 class Som:
@@ -8,7 +8,6 @@ class Som:
         self.n_rows = n_rows
         self.n_cols = n_cols
         self.weights = np.random.randn(n_rows, n_cols, dim_in)
-
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -51,7 +50,6 @@ class Som:
                     horizontal_distances[j, i] = np.linalg.norm(self.weights[j - 1, i] - self.weights[j, i])
         return horizontal_distances
 
-
     def neuron_activations_data(self, inputs):
         (_, count) = inputs.shape
         activations_data = np.zeros((self.n_rows, self.n_cols))
@@ -65,7 +63,7 @@ class Som:
         class3_x = []
         class3_y = []
 
-        for i in range(count-1):
+        for i in range(count - 1):
             x = inputs[:, i]
             input_class = x[7]
 

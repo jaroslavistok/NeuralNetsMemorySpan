@@ -7,10 +7,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import time
 
-
 ## plotting
 
 palette = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']
+
 
 def plot_errors(title, errors, test_error=None, block=True):
     plt.figure(1)
@@ -83,62 +83,64 @@ def plot_grid_3d(inputs, weights, i_x=0, i_y=1, i_z=2, s=60, block=True):
 
 plot_grid_3d.ax = None
 
-
-width  = None
+width = None
 height = None
+
 
 def util_setup(w, h):
     global width, height
-    width  = w
+    width = w
     height = h
 
 
 def plot_state(s, errors=None, index=None, max_eps=None, rows=1, row=1, size=2, aspect=2, title=None, block=True):
     if plot_state.fig is None:
-        plot_state.fig = plt.figure(figsize=(size,size*rows) if errors is None else ((1+aspect)*size,size*rows))
+        plot_state.fig = plt.figure(
+            figsize=(size, size * rows) if errors is None else ((1 + aspect) * size, size * rows))
         plot_state.fig.canvas.mpl_connect('key_press_event', keypress)
 
         gs = gridspec.GridSpec(rows, 2, width_ratios=[1, aspect])
-        plot_state.grid = {(r,c): plt.subplot(gs[r,c]) for r in range(rows) for c in range(2 if errors else 1)}
+        plot_state.grid = {(r, c): plt.subplot(gs[r, c]) for r in range(rows) for c in range(2 if errors else 1)}
 
         plt.subplots_adjust()
         plt.tight_layout()
 
-    plot_state.fig.show() # foreground, swith plt.(g)cf
+    plot_state.fig.show()  # foreground, swith plt.(g)cf
 
-    ax = plot_state.grid[row-1,0]
+    ax = plot_state.grid[row - 1, 0]
     ax.clear()
     ax.imshow(s.reshape((height, width)), cmap='gray', interpolation='nearest', vmin=-1, vmax=+1)
     ax.set_xticks([])
     ax.set_yticks([])
 
     if index:
-        ax.scatter(index%width, index//width, s=150)
+        ax.scatter(index % width, index // width, s=150)
 
     if errors is not None:
-        ax = plot_state.grid[row-1,1]
+        ax = plot_state.grid[row - 1, 1]
         ax.clear()
         ax.plot(errors)
 
         if max_eps:
-            ax.set_xlim(0, max_eps-1)
+            ax.set_xlim(0, max_eps - 1)
 
         ylim = ax.get_ylim()
-        ax.vlines(np.arange(0, len(errors), width*height)[1:], ymin=ylim[0], ymax=ylim[1], color=[0.8]*3, lw=1)
+        ax.vlines(np.arange(0, len(errors), width * height)[1:], ymin=ylim[0], ymax=ylim[1], color=[0.8] * 3, lw=1)
         ax.set_ylim(ylim)
 
     plt.gcf().canvas.set_window_title(title or 'State')
     plt.show(block=block)
 
+
 plot_state.fig = None
 
 
 def plot_states(S, title=None, block=True):
-    plt.figure(2, figsize=(9,3)).canvas.mpl_connect('key_press_event', keypress)
+    plt.figure(2, figsize=(9, 3)).canvas.mpl_connect('key_press_event', keypress)
     plt.clf()
 
     for i, s in enumerate(S):
-        plt.subplot(1, len(S), i+1)
+        plt.subplot(1, len(S), i + 1)
         plt.imshow(s.reshape((height, width)), cmap='gray', interpolation='nearest', vmin=-1, vmax=+1)
         plt.xticks([])
         plt.yticks([])
@@ -146,6 +148,28 @@ def plot_states(S, title=None, block=True):
     plt.tight_layout()
     plt.gcf().canvas.set_window_title(title or 'States')
     plt.show(block=block)
+
+
+def plot_sequence(targets, outputs=None, split=None, title=None, block=True):
+    plt.figure(2).canvas.mpl_connect('key_press_event', keypress)
+
+    if outputs is None:
+        plt.plot(targets)
+        lim = limits(targets)
+
+    else:
+        plt.plot(targets, lw=5, alpha=0.3)
+        plt.plot(outputs)
+        lim = limits(np.concatenate((outputs.flat, targets)))
+
+    if split is not None:
+        plt.vlines([split], ymin=lim[0], ymax=lim[1], color=palette[-1], lw=1)
+
+    plt.ylim(lim)
+    plt.tight_layout()
+    plt.gcf().canvas.set_window_title(title or ('Prediction' if outputs is not None else 'Sequence'))
+    plt.show(block=block)
+
 
 ## interactive drawing, very fragile....
 
