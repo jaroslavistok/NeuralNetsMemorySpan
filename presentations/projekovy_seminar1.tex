@@ -29,12 +29,115 @@
   \tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{Introduction}
+\section{SOM}
+
 
 \begin{frame}[fragile]{SOM}
 
-Non recursive self organizing map
+\begin{itemize}
+\item Self organizing map
+\item Biologicaly motivated model
+\item Unsupervised competitive learning
+\item Clustering
+\item Preserving topological features
+\item Quantization error
+\end{itemize}
+
+Find Winner
+\begin{equation*}
+i^* = argmin_i||x-w_i|| 
+\end{equation*}
+
+Rule for update weights
+\begin{equation*}
+w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)]
+\end{equation*}
+
 \end{frame}
+
+\begin{frame}[fragile]{Recurrent SOM}
+Self organizing map with some context from previous steps
+\begin{itemize}
+\item RecSom - context is copy of whole map from previous step
+\end{itemize}
+Weights update
+\begin{equation*}
+w_i(t+1) = w_i(t) + zh_{ik}[s(t) - w_i(t)]
+\end{equation*}
+\begin{equation*}
+c_i(t+1) = c_i(t) + zh_{ik}[y(t - 1) - c_i(t)]
+\end{equation*}
+\begin{equation*}
+y_i=exp(-d_i)
+\end{equation*}
+Distance
+\begin{equation*}
+d_i(t) = \alpha||x(t)-w_i||^2 + b||r(t)-c_i||^2
+\end{equation*}
+Recursive context
+\begin{equation*}
+r(t)=[y_i(t-1),...,y_N(t-1)]
+\end{equation*}
+
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Merge SOM}
+
+\begin{itemize}
+\item In Merge SOM \textbf{context is not} copy of whole map from previous step
+\item Fewer parameters than RecSOM
+Weights update
+\begin{equation*}
+w_i(t+1) = w_i(t) + zh_{ik}[s(t) - w_i(t)]
+\end{equation*}
+\begin{equation*}
+c_i(t+1) = c_i(t) + zh_{ik}[y(t - 1) - c_i(t)]
+\end{equation*}
+\begin{equation*}
+y_i=exp(-d_i)
+\end{equation*}
+Distance
+\begin{equation*}
+d_i(t) = (1-\alpha)||(x(t) - w_i||^2 + \alpha||r(t)-c_i||^2
+\end{equation*}
+Recursive context
+\begin{equation*}
+r(t)=\beta w_{i^*}(t-1)+(1-\beta)*r_{i^*}(t-1)
+\end{equation*}
+\end{itemize}
+
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]{SRN}
+
+\begin{itemize}
+\item Elman recurrent network
+\item Backpropagation and backpropagation through time
+\item Context layer
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Measuring memory span}
+
+\begin{itemize}
+\item Words sequences
+\item Every neuron will have set of letters
+\item If this neuron is winner, it will save letter to the set
+
+\end{itemize}
+
+\end{frame}
+
+
+
 \begin{frame}[fragile]{Sections}
   Sections group slides of the same topic
 
