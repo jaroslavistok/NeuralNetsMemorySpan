@@ -1,6 +1,7 @@
 import numpy as np
 
 from plotting_helpers.plot_utils import *
+from plotting_helpers.helpers import *
 
 
 ## Simple Recurrent Network with Elman's original simple BP training

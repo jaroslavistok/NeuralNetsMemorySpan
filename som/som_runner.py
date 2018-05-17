@@ -31,7 +31,7 @@ def Lmax_norm(X, Y):
 # # first two features of iris
 # inputs = np.loadtxt('data/iris.dat').T[:3]
 
-inputs = np.loadtxt('data/seeds_dataset.txt').T[:7]
+inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
 # print(inputs.shape)
 # print(inputs)
 
