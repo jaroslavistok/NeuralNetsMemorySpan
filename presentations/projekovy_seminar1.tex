@@ -75,7 +75,7 @@ y_i=exp(-d_i)
 \end{equation*}
 Distance
 \begin{equation*}
-d_i(t) = \alpha||x(t)-w_i||^2 + b||r(t)-c_i||^2
+d_i(t) = \alpha||x(t)-w_i||^2 + \beta||r(t)-c_i||^2
 \end{equation*}
 Recursive context
 \begin{equation*}
@@ -126,6 +126,13 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 
 \end{frame}
 
+
+\begin{frame}[fragile]{SRN - Elman network}
+
+\includegraphics[width=\textwidth]{elman}
+
+\end{frame}
+
 \begin{frame}[fragile]{Measuring memory span}
 
 \begin{itemize}
@@ -141,6 +148,16 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 
 \begin{frame}[fragile]{Example of receptive field}
 \includegraphics[width=\textwidth]{receptive_field}
+\end{frame}
+
+\begin{frame}{Progress}
+
+\begin{itemize}
+\item Read 3 articles
+\item Working implementation of non-recursive SOM as base for RecSOM and mSOM implementations
+\item Working implementation of simple SRN without backpropagation through time
+\end{itemize}
+
 \end{frame}
 
 
