@@ -1,8 +1,4 @@
-import numpy as np
-import random
-import seaborn as sns
-
-from som.Som import *
+from recsom.RecSom import RecSom
 from plotting_helpers.plot_utils import *
 
 
@@ -55,7 +51,7 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-model = Som(dim, rows, cols, inputs)
+model = RecSom(dim, rows, cols, inputs)
 model.train(inputs, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
             lambda_f=1, eps=50, in3d=dim > 2, trace=True, trace_interval=20)
 
