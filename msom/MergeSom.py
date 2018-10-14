@@ -3,15 +3,22 @@ from plotting_helpers.plot_utils import *
 
 
 class MergeSom:
-    def __init__(self, dim_in, n_rows, n_cols, inputs=None):
-        self.dim_in = dim_in
-        self.n_rows = n_rows
-        self.n_cols = n_cols
-        self.weights = np.random.randn(n_rows, n_cols, dim_in)
-        self.previous_activity_weights = np.random.randn(n_rows, n_cols, dim_in)
-        self.context = np.random.randn(dim_in)
-        self.alpha = 0.5
+    def __init__(self, input_dimension, rows_count, columns_count, inputs=None):
+        self.input_dimension = input_dimension
+        self.rows_count = rows_count
+        self.columns_count = columns_count
+        self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
+        self.weights = np.random.randn(rows_count, columns_count, input_dimension)
+
+        self.context_weights = np.random.randn(rows_count, columns_count, input_dimension)
+
+        self.previous_winner_context = np.zeros(self.input_dimension)
+        self.previous_winner_weights = np.zeros(self.input_dimension)
+
+        # meta parameters
+        self.beta = 0.5
+        self.alpha = 0.5
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -20,15 +27,15 @@ class MergeSom:
 
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
-                current_distance = self.alpha * np.linalg.norm(x - self.weights[i][j]) + \
-                                   self.beta * np.linalg.norm(self.previous_activity_weights[i][j] - self.context[i][j])
+                current_distance = (1 - self.beta) * np.linalg.norm(x - self.weights[i][j]) + \
+                                   self.beta * np.linalg.norm(self.previous_winner_context - self.context_weights[i][j])
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
                     winner_row = i
                     winner_column = j
-        return winner_row, winner_column
 
+        return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
               lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10):
@@ -62,14 +69,23 @@ class MergeSom:
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
 
-                # quantization error
-                sum_of_distances += self.alpha * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
-                                    self.beta * np.linalg.norm(self.previous_activity_weights[winner_row][winner_column] - self.context[winner_row][winner_column])
+                if np.count_nonzero(self.previous_winner_context) == 0:
+                    context = np.zeros(self.input_dimension)
+                else:
+                    context = (1 - self.alpha) * self.previous_winner_weights + self.alpha * self.previous_winner_context
 
-                for r in range(self.n_rows):
-                    for c in range(self.n_cols):
-                        winner_position = np.array([r, winner_row])
-                        current_position = np.array([c, winner_column])
+                self.previous_winner_weights = self.weights[winner_row][winner_column]
+                self.previous_winner_context = context
+
+
+                # quantization error.
+                sum_of_distances += (1 - self.beta) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
+                                    self.beta * np.linalg.norm(context - self.context_weights[winner_row][winner_column])
+
+                winner_position = np.array([winner_row, winner_column])
+                for row_index in range(self.rows_count):
+                    for column_index in range(self.columns_count):
+                        current_position = np.array([row_index, column_index])
                         distance_from_winner = metric(winner_position, current_position)
 
                         if discrete:
@@ -81,17 +97,18 @@ class MergeSom:
                             argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                             h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[r, c]) * h
-                        current_context_adjustment = alpha_t * (self.previous_activity_weights[r, c] - self.context[r, c]) * h
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
-                        self.previous_activity_weights[r, c] = self.weights[r, c]
-                        self.weights[r, c] += current_weight_adjustment
-                        self.context[r, c] += current_context_adjustment
+                        current_context_weight_adjustment = alpha_t * (
+                                self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+
+                        self.weights[row_index, column_index] += current_weight_adjustment
+                        self.context_weights[row_index, column_index] += current_context_weight_adjustment
 
                         adjustment_deltas.append(current_weight_adjustment - last_adjustment)
                         last_adjustment = current_weight_adjustment
 
-            quantization_error = sum_of_distances / (self.n_rows * self.n_cols)
+            quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
             cumulated_quantization_error.append(quantization_error)
 
@@ -104,8 +121,8 @@ class MergeSom:
             print("adjustments: {}".format(adjustments))
 
             print("Quantization error: {}".format(quantization_error))
-            print(self.n_rows)
-            print(self.n_cols)
+            print(self.rows_count)
+            print(self.columns_count)
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
@@ -115,4 +132,3 @@ class MergeSom:
 
         if trace:
             ioff()
-
