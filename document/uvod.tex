@@ -1,1 +1,27 @@
 \chapter{Uvod}
+
+
+\section{Typy neurónových sietí}
+\begin{itemize}
+	\item elmanova sieť
+	\item recSOM
+	\item mergeSOM
+\end{itemize}
+
+\section{Meranie hĺbky pamäte samorganizujúcich sa máp}
+Trénovacou množinou bude dostatočne dlhá sekvencia písmen (slov).
+Vstupmi pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
+Písmená sú kódované do 26 prvkového vektora, ktorého prvky budú nuly a jednotky.
+Mierou hĺbky pamäte bude najdlhšia spoločná podpostupnosť písmen.
+Každé písmeno bude mať v sieti nejakého víťaza a vďaka tomu, že rekurentné siete majú kontext, môže sa stať, že rovnaké písmeno môže mať rôznych víťazov počas trénovania.
+
+Keď chceme hladať najdlhšiu spoločnú podpostupnosť, každý neurón bude mať "okno", resp. bude si pamätať $k$ posledných písmen, pre ktoré bol víťazom. Potom budem vedieť povedať o každom neuróne na aké písmená (časti vstupnej sekvencie) reagoval.
+Toto si budem pamätať pre jednotlivé trénovacie iterácie. Po trénovaní zistím najdlhšiu spoločnú podpostupnosť znakov na ktoré neurón reagoval počas jednotlivých iterácii trénovania. Podpostupnosť budem zisťovať od posledného zapamätaného písmena. Dĺžka najdlhšej nájdenej podpostupnosti bude vyjadrovať pamäťovú hĺbku pre konkrétny neurón. Hĺbku pamäte potrebujem určiť pre celú sieť, preto musím spraviť priemer pamäťových hĺbok všetkých neurónov. Musím však spraviť váhovaný priemer, resp. brať do úvahy počet podpostupností, ktoré sa na daný neurón zobrazili.
+
+
+
+
+
+
+
+
