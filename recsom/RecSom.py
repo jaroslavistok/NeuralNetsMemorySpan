@@ -9,6 +9,8 @@ class RecSom:
         self.columns_count = columns_count
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
+        self.memory_window = [[[] for x in range(self.rows_count)] for y in range(self.columns_count)]
+
         self.weights = np.random.randn(rows_count, columns_count, input_dimension)
         self.context_weights = np.random.randn(rows_count, columns_count, self.number_of_neurons_in_map)
         self.previous_step_activities = np.zeros(self.number_of_neurons_in_map)
