@@ -17,7 +17,7 @@ Každé písmeno bude mať v sieti nejakého víťaza a vďaka tomu, že rekuren
 
 Keď chceme hladať najdlhšiu spoločnú podpostupnosť, každý neurón bude mať "okno", resp. bude si pamätať $k$ posledných písmen, pre ktoré bol víťazom. Potom budem vedieť povedať o každom neuróne na aké písmená (časti vstupnej sekvencie) reagoval.
 Toto si budem pamätať pre jednotlivé trénovacie iterácie. Po trénovaní zistím najdlhšiu spoločnú podpostupnosť znakov na ktoré neurón reagoval počas jednotlivých iterácii trénovania. Podpostupnosť budem zisťovať od posledného zapamätaného písmena. Dĺžka najdlhšej nájdenej podpostupnosti bude vyjadrovať pamäťovú hĺbku pre konkrétny neurón. Hĺbku pamäte potrebujem určiť pre celú sieť, preto musím spraviť priemer pamäťových hĺbok všetkých neurónov. Musím však spraviť váhovaný priemer, resp. brať do úvahy počet podpostupností, ktoré sa na daný neurón zobrazili.
-
+Z toho si viem ďalej vytvoriť heatmapu, ktorá mi bude nejakým spôsobom vizualizovať, na ktoré vstupy neuróny reagovali.
 
 
 
