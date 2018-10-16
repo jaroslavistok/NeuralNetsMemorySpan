@@ -1,7 +1,7 @@
 import numpy as np
 
 """
-abcdefghijklmnopqrstuvwxyz
+Simple helper for encoding characters
 
 """
 
