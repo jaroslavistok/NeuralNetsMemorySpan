@@ -31,6 +31,9 @@ inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
 # print(inputs.shape)
 # print(inputs)
 
+lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+dim = 26
+
 
 # # first three features of iris
 # inputs = np.loadtxt('data/iris.dat').T[:2]
@@ -38,7 +41,7 @@ inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
 # # all features of iris
 # inputs = np.loadtxt('data/iris.dat').T
 
-(dim, count) = inputs.shape
+# (dim, count) = inputs.shape
 
 ## train model
 rows = 20
@@ -52,8 +55,11 @@ bottom_right = np.array((rows - 1, cols - 1))
 lambda_s = metric(top_left, bottom_right) * 0.5
 
 model = RecSom(dim, rows, cols, inputs)
-model.train(inputs, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=5)
+model.train(lorem_ipsum, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
+            lambda_f=1, eps=10, in3d=False, trace=False, trace_interval=5)
+
+print(model.calculate_memory_span_of_net())
+
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())
