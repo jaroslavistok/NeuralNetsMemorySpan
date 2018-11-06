@@ -26,7 +26,7 @@ def Lmax_norm(X, Y):
 # # first two features of iris
 # inputs = np.loadtxt('data/iris.dat').T[:3]
 
-inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
+# inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
 # print(inputs.shape)
 # print(inputs)
 
@@ -37,7 +37,15 @@ inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
 # # all features of iris
 # inputs = np.loadtxt('data/iris.dat').T
 
-(dim, count) = inputs.shape
+# (dim, count) = inputs.shape
+
+# number of letter in alphabet
+
+
+# inputs for training merge som
+lorem_ipsum_training_example = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
+dim = 26
 
 ## train model
 rows = 20
@@ -50,9 +58,9 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-model = MergeSom(dim, rows, cols, inputs)
-model.train(inputs, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=20)
+model = MergeSom(dim, rows, cols)
+model.train(lorem_ipsum_training_example, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
+            lambda_f=1, eps=50, in3d=False, trace=False, trace_interval=20)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())

@@ -1,4 +1,7 @@
 import numpy as np
+
+from helpers.Encoder import Encoder
+from helpers.LongestCommonSubsequence import LongestCommonSubsequence
 from plotting_helpers.plot_utils import *
 
 
@@ -38,9 +41,9 @@ class MergeSom:
         return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10):
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
 
-        (_, count) = inputs.shape
+        count = len(inputs)
 
         if trace:
             ion()
@@ -51,6 +54,9 @@ class MergeSom:
         adjustments = []
 
         for ep in range(eps):
+
+            self.memory_window = [[['' for x in range(count)] for x in range(self.columns_count)] for y in
+                                  range(self.rows_count)]
 
             alpha_t = alpha_s * (alpha_f / alpha_s) ** ((ep - 1) / (eps - 1))
             lambda_t = lambda_s * (lambda_f / lambda_s) ** ((ep - 1) / (eps - 1))
@@ -63,11 +69,18 @@ class MergeSom:
             last_adjustment = 0
             adjustment_deltas = []
 
-            for i in np.random.permutation(count):
-                x = inputs[:, i]
+            for i in range(count):
+                x = Encoder.encode_character(inputs[i])
 
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
+
+                window_size = i - sliding_window_size
+                if window_size < 0:
+                    window_size = 0
+
+                self.memory_window[winner_row][winner_column][i] = inputs[window_size:i]
+                print(self.memory_window[winner_row][winner_column][i])
 
                 if np.count_nonzero(self.previous_winner_context) == 0:
                     context = np.zeros(self.input_dimension)
@@ -132,3 +145,22 @@ class MergeSom:
 
         if trace:
             ioff()
+
+        def calculate_memory_span_of_net(self):
+            lcs = LongestCommonSubsequence()
+            sum_of_weighted_lcs = 0
+
+            for i in range(self.rows_count):
+                for j in range(self.columns_count):
+                    sequences = list(filter(str.strip, self.memory_window[i][j]))
+                    if not sequences:
+                        continue
+                    longest_common_subsequence_length = lcs.get_longest_subsequence_length(sequences)
+                    if longest_common_subsequence_length == 0:
+                        continue
+                    weight = len(sequences) / longest_common_subsequence_length
+                    longest_common_subsequence_length *= weight
+                    sum_of_weighted_lcs += longest_common_subsequence_length
+
+            memory_span = sum_of_weighted_lcs / (self.rows_count * self.columns_count)
+            return memory_span
