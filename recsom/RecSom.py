@@ -12,14 +12,10 @@ class RecSom:
         self.columns_count = columns_count
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
-        self.memory_window = [[['' for x in range(50)] for x in range(self.columns_count)] for y in range(self.rows_count)]
-
-
         self.weights = np.random.randn(rows_count, columns_count, input_dimension)
         self.context_weights = np.random.randn(rows_count, columns_count, self.number_of_neurons_in_map)
         self.previous_step_activities = np.zeros(self.number_of_neurons_in_map)
         self.current_step_activities = np.array([])
-
         # meta parameters
         self.alpha = 0.5
         self.beta = 0.5
@@ -46,7 +42,7 @@ class RecSom:
         return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10):
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
 
         # (_, count) = inputs.shape
         count = len(inputs)
@@ -60,6 +56,9 @@ class RecSom:
         adjustments = []
 
         for ep in range(eps):
+
+            self.memory_window = [[['' for x in range(count)] for x in range(self.columns_count)] for y in
+                                  range(self.rows_count)]
 
             alpha_t = alpha_s * (alpha_f / alpha_s) ** ((ep - 1) / (eps - 1))
             lambda_t = lambda_s * (lambda_f / lambda_s) ** ((ep - 1) / (eps - 1))
@@ -78,9 +77,10 @@ class RecSom:
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
 
-                self.memory_window[winner_row][winner_column][ep] += Encoder.decode_character(x)
-                print("window for row: {} column: {} epoch{} ".format(winner_row, winner_column, ep))
-                print(self.memory_window[winner_row][winner_column][ep])
+                window_size = i - sliding_window_size
+                if window_size < 0:
+                    window_size = 0
+                self.memory_window[winner_row][winner_column][i] = inputs[window_size:i]
 
                 # quantization error
                 sum_of_distances += self.alpha * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
@@ -127,6 +127,9 @@ class RecSom:
             print("Quantization error: {}".format(quantization_error))
             print(self.rows_count)
             print(self.columns_count)
+
+            print("Memory span of the net")
+            print(self.calculate_memory_span_of_net())
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
