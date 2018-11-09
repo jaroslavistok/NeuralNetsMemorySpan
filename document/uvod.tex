@@ -9,15 +9,17 @@
 \end{itemize}
 
 \section{Meranie hĺbky pamäte samorganizujúcich sa máp}
-Trénovacou množinou bude dostatočne dlhá sekvencia písmen (slov).
-Vstupmi pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
-Písmená sú kódované do 26 prvkového vektora, ktorého prvky budú nuly a jednotky.
-Mierou hĺbky pamäte bude najdlhšia spoločná podpostupnosť písmen.
-Každé písmeno bude mať v sieti nejakého víťaza a vďaka tomu, že rekurentné siete majú kontext, môže sa stať, že rovnaké písmeno môže mať rôznych víťazov počas trénovania.
+Ako trénovaciu množinu budem používať sekvenciu písmen abecedy (26 písmen).
+Vstupmi (trénovacie príklady) pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
+Písmená kódujem do 26 prvkového vektora, ktorého prvky budú nuly a jednotka (pre každé písmeno na inej pozícii).
+Každý neurón bude mať množinu v ktorej si bude pamätať pre aký vstup bol víťazom. Nebude si však ukladať iba konkrétne písmeno zo vstupu, ale $k$ posledných písmen z trénovacej množiny (tzv. sliding window). 
+Z toho si viem ďalej vytvoriť hitmapu, ktorá mi bude vizualizovať, na aké vstupy neuróny reagovali.
+Mierou hĺbky pamäte mapy bude potom vážený priemer dĺžky najdlhších spoločných podpostupností písmen v množinách jednotlivých neurónov. Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny s väčším počtom víťazov mali vyššiu váhu ako neuróny s menším počtom víťazov.
+Po každej trénovacej epoche (prechode trénovacou množinou) budem vedieť určiť pamäťovú hĺbku mapy.
+Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, ktoré uchovávajú informáciu z predchádzajúceho kroku,  môže sa stať, že rovnaké písmeno zo vstupu bude mať rôzne víťazné neuróny počas trénovania.
 
-Keď chceme hladať najdlhšiu spoločnú podpostupnosť, každý neurón bude mať "okno", resp. bude si pamätať $k$ posledných písmen, pre ktoré bol víťazom. Potom budem vedieť povedať o každom neuróne na aké písmená (časti vstupnej sekvencie) reagoval.
-Toto si budem pamätať pre jednotlivé trénovacie iterácie. Po trénovaní zistím najdlhšiu spoločnú podpostupnosť znakov na ktoré neurón reagoval počas jednotlivých iterácii trénovania. Podpostupnosť budem zisťovať od posledného zapamätaného písmena. Dĺžka najdlhšej nájdenej podpostupnosti bude vyjadrovať pamäťovú hĺbku pre konkrétny neurón. Hĺbku pamäte potrebujem určiť pre celú sieť, preto musím spraviť priemer pamäťových hĺbok všetkých neurónov. Musím však spraviť váhovaný priemer, resp. brať do úvahy počet podpostupností, ktoré sa na daný neurón zobrazili.
-Z toho si viem ďalej vytvoriť heatmapu, ktorá mi bude nejakým spôsobom vizualizovať, na ktoré vstupy neuróny reagovali.
+
+
 
 
 
