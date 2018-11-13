@@ -6,7 +6,7 @@ from plotting_helpers.plot_utils import *
 
 
 class RecSom:
-    def __init__(self, input_dimension, rows_count, columns_count, inputs=None):
+    def __init__(self, input_dimension, rows_count, columns_count):
         self.input_dimension = input_dimension
         self.rows_count = rows_count
         self.columns_count = columns_count
@@ -42,7 +42,7 @@ class RecSom:
         return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=20):
 
         # (_, count) = inputs.shape
         count = len(inputs)
@@ -57,7 +57,7 @@ class RecSom:
 
         for ep in range(eps):
 
-            self.memory_window = [[['' for x in range(count)] for x in range(self.columns_count)] for y in
+            self.memory_window = [[[] for x in range(self.columns_count)] for y in
                                   range(self.rows_count)]
 
             alpha_t = alpha_s * (alpha_f / alpha_s) ** ((ep - 1) / (eps - 1))
@@ -80,7 +80,8 @@ class RecSom:
                 window_size = i - sliding_window_size
                 if window_size < 0:
                     window_size = 0
-                self.memory_window[winner_row][winner_column][i] = inputs[window_size:i]
+                self.memory_window[winner_row][winner_column].append(inputs[window_size:i])
+
 
                 # quantization error
                 sum_of_distances += self.alpha * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
@@ -127,9 +128,7 @@ class RecSom:
             print("Quantization error: {}".format(quantization_error))
             print(self.rows_count)
             print(self.columns_count)
-
-            print("Memory span of the net")
-            print(self.calculate_memory_span_of_net())
+            print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
@@ -147,9 +146,11 @@ class RecSom:
         for i in range(self.rows_count):
             for j in range(self.columns_count):
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
+                # sequences = self.memory_window[i][j]
                 if not sequences:
                     continue
                 longest_common_subsequence_length = lcs.get_longest_subsequence_length(sequences)
+                print(longest_common_subsequence_length)
                 if longest_common_subsequence_length == 0:
                     continue
                 weight = len(sequences) / longest_common_subsequence_length

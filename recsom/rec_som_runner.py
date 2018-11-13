@@ -54,7 +54,7 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-model = RecSom(dim, rows, cols, inputs)
+model = RecSom(dim, rows, cols)
 model.train(lorem_ipsum, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
             lambda_f=1, eps=10, in3d=False, trace=False, trace_interval=5)
 
