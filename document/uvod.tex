@@ -1,13 +1,59 @@
-\chapter{Uvod}
+\chapter{Úvod}
+
+\section{Motivácia}
+V mojem diplomovej práci budem skúmať hĺbku pamäte rôznych typov neurónových sietí.
+% uvod do problematiky
+% 
+
+\section{Prehľad literatúry a úvod do problematiky}
+\subsection{Samoorganizujúca sa mapy}
+Je to typ neurónovej siete, v ktorej sú jednotlivé neuróny usporiadané do štvorcovej mriežky. Samorganizujúce sa mapy (ďalej iba SOM) sú trénované bez učiteľa, čiže váhy jednotlivých neurónov sú upravované iba na základe trénovacej množiny. Čo je zaujímavé na spôsobe trénovania SOM je, že je veľmi podobný učeniu neurónov v mozgovej kôre živočíchov.
+
+Špeciálnou vlastnosťou SOM je, že po natrénovaní zobrazí trénovaciu množinu so zachovanou topológiou. To znamená, že blízke (podobné) vstupy aktivujú blízke neuróny v sieti. Vzdialenosť dvoch neurónov je ich euklidovská vzdialenosť v mriežke. Toto topologické zobrazenie dát sa vyskytuje aj v biologických neurónových sieťach.
+
+\subsection{Trénovanie}
+Proces trénovania SOM je zložený z dvoch častí:
+\begin{itemize}
+\item hľadanie víťaza
+\item adaptácia váh neurónov
+\end{itemize}
+
+V každom kroku trénovania nájdeme najskôr víťazný neurón pre daný vstup. Postupne počítam euklidovské vzdialenosti vstupu od váhového vektora jednotlivých neurónov. Víťazom je neurón, ktorý je najbližšie k vstupu (má najkratšiu vzdialenosť).
+
+\begin{equation}
+i^* = argmin_i||x-w_i|| 
+\end{equation}
+
+Druhým krokom je adaptácia váh víťazného neurónu a jeho okolia. Pravidlo pre zmenu váh neurónov:
+
+\begin{equation}
+w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)]
+\end{equation}
+
+Váhové vektory víťazného neurónu a jeho topologických susedov sa posúvajú smerom k aktuálnemu vstupu.
+$\alpha(t)$ predstavuje rýchlosť učenia, ktorá sa môže klesať v čase alebo môže zostať konštantná. $h(i^*, i)$ je funkcia okolia (tzv. excitačná funkcia), ktorá definuje koľko neurónov v okolí víťaza bude trénovaných a do akej miery. Inými slovami, excitačná funkcia definuje rozsah kooperácie medzi neurónmi. Používajú sa najčastejšie 2 typy okolia:
+\begin{itemize}
+\item pravouhlé okolie
+\item gaussovské okolie
+\end{itemize}
+
+\begin{align*}
+N(i^{*}, i) = \exp^{- \frac{d^{2}_{E}(i^{*}, i)}{\lambda^{2}(t)}
+\end{align*}
 
 
+\section{Štruktúra ďalšej práce}
 \section{Typy neurónových sietí}
 \begin{itemize}
 	\item elmanova sieť
 	\item recSOM
 	\item mergeSOM
 \end{itemize}
+\section{Elmanova sieť a backpropagácia v čase}
+Jednoduchú Elmanovu sieť nie je vhodné trénovať pomocou jednoduchécho algoritmu spätného šírenia chyby, pretože neberie do úvahy spätné šírenie chybového signálu cez rekurentné prepojenia do predchádzajúcich časových krokov.
+Môže byť však použitý na porovnanie s inými algoritmami pri vyhodnocovaní výsledkov.
 
+Pri algoritme spätného šírenia chyby v čase musíme akokeby rozvinúť rekurentnú sieť do mnohovrstvovej doprednej siete (každý časový krok) a na takto rozvinutú sieť aplikovať algoritmus spätného šírenia chyby.
 \section{Meranie hĺbky pamäte samorganizujúcich sa máp}
 Ako trénovaciu množinu budem používať sekvenciu písmen abecedy (26 písmen).
 Vstupmi (trénovacie príklady) pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
