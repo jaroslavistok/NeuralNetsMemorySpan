@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 # matplotlib.use('TkAgg') # todo: remove or change if not working
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import time
