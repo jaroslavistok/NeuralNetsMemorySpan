@@ -1,7 +1,7 @@
 \chapter{Úvod}
 
 \section{Motivácia}
-Väčšina modelov v strojovom učení predikuje alebo klasifikuje iba na základe aktuálneho vstupu pričom neberie do úvahy predchádzajúce vstupy. Existujú však úlohy pri ktorých potrebujeme brať do úvahy aj predchádzajúce stavy z minulých vstupov, čo nazývame kontext. 
+Väčšina modelov v strojovom učení predikuje alebo klasifikuje iba na základe aktuálneho vstupu pričom neberie do úvahy vplyv predchádzajúce vstupy. Existujú však úlohy pri ktorých musíme brať do úvahy aj predchádzajúce stavy z minulých vstupov, čo nazývame kontext. 
 Predstavme si napríklad, že chceme sieť naučiť predikovať ďalšie písmeno v slove. Ako príklad si vezmime slovo "java". Trénovanie nerekurentnej siete by prebiehalo nasledujúcim spôsobom: sieti dám písmeno "j" a poviem, že očakávam "a" a takto pokračujem ďalej. Problém nastane pri písmene "v", kde opäť očakávam "a", ale sieť je už naučená, že pímeno "a" nasleduje po "j". Je zrejmé, že na vyriešenie tohto problému potrebujem brať do úvahy aj nejaký historický kontext, teda stavy siete z predchádzajúcich krokov.
 Takýto druh neurónovej siete sa nazýva rekurentná neurónová sieť.
 
@@ -10,10 +10,18 @@ V našej diplomovej práci budeme skúmať hĺbku pamäte rôznych typov neurón
 \section{Prehľad literatúry a úvod do problematiky}
 \subsection{Samoorganizujúce sa mapy}
 Je to typ neurónovej siete, v ktorej sú jednotlivé neuróny usporiadané v štvorcovej mriežke. Samoorganizujúce sa mapy (ďalej iba SOM) sú trénované bez učiteľa, čiže váhy jednotlivých neurónov sú upravované iba na základe dát z trénovacej množiny. Čo je zaujímavé na spôsobe trénovania SOM je, že je veľmi podobný učeniu neurónov v mozgovej kôre živočíchov.
-
 Špeciálnou vlastnosťou SOM je, že po natrénovaní zobrazí trénovaciu množinu so zachovanou topológiou. To znamená, že blízke (podobné) vstupy aktivujú blízke neuróny v sieti. Vzdialenosť dvoch neurónov je ich euklidovská vzdialenosť v mriežke. Takéto topologické zobrazenie dát sa vyskytuje aj v biologických neurónových sieťach.
 
+\section{Typy rekurentných neurónových sietí, ktoré budem skúmať}
+\begin{itemize}
+	\item elmanova sieť
+	\item recSOM
+	\item mergeSOM
+\end{itemize}
+
+
 \subsection{Trénovanie}
+I read \cite{Elman90findingstructure}.
 Trénovanie SOM je založené na tzv. Hebbovom pravidle učenia, ktoré znie nasledovne:
 Keď má axón bunky A excitačný účinok na bunku B, a opakovane sa zúčastňuje na jej aktivácii, v jednej
 alebo v oboch bunkách prebehne určitý rastový proces alebo metabolická zmena, takže účinnosť bunky A ako jednej z buniek, ktoré aktivujú B, vzrastie.
@@ -32,7 +40,7 @@ i^* = argmin_i||x-w_i||
 Druhým krokom je adaptácia váh víťazného neurónu a jeho okolia. Pravidlo pre zmenu váh neurónov:
 
 \begin{equation}
-w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)]
+w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)])
 \end{equation}
 
 Váhové vektory víťazného neurónu a jeho topologických susedov sa posúvajú smerom k aktuálnemu vstupu.
@@ -59,6 +67,15 @@ $d_{E}(i^{*}, i)$ je euklidovská vzdialenosť (L2 norma) neurónov v mriežke. 
 	funkcia slúži na zmenšovanie okolia víťazného neurónu počas trénovania, čím sa zabezpečí ukončenie učenia.
 \end{itemize}
 
+$[x(t) - w_i(t)]$ Je euklidovská vzdialenosť medzi vstupným vektorom a váhovým vektorom.
+
+Na vyhodnocovanie trénovania SOM používame kvantizačnú chybu. Je to vzdialenosť vstupu
+od neurónu. 
+Po každej epoche učenia vieme určiť celkovú kvantizačnú chybu siete pre danú trénovaciu množinu.
+Vypočítame pre každý vstup vzdialenosť od každého neurónu v sieti. Spravíme priemer týchto vzdialeností pre každý vstup. Urobím súčet týchto hodnôt a vydelím počtom trénocích príkladov. 
+Tým dostanem priemernu kvantizačnú chybu pre celú sieť. 
+Táto by mala po každej epoche učenia (po natrénovaní a adaptácii váh na celej trénovacej množine) postupne klesať.
+
 Pri učení rozlišujeme všeobecne dve fázy:
 \begin{itemize}
 	\item usporiadavanie - s časom klesá veľkosť okolia víťazných neurónov 
@@ -73,23 +90,23 @@ Počas trénovania SOM môžu nastať špeciálne situácie:
 \begin{itemize}
 	\item Sieť je neúplne rozvinutá - príliš rýchle zmenšovanie rýchlosti učenia $\alpha$
 	\begin{figure}[H]
-		\caption{Neúplne rozvinutá sieť}
 		\centering
 		\includegraphics[width=8cm]{assets/too_fast}
+		\caption{Neúplne rozvinutá sieť}
 	\end{figure}
 	
 	\item Motýlí efekt - príliš rýchle zmenšovanie okolia $\lambda$
 	\begin{figure}[H]
-		\caption{Motýlí efekt}
 		\centering
 		\includegraphics[width=8cm]{assets/butterfly_effect}
+		\caption{Motýlí efekt}
 	\end{figure}
 	
 	\item Pinch efekt - príliš pomalé zmenšovanie okolia $\lambda$
 	\begin{figure}[H]
-		\caption{Pinch effect}
 		\centering
 		\includegraphics[width=8cm]{assets/pinch_effect}
+		\caption{Pinch effect}
 	\end{figure}
 \end{itemize}
 
@@ -105,41 +122,122 @@ Počas trénovania SOM môžu nastať špeciálne situácie:
 \end{itemize}
 
 
+\subsection{Rekurentné modely}
+Rekurentné samoorganizujúce sa mapy sú modifikáciou nerekurentnej SOM.
+Rozdielom oproti nerekurentnej verzii je v tom, že vstupy sú porovnávané
+nielen s váhovým vektorom jednotlivých neurónov, ale aj s kontextom.
+Rôzne verzie rekurentných SOM sa líšia iba v type kontextu, ktorý je v nich použítý. 
+V kontexte je spravidla uložený stav siete alebo časti siete z minulého časového kroku.
+
+V mojej práci budem porovnávať 2 základné typy rekuretných SOM.
+
+\begin{itemize}
+	\item Recursive SOM (RecSOM)
+	Pri RecSOM je kontextom celá kópia aktívacií mapy z minulého kroku.
+	\item Merge SOM (mSOM)
+	Pri mSOM sú kontextom vlastnosti víťazného neurónu z predchádzajúceho kroku učenia.
+\end{itemize}
 
 \subsection{RecSOM}
-Rekurentná som je modifikáciou
+Pri RecSom je SOM algoritmus použítý rekurzívne na vstupný vektor $x(t)$ a tiež reprezentáciu mapy
+z minulého kroku $y(t-1)$. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{assets/rec_som}
+	\caption{Architektúra RecSOM. V RecSOM je každý vstup asociovaný k stavom z predchádzajúcich krokov a preto každý 
+	neurón reaguje na sekvenciu vstupov.
+	 Prerušované čiary predstavujú trénovateľné spojenia. }
+\end{figure}
+
+Každý neurón má 2 váhové vektory. Váhový vektor $w_i$, ktorý je porovnávaný so
+vstupným vektorom $x(t)$ a vektor kontextových váh $c_i$, ktorý je porovnávaný s kontextom z predchádzajúceho
+kroku $y(t-1)$. Kedže chceme aby boli dopredné a spätné spojenia v RecSOM homogénne, 
+celkovú chybu určíme ako súčet druhých mocnín kvantizačných chýb oboch prípadov. Chyba je vlastne súčet euklidovských vzdialeností
+vstupu od váhového vektoru a kontextu z predchádzajúceho kroku od kontextových váh. 
+
+$N$ je počet neurónov v sieti (pretože kontextom je kópia celej mapy)
+\begin{equation}
+	d_i = \alpha \cdot ||x(t) - w_i||^{2} + b \cdot ||y(t-1) - c_i||^{2} \quad c \in R^{N}
+\end{equation}
+$\alpha$ a $\beta$ sú parametre, ktoré určujú akú váhu pri trénovaní bude mať kontext a akú váhu bude mať
+aktuálny krok.
+
+Kontextom je kópia aktivácii všetkých neurónov z predchádzajúceho kroku.
+\begin{equation}
+	y(t) = [y_1(t-1), ..., y_{N}(t-1)]  \quad c, r \in R^{N}
+\end{equation}
+
+Hodnota aktivácie pre určitý neurón je vyjadrená vzťahom:
+\begin{equation}
+	y_i = \exp(-d_i)
+\end{equation}
+
+Pravidlo pre zmenu váh neurónov (podobné ako pri nerekurentnej SOM):
+\begin{equation}
+	w_i(t + 1) = w_i(t) + \alpha(t)h(i^*, i)[x(t) - w_i(t)]
+\end{equation}
+Pre pre zmenu kontextových váh, platí to isté pravidlo ako pre normálne váhy, iba je aplikované 
+na kontextové vektory:
+\begin{equation}
+	c_i(t + 1) = c_i(t) + \alpha(t)h(i^*, i)[y(t - 1) - c_i(t)]
+\end{equation}
+
+Pri RecSom majú kontext aj kontextové váhy veľkú dimenziu (rovnú počtu neurónov v sieti) čo môže spomalovať
+proces trénovania.
+Výhodou môže byť, že kontext RecSOM obsahuje veľa informácií a teda môže mať v niektorých prípadoch
+lepšie vlastnosti. 
 
 
 \subsection{mSOM}
-mSOM
+mSOM je podobná recSOM, líši sa v reprezentácii kontextu.
+
+Chybu (vzdialenosť vstupu od neurónu) vyjadríme vzťahom (podobne ako pri recSOM):
+$d$ je dimenzia vstupov
+\begin{equation}
+	d_i = \alpha \cdot ||s(t) - w_i||^{2} + \beta \cdot ||r(t) - c_i||^{2} \quad x, c \in R^{d}
+\end{equation}
+
+Kontextom pri mSOM nie je kópia aktivácii neurónov z predchádzajúceho kroku, ako je tomu pri RecSom. 
+Kontextom pri mSOM je zlúčenie (lineárna kombinácia) vlastností víťaza z predchádzajúceho kroku.
+(Odtiaľ je odvodený názov - "zlučovacia samoorganizujúca sa mapa" - Merge SOM). 
+Kontext mSOM vyjadríme vzťahom:
+\begin{equation}
+	y(t) = \beta \cdot w_{i^{*}}(t-1) + (1 - \beta) \cdot y_{i^{*}}(t-1)
+\end{equation}
+$\beta$ je zlučovací parameter, ktorý určuje váhu kombinovaných vlastností
+víťazného neurónu z predchádzajúceho kroku. Typická hodnota tohto parametra
+počas trénovania je $\beta = 0.5$, čiže taká aby obe zložky mali približne 
+rovnakú váhu. Kontextom pri mSOM je teda lineárna kombinácia váhového vektora a 
+kontextového vektora víťazného neurónu z predchádzajúceho kroku.
+Pravidlá pre zmenu váh a kontextových váh zostávajú rovnaké ako pri RecSom, resp. SOM. Líšia sa iba v kontexte.
+\begin{equation}
+	w_i(t + 1) = w_i(t) + \alpha(t)h(i^*, i)[s(t) - w_i(t)]
+\end{equation}
+Pravidlo pre zmenu kontextových váh:
+\begin{equation}
+	c_i(t + 1) = c_i(t) + \alpha(t)h(i^*, i)[y(t - 1) - c_i(t)]
+\end{equation}
+
+Kontext pri mSOM obsahuje odlišné informácie ako pri RecSom.
+Na rozdiel od recSom, kde kontext tvorí vektor aktivít neurónov z predchádzajúceho kroku, pri
+mSOM je kontext tvorený iba lineárnou kombináciou vlastností víťazného neurónu z minulého kroku.
+Má však menšiu dimenziu (dimenziu vstupu), vďaka čomu je trénovanie mSOM rýchlejšie a teda je možné použiť 
+viacrozmerné mapy a viac epoch trénovania. Rozdielne typy kontextov a ich 
+vplyv na pamäťovú hĺbku rekurentných sietí je jedným z cieľov mojej diplomovej práce.
+
+\section{Dopredné neurónové siete}
+Narozdiel od SOM, dopredné neurónové siete majú neuróny usporiadané do vrstiev.
+Trénovanie prebieha pomocou algoritmu spätnej propagácie chyby.
 
 
-
-\section{Štruktúra ďalšej práce}
-\section{Typy neurónových sietí}
-\begin{itemize}
-	\item elmanova sieť
-	\item recSOM
-	\item mergeSOM
-\end{itemize}
 \section{Elmanova sieť a backpropagácia v čase}
 Jednoduchú Elmanovu sieť nie je vhodné trénovať pomocou jednoduchécho algoritmu spätného šírenia chyby, pretože neberie do úvahy spätné šírenie chybového signálu cez rekurentné prepojenia do predchádzajúcich časových krokov.
 Môže byť však použitý na porovnanie s inými algoritmami pri vyhodnocovaní výsledkov.
 
 Pri algoritme spätného šírenia chyby v čase musíme akokeby rozvinúť rekurentnú sieť do mnohovrstvovej doprednej siete (každý časový krok) a na takto rozvinutú sieť aplikovať algoritmus spätného šírenia chyby.
-\section{Meranie hĺbky pamäte samorganizujúcich sa máp}
-Ako trénovaciu množinu budem používať sekvenciu písmen abecedy (26 písmen).
-Vstupmi (trénovacie príklady) pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
-Písmená kódujem do 26 prvkového vektora, ktorého prvky budú nuly a jednotka (pre každé písmeno na inej pozícii).
-Každý neurón bude mať množinu v ktorej si bude pamätať pre aký vstup bol víťazom. Nebude si však ukladať iba konkrétne písmeno zo vstupu, ale $k$ posledných písmen z trénovacej množiny (tzv. sliding window). 
-Z toho si viem ďalej vytvoriť hitmapu, ktorá mi bude vizualizovať, na aké vstupy neuróny reagovali.
-Mierou hĺbky pamäte mapy bude potom vážený priemer dĺžky najdlhších spoločných podpostupností písmen v množinách jednotlivých neurónov. Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny s väčším počtom víťazov mali vyššiu váhu ako neuróny s menším počtom víťazov.
-Po každej trénovacej epoche (prechode trénovacou množinou) budem vedieť určiť pamäťovú hĺbku mapy.
-Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, ktoré uchovávajú informáciu z predchádzajúceho kroku,  môže sa stať, že rovnaké písmeno zo vstupu bude mať rôzne víťazné neuróny počas trénovania.
 
-
-
-
+\section{Štruktúra ďalšej práce}
 
 
 

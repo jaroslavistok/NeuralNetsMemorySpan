@@ -1,15 +1,41 @@
 \documentclass[12pt, oneside]{book}
-\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=3.5cm,right=2cm]{geometry}
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=3.5cm,right=2cm,footskip=.25in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{url}
-
-
 \usepackage{float}
 \usepackage{mathtools}
-\usepackage[slovak]{babel} % vypnite pre prace v anglictine
-\linespread{1.25} % hodnota 1.25 by mala zodpovedat 1.5 riadkovaniu
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{lmodern}
+\usepackage{indentfirst}
+\usepackage{enumerate}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{lipsum}
+
+\usepackage[
+backend=bibtex
+% backend=biber % <-- biber is a modern replacement for BibTeX designed for use (only) with biblatex
+]
+{biblatex}
+\addbibresource{bibliography.bib}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\usepackage[slovak]{babel}
+%\renewcommand{\baselinestretch}{1.8} 
+
+% toto som zmenil aby som mal viac textu na seminar :D
+\linespread{1.8} % hodnota 1.25 by mala zodpovedat 1.5 riadkovaniu
 
 % -------------------
 % --- Definicia zakladnych pojmov
@@ -162,7 +188,6 @@ Abstrakt - obsah
 
 Abstract
 
-
 \paragraph*{Keywords:} neural net, machine learning, memory span
 
 % --- Koniec Abstrakt - Anglicky
@@ -229,7 +254,7 @@ Abstract
 \nocite{*}
 \clearpage
 
-\bibliographystyle{plain}
+\printbibliography
 
 %\bibliography{literatura} 
 
