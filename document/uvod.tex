@@ -1,30 +1,151 @@
 \chapter{Úvod}
 
 \section{Motivácia}
-Väčšina modelov v strojovom učení predikuje alebo klasifikuje iba na základe aktuálneho vstupu pričom neberie do úvahy vplyv predchádzajúce vstupy. Existujú však úlohy pri ktorých musíme brať do úvahy aj predchádzajúce stavy z minulých vstupov, čo nazývame kontext. 
-Predstavme si napríklad, že chceme sieť naučiť predikovať ďalšie písmeno v slove. Ako príklad si vezmime slovo "java". Trénovanie nerekurentnej siete by prebiehalo nasledujúcim spôsobom: sieti dám písmeno "j" a poviem, že očakávam "a" a takto pokračujem ďalej. Problém nastane pri písmene "v", kde opäť očakávam "a", ale sieť je už naučená, že pímeno "a" nasleduje po "j". Je zrejmé, že na vyriešenie tohto problému potrebujem brať do úvahy aj nejaký historický kontext, teda stavy siete z predchádzajúcich krokov.
-Takýto druh neurónovej siete sa nazýva rekurentná neurónová sieť.
+V strojovom učení nastávajú situácie, kedy potrebujeme predikovať výsledok nie len na základe aktuálneho vstupu, 
+ale aj na základe určitého kontextu. Kontext predstavuje väčšinou nejaký stav z minulých krokov.
+Príkladom takejto úlohy môže byť spracovanie tzv. časových radov, či predikovanie priebehu spojitej funkcie.
 
-V našej diplomovej práci budeme skúmať hĺbku pamäte rôznych typov neurónových sietí. 
+Predstavme si úlohu, kde chceme model strojového učenia naučiť predikovať ďalšie písmeno v slove. Ako príklad si môžeme zobrať slovo "Bratislava". 
+Trénovanie určitého modelu bez využitia kontextu by prebiehalo nasledujúcim spôsobom:
+Trénovaciou množinu by tvorili písmená daného slova kde očakávanou hodnotou pre nejaké písmeno by bolo ďalšie písmeno, ktoré za ním v slove nasleduje.
+Čiže pre písmeno "B" a poviem, že očakávam "r" a takto pokračujem ďalej. 
 
-\section{Prehľad literatúry a úvod do problematiky}
-\subsection{Samoorganizujúce sa mapy}
-Je to typ neurónovej siete, v ktorej sú jednotlivé neuróny usporiadané v štvorcovej mriežke. Samoorganizujúce sa mapy (ďalej iba SOM) sú trénované bez učiteľa, čiže váhy jednotlivých neurónov sú upravované iba na základe dát z trénovacej množiny. Čo je zaujímavé na spôsobe trénovania SOM je, že je veľmi podobný učeniu neurónov v mozgovej kôre živočíchov.
-Špeciálnou vlastnosťou SOM je, že po natrénovaní zobrazí trénovaciu množinu so zachovanou topológiou. To znamená, že blízke (podobné) vstupy aktivujú blízke neuróny v sieti. Vzdialenosť dvoch neurónov je ich euklidovská vzdialenosť v mriežke. Takéto topologické zobrazenie dát sa vyskytuje aj v biologických neurónových sieťach.
+Problém nastane pri druhom písmene "a" v slove Bratislava. Pri prvom výskyte tohto písmena som modelu tvrdil, že očakávam písmeno "t" a 
+pri druhom očakávam "v". Toto model, ktorý nevyužíva kontext, nevieme naučiť, pretože nemá žiadnu pamäť (okno do minulosti).
 
-\section{Typy rekurentných neurónových sietí, ktoré budem skúmať}
+V mojej práci budeme skúmať iba na jeden model strojového učenia, ktorý pracuje s kontextom - rekurentné neurónové siete, konkrétne ich 
+pamäťovú hĺbku, čiže s akým dlhým kontextom do minulosti dokážu pracovať. Konkrétne pôjde o nasledúce 3 typy neurónových sietí:
+
 \begin{itemize}
-	\item elmanova sieť
-	\item recSOM
-	\item mergeSOM
+	\item Elmanova sieť
+	\item RecSOM
+	\item MergeSOM
 \end{itemize}
 
+\section{Úvod do neurónových sietí}
+
+\subsection{Perceptrón}
+Je základnou stavebnou jednotkou neurónových sietí. 
+Na vstupe každého perceptrónu je vektor vstupných hodnôt (vzor) $\overline{x}$ pričom hodnoty sú reálne čísla, do ktorých môže byť zakódované
+napríklad slovo alebo obrázok. Každý perceptrón má vektor synaptických váh $\overline{w}$. 
+Výstup perceptrón vyjadruje rovnica:
+\begin{equation}
+	y = f (\sum_{j=1}^{n+1} w_{i} x_{j}) \quad x_{n+1} = -1
+\end{equation}
+Funkcia $f$ sa nazýva aj aktivačná funkcia perceptrónu. 
+% Popisat nejake dalsie aktivacne funkcie
+
+Vstupom do aktivačnej funkcie je váhovaný súčet vstupov, teda skalárny súčin vstupného vektora $\overline{x}$ a 
+váhového vektora perceptrónu $\overline{w}$.
+
+
+Trénovanie perceptrónu prebieha za pomoci učiteľa (ang. supervised learning).
+Pravidlo pre adaptáciu váh percetrónu:
+\begin{equation}
+	w_j(t+1) = w_j(t) + \alpha (d - y)\cdot x_j
+\end{equation}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=8cm]{assets/perceptron}
+	\caption{Percetrón}
+\end{figure}
+
+Perceptrón je veľmi jednoduchým modelom. 
+Nevieme ním vyriešiť celú škálu úloh. Napríklad dokáže klasifikovať 
+iba lineárne separovateľné dáta. Je však dokázané, že ak dáta sú lineárne separovateľné, trénovací algoritmus
+konverguje a teda vie dáta separovať.
+Perceptrón sa v strojovom učení niekedy označuje aj ako logistická regresia.
+
+\subsection{Viacvrstvová dopredná neurónová sieť}
+V našej práci sa budeme zaoberať rekurentnou doprednou neurónovou sieťou. Najskôr však popíšem základný model
+neurónovej siete. 
+Viacvrstvová dopredná neurónová sieť má jednu vstupnú vrstvu, jednu výstupnú vrstvu a minimálne jednu skrytú vrstvu. 
+Jednotlivé vrstvy sú tvorené perceptrónmi. Jednotlivé vrstvy sú pospájané väzbami, ktoré majú váhy.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=8cm]{assets/mlp}
+	\caption{Viacvrstvová dopredná neurónová sieť}
+\end{figure}
+
+Trénovací algoritmus pomocou ktorého sa trénujú dopredné neurónové sa nazýva "spätné šírenie chyby" (angl. backpropagation).
+
+Aktivácie na naurónoch výstupnej vrstvy môžeme popísať vzťahom:
+\begin{equation}
+y_i = f(\sum_{k=1}^{q+1}w_{ik}h_{k})
+\end{equation}
+
+Aktivácie na naurónoch skrytej vrstve môžeme popísať vzťahom:
+\begin{equation}
+	h_{k} = f(\sum_{j=1}^{n+1}v_{kj}x_{j})
+\end{equation}
+
+Prahové hodnoty:
+\begin{equation}
+	x_{n+1} = h_{q+1} = -1
+\end{equation}
+
+Aby dopredná neurónová sieť vedela pracovať aj s nelineárnymi problémami, musí byť aktivačná funkcia neurónov
+nejaká nelineárna diferencovateľná funckia. 
+
+Najpoužívanejšie aktivačné funkcie sú:
+
+\begin{itemize}
+	\item Logistická sigmoida
+	\item Hyperbolický tangens
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=8cm]{assets/activation_functions}
+		\caption{Logistická sigmoida a Hyperbolický tangens}
+	\end{figure}
+	\item Relu
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=8cm]{assets/relu}
+		\caption{Rectified Linear Unit}
+	\end{figure}
+\end{itemize}
+
+Vzťahy pre aktualizáciu váh sú nasledovné: \\
+
+Váhy medzi vstupnou a skrytou vrstvou
+\begin{equation}
+	w_{ik}(t+1) = w_{ik}(t) + \alpha\delta_{i}h_{k} \quad \delta_{i} = (d_i - y_i)f'(net_{i})
+\end{equation}
+
+Váhy medzi skrytou a výstupnou vrstvou: 
+\begin{equation}
+	v_{kj}(t+1) = v_{kj}(t) + \alpha\delta_{k}x_{j} \quad \delta_{k} = (\sum_{i} w_{ik}\delta_{i})f'(net_{k})
+\end{equation}
+
+\subsection{Trénovací algoritmus dopredných neurónových sietí}
+\begin{enumerate}
+	\item zoberie sa vstup $x^{(p)}$ a vypočíta sa výstup $y^{(p)}$ (dopredný krok)
+	\item vypočíta sa chyba pomocou zvolenej chybovej funkcie
+	\item vypočítame hodnoty $\delta_{i}$ a $\delta_{k}$  (spätný krok)
+	\item upravíme váhy $\Delta w_{ik}$ a $\Delta w_{kj}$
+	\item ak už boli použité všetky trénovacie príklady z trénovacej množiny pokračuj bodom 6. inak pokračuj bodom 1.
+	\item ak bolo dosiahnuté nejaké zastavovacie kritérium, potom skonči, inak prepermutuj vstupy a pokračuj bodom 1.
+\end{enumerate}
+
+
+\subsection{Rekurentná neurónová sieť}
+ 
+
+
+
+\subsection{Samoorganizujúce sa mapy}
+Ďalší typ rekurentných neurónových sietí, ktorých pamäťovú hĺbku budeme skúmať v našej práci sú rekurentné samoorganizujúce sa mapy, 
+ktoré sú však rozšírením základnej nerekurentnej verzie samoorganizujúcich sa máp (ďalej iba SOM). 
+Preto najskôr popíšem základný nerekurentný model SOM.
+
+SOM typ neurónovej siete, v ktorej sú jednotlivé neuróny usporiadané v štvorcovej mriežke. Samoorganizujúce sa mapy (ďalej iba SOM) sú trénované bez učiteľa, čiže váhy jednotlivých neurónov sú upravované iba na základe dát z trénovacej množiny. Čo je zaujímavé na spôsobe trénovania SOM je, že je veľmi podobný učeniu neurónov v mozgovej kôre živočíchov.
+Špeciálnou vlastnosťou SOM je, že po natrénovaní zobrazí trénovaciu množinu so zachovanou topológiou. To znamená, že blízke (podobné) vstupy aktivujú blízke neuróny v sieti. Vzdialenosť dvoch neurónov je ich euklidovská vzdialenosť v mriežke. Takéto topologické zobrazenie dát sa vyskytuje aj v biologických neurónových sieťach.
 
 \subsection{Trénovanie}
-I read \cite{Elman90findingstructure}.
-Trénovanie SOM je založené na tzv. Hebbovom pravidle učenia, ktoré znie nasledovne:
-Keď má axón bunky A excitačný účinok na bunku B, a opakovane sa zúčastňuje na jej aktivácii, v jednej
-alebo v oboch bunkách prebehne určitý rastový proces alebo metabolická zmena, takže účinnosť bunky A ako jednej z buniek, ktoré aktivujú B, vzrastie.
 Proces trénovania SOM je zložený z dvoch častí:
 \begin{itemize}
 \item hľadanie víťaza
@@ -145,10 +266,12 @@ z minulého kroku $y(t-1)$.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{assets/rec_som}
-	\caption{Architektúra RecSOM. V RecSOM je každý vstup asociovaný k stavom z predchádzajúcich krokov a preto každý 
-	neurón reaguje na sekvenciu vstupov.
-	 Prerušované čiary predstavujú trénovateľné spojenia. }
+	\caption{Architektúra RecSOM}
 \end{figure}
+
+V RecSOM je každý vstup asociovaný k stavom z predchádzajúcich krokov a preto každý 
+neurón reaguje na sekvenciu vstupov.
+Prerušované čiary predstavujú trénovateľné spojenia.
 
 Každý neurón má 2 váhové vektory. Váhový vektor $w_i$, ktorý je porovnávaný so
 vstupným vektorom $x(t)$ a vektor kontextových váh $c_i$, ktorý je porovnávaný s kontextom z predchádzajúceho
