@@ -186,12 +186,23 @@ ktorá je znázornená na nasledujúcom diagrame.
 	\caption{Architektúra elmanovej siete}
 \end{figure}
 
-Využitie rekurentných neurónových sietí.
+Dvojité šípky reprezentujú spojenia neurónov medzi vrstvami. Neuróny v tej istej vrstve nie sú, podobne ako
+v nerekurentnej doprednej sieti, medzi sebou prepojené. Spojenia znázornené dvojitou šípkou majú váhy, ktoré 
+sú upravované počas trénovania.
+Jednoduché šípky reprezentujú rekurentné spojenia. Tieto majú nemennú váhu s hodnotou 1.
+Tieto spojenia slúžia na odpamätanie aktivácii rekurentných neurónov. 
 
+Využitie rekurentných neurónových sietí:\\
 \begin{itemize}
-	\item Klasifikácia s časovým kontextom 
-	\item Predikcie
-	\item Generovanie postupnosti
+	\item Klasifikácia s časovým kontextom \\
+	Príkladom úlohy môže byť napríklad určiť, či určitá postupnosť vstupov patrí do nejakej triedy.
+	Praktickým problémom môže byť zistiť či postupnosť signálov z určitého zariadenia signalizuje poruchu zariadenia alebo nie
+	\item Predikcie\\
+	Príkladom môže byť napríklad predikcia nasledujúceho člena postupnosti
+	\item Generovanie postupnosti\\
+	Podobne ako predikcie, ale nepredikujeme iba ďalšiu hodnotu postupnosti, ale celé pokračovanie.
+	Je to komplexnejšia úloha. Napríklad 23123123123123123123 .. pokračovaním by bolo 123123123...
+	Reálne úlohy sú komplexnejšie.
 \end{itemize}
 
 Trénovací algoritmus, ktorým sa trénujú rekurentné neurónové siete
@@ -364,7 +375,7 @@ V mojej práci budem porovnávať 2 základné typy rekuretných SOM.
 
 \begin{itemize}
 	\item Recursive SOM (RecSOM)
-	Pri RecSOM je kontextom celá kópia aktívacií mapy z minulého kroku.
+	Pri RecSOM je kontextom celá kópia aktívacií neurónov z minulého kroku.
 	\item Merge SOM (mSOM)
 	Pri mSOM sú kontextom vlastnosti víťazného neurónu z predchádzajúceho kroku učenia.
 \end{itemize}
@@ -459,18 +470,7 @@ Má však menšiu dimenziu (dimenziu vstupu), vďaka čomu je trénovanie mSOM r
 viacrozmerné mapy a viac epoch trénovania. Rozdielne typy kontextov a ich 
 vplyv na pamäťovú hĺbku rekurentných sietí je jedným z cieľov mojej diplomovej práce.
 
-\section{Dopredné neurónové siete}
-Narozdiel od SOM, dopredné neurónové siete majú neuróny usporiadané do vrstiev.
-Trénovanie prebieha pomocou algoritmu spätnej propagácie chyby.
 
-
-\section{Elmanova sieť a backpropagácia v čase}
-Jednoduchú Elmanovu sieť nie je vhodné trénovať pomocou jednoduchécho algoritmu spätného šírenia chyby, pretože neberie do úvahy spätné šírenie chybového signálu cez rekurentné prepojenia do predchádzajúcich časových krokov.
-Môže byť však použitý na porovnanie s inými algoritmami pri vyhodnocovaní výsledkov.
-
-Pri algoritme spätného šírenia chyby v čase musíme akokeby rozvinúť rekurentnú sieť do mnohovrstvovej doprednej siete (každý časový krok) a na takto rozvinutú sieť aplikovať algoritmus spätného šírenia chyby.
-
-\section{Štruktúra ďalšej práce}
 
 
 
