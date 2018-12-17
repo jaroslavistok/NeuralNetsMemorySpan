@@ -29,7 +29,24 @@
   \tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{Implementácia}
+
+\section{Elmanova rekurentná neurónová sieť}
+
+\begin{frame}[fragile]{Elmanova rekurentná neurónová sieť}
+\begin{itemize}
+\item Učenie s učiteľom 
+\item Trénovanie pomocou algoritmu spätného šírenia chyby cez čas
+\item Kontextová vrstva neurónov (kontextové neuróny)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Elmanova rekurentná neurónová sieť}
+
+\includegraphics[width=\textwidth]{elman}
+
+\end{frame}
+
+\section{Samoorganizujúca sa mapa}
 \begin{frame}[fragile]{SOM}
 
 \begin{itemize}
@@ -53,24 +70,6 @@ w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)]
 
 \end{frame}
 
-
-\section{Elmanova rekurentná neurónová sieť}
-
-\begin{frame}[fragile]{Elmanova rekurentná neurónová sieť}
-\begin{itemize}
-\item Učenie s učiteľom 
-\item Trénovanie pomocou algoritmu spätného šírenia chyby cez čas
-\item Kontextová vrstva neurónov (kontextové neuróny)
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Elmanova rekurentná neurónová sieť}
-
-\includegraphics[width=\textwidth]{elman}
-
-\end{frame}
-
-
 \section{Rekurentná SOM}
 
 \begin{frame}[fragile]{Rekurentná SOM}
@@ -79,7 +78,7 @@ Je to samoorganizujúca sa mapa,
 \item RecSom - kontextom je kópia mapy z predchádzajúceho kroku
 \item Veľké množstvo atribútov
 \end{itemize}
-Aktualizácia váh
+Aktualizácia váh neurónov
 \begin{equation*}
 w_i(t+1) = w_i(t) + zh_{ik}[s(t) - w_i(t)]
 \end{equation*}
@@ -130,17 +129,17 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 \end{equation*}
 \end{frame}
 
-\begin{frame}[fragile]{Meranie pamäťovej hĺbky}
+\section{Určovanie pamäťovej hĺbky}
+\begin{frame}[fragile]{Určovanie pamäťovej hĺbky}
 
 \begin{itemize}
-\item sekvencie slov
-\item každý neurón má množinu písmen
-\item tieto tvoria tzv. receptívne pole neurónovej siete
-\item každý neurón si zapamätá $k$ posledných znakov
-\item nájdeme najdlhšiu spoločnú podpostupnosť pre každý neurón
-\item tým získame pamäťovú hĺbku pre jednotlivé neuróny
-\item ked spravíme výhovaný priemer pamäťových hĺbok pre všetky neuróny v sieti dostaneme pamäťovú hĺbku pre celú sieť
-\item toto číslo budeme používať ako mieru pamäťovej hĺbky pre SOM
+\item Vstup - sekvencia písmen abecedy
+\item Každý neurón má množinu, v ktorej si pamätá pre ktoré vstupy bol víťazom.
+\item Nezapamätá si iba aktuálny vstup ale aj $k$ posledných vstupov
+\item Na konci každej epochy trénovania zistíme dĺžku najdlhšej spoločnej podpostupnosti.
+\item Tým získame pamäťovú hĺbku pre jednotlivé neuróny
+\item Keď spravíme výhovaný priemer pamäťových hĺbok pre všetky neuróny v sieti dostaneme pamäťovú hĺbku pre celú sieť
+\item Toto číslo budeme používať ako mieru pamäťovej hĺbky pre SOM
 \end{itemize}
 
 \end{frame}
@@ -149,13 +148,26 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 \includegraphics[width=\textwidth]{receptive_field}
 \end{frame}
 
+\section{Implementácia}
 \begin{frame}{Implementácia}
 
 \begin{itemize}
-  \item Vlasná implementácia sietí
+  \item Vlastná implementácia jednotlivých druhov neurónových sietí
+  \item Python + Numpy
+  \item Algoritmus hľadania najdlhšej spoločnej podpostupnosti viacerých podpostupností
 \end{itemize}
-
 \end{frame}
+
+
+\section{Čo ďalej?}
+\begin{frame}{Čo ďalej?}
+  \begin{itemize}
+    \item Implementácia algoritmu spätného šírenia chyby v čase
+    \item Vymyslieť spôsob ako merať pamäťovú hĺbku v Elmanovej sieti
+    \item Naprogramovať vizualizáciu výsledkov
+    \item Porovnávať a skúmať vplyvy rôznych parametrov na pamäťovú hĺbku sietí
+  \end{itemize}
+  \end{frame}
 
 
 {\setbeamercolor{palette primary}{fg=black, bg=yellow}
