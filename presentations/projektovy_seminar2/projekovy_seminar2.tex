@@ -1,16 +1,15 @@
 \documentclass[10pt]{beamer}
-
+\usepackage[slovak]{babel}
 \usetheme[progressbar=frametitle]{metropolis}
 \usepackage{appendixnumberbeamer}
-\usepackage[utf8]{inputenc}    
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
-
 \usepackage{pgfplots}
 \usepgfplotslibrary{dateplot}
-
 \usepackage{xspace}
 \newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+
 
 \title{Porovnanie typov rekurentných neurónových sietí z hľadiska hĺbky pamäte}
 \subtitle{Diplomová práca}
@@ -34,9 +33,10 @@
 
 \begin{frame}[fragile]{Elmanova rekurentná neurónová sieť}
 \begin{itemize}
-\item Učenie s učiteľom 
+\item Architektúra siete 
 \item Trénovanie pomocou algoritmu spätného šírenia chyby cez čas
 \item Kontextová vrstva neurónov (kontextové neuróny)
+\item Možnosti využitia 
 \end{itemize}
 \end{frame}
 
@@ -50,7 +50,7 @@
 \begin{frame}[fragile]{SOM}
 
 \begin{itemize}
-  \item samoorganizujúca sa mapa
+  \item pojem samoorganizujúca sa mapa
   \item biologicky motivovaný model
   \item učenie so súťažením
   \item učenie bez učiteľa
@@ -75,7 +75,7 @@ w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)]
 \begin{frame}[fragile]{Rekurentná SOM}
 Je to samoorganizujúca sa mapa, 
 \begin{itemize}
-\item RecSom - kontextom je kópia mapy z predchádzajúceho kroku
+\item RecSom - kontextom je kópia aktivácii neurónov z predchádzajúceho kroku
 \item Veľké množstvo atribútov
 \end{itemize}
 Aktualizácia váh neurónov
@@ -104,11 +104,8 @@ r(t)=[y_i(t-1),...,y_N(t-1)]
 
 \begin{itemize}
 \item V merge SOM kontext nie je kópia celej mapy z predchádzajúceho kroku
-\item Kontextom je iba stav víťazného neurónu z predchádzajúceho kroku
+\item Kontextom sú vlastnosti víťazného neurónu z predchádzajúceho kroku
 \item Menej parametrov ako pri rekurzívnej SOM
-\item $\gamma_1$ $\gamma_2$ - parametre rýchlosti učenia
-\item $h_{\sigma}$ - excitačná funkcia
-\item $d_N$ - susedná funkcia
 \end{itemize}
 Aktualizácia váh
 \begin{equation*}
@@ -133,13 +130,13 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 \begin{frame}[fragile]{Určovanie pamäťovej hĺbky}
 
 \begin{itemize}
-\item Vstup - sekvencia písmen abecedy
-\item Každý neurón má množinu, v ktorej si pamätá pre ktoré vstupy bol víťazom.
-\item Nezapamätá si iba aktuálny vstup ale aj $k$ posledných vstupov
-\item Na konci každej epochy trénovania zistíme dĺžku najdlhšej spoločnej podpostupnosti.
+\item Vstup - sekvencia písmen (znakov)
+\item Každý neurón má navyše množinu, v ktorej si pamätá pre ktoré vstupy bol víťazom
+\item Nezapamätá si iba aktuálny vstup ale aj $k$ posledných vstupov, tzv. posuvné okno
+\item Na konci každej epochy trénovania zistíme dĺžku najdlhšej spoločnej podpostupnosti pre každý neurón
 \item Tým získame pamäťovú hĺbku pre jednotlivé neuróny
-\item Keď spravíme výhovaný priemer pamäťových hĺbok pre všetky neuróny v sieti dostaneme pamäťovú hĺbku pre celú sieť
-\item Toto číslo budeme používať ako mieru pamäťovej hĺbky pre SOM
+\item Keď spravíme vážený priemer pamäťových hĺbok pre všetky neuróny v sieti dostaneme pamäťovú hĺbku pre celú sieť
+\item Toto číslo budeme používať ako mieru pamäťovej hĺbky pre SOM 
 \end{itemize}
 
 \end{frame}
@@ -155,6 +152,7 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
   \item Vlastná implementácia jednotlivých druhov neurónových sietí
   \item Python + Numpy
   \item Algoritmus hľadania najdlhšej spoločnej podpostupnosti viacerých podpostupností
+  \item Implementácia posuvného okna
 \end{itemize}
 \end{frame}
 
@@ -179,32 +177,5 @@ c^t = (1 - \beta) \cdot w^{I_{t-1}} + \beta \cdot c^{I_{t-1}}
 \appendix
 
 
-\begin{frame}[allowframebreaks]{References}
-
-  \bibliographystyle{abbrv}
-  
-\begin{thebibliography}{9}
-\bibitem{srn} 
-Jeffrey L.Elman
-\textit{Finding Structure in Time}. 
-University of California, San Diego, 1990
- 
-\bibitem{som} 
-H. Ritter and T. Kohonen
-\textit{Self-Organizing Semantic Maps} 
-Helsinky University of Technology, 1982
-  
-\bibitem{recsom} 
-Thomas Voegtlin
-\textit{Recursive self-organizing maps}, 2002
- 
-\bibitem{msom} 
-Marc Strickert, Barbara Hammer
-\textit{Merge SOM for temporal data}
-Technical University of Clausthal, 2005
- 
-\end{thebibliography}
-
-\end{frame}
 
 \end{document}
