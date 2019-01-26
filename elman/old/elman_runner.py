@@ -1,5 +1,5 @@
-from elman.ElmanNet import ElmanNet
-from elman.seq import *
+from elman.old.ElmanNet import ElmanNet
+from elman.old.seq import *
 from plotting_helpers.plot_utils import *
 
 
