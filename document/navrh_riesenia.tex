@@ -12,10 +12,27 @@ Z toho si viem ďalej vytvoriť hitmapu, ktorá mi bude vizualizovať, na aké v
 	\caption{Hitmapa}
 \end{figure}
 
-
 Mierou hĺbky pamäte mapy bude potom vážený priemer dĺžky najdlhších spoločných podpostupností písmen v množinách jednotlivých neurónov. Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, %s väčším počtom víťazov mali vyššiu váhu ako neuróny s menším počtom víťazov.
 ktoré zvíťazili pre viac vstupov, mali vyššiu váhu ako víťazné neuróny pre menší počet vstupov.
 Po každej trénovacej epoche (prechode trénovacou množinou) budem vedieť určiť pamäťovú hĺbku mapy.
 Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, ktoré uchovávajú informáciu z predchádzajúceho kroku,  môže sa stať, že rovnaké písmeno zo vstupu bude mať rôzne víťazné neuróny počas trénovania.
+
+Samotná pamäťová hĺbka je relatívna a závisí od veľkosti sliding window.
+
+Počet neurónov v mape volíme podľa množstva rôznych slov v použitej trénovacej
+množine.
+
+Tradeoff medzi rozlišovaciou schopnosťou jednotlivých slov a schopnosťou
+zachovať podobné slová topologicky čo najbližšie pri sebe.
+
+Na trénovanie a vyhodnocovanie pamäťovej hĺbky som si vytvoril 3 sady 
+trénovacích príkladov. 
+Prvá sada sú najednoduchšie sekvenice (slová), ktoré obsahujú veľké množstvo regularít a malé množstvo rôznych písmen.
+Napríklad sekvencie ako $aaabbb$,  $bbbaaaaa$.
+Druhou sadou budú slová generované Reberovým automatom.
+Treťou sadou trénovacích príkladov budú najzložitejšie sekvencie, resp. náhodný text s
+veľkým množstvom rôznych písmen. Túto sadu budem používať ako performance benchmark. 
+
+Slova generovane Reberovou grmaatikou
 
 
