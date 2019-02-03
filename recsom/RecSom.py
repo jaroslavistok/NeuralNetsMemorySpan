@@ -8,17 +8,25 @@ from plotting_helpers.plot_utils import *
 class RecSom:
     def __init__(self, input_dimension, rows_count, columns_count):
         self.input_dimension = input_dimension
+
         self.rows_count = rows_count
         self.columns_count = columns_count
+
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
+        # weights vectors
         self.weights = np.random.randn(rows_count, columns_count, input_dimension)
         self.context_weights = np.random.randn(rows_count, columns_count, self.number_of_neurons_in_map)
+
+        # activities
         self.previous_step_activities = np.zeros(self.number_of_neurons_in_map)
         self.current_step_activities = np.array([])
-        # meta parameters
-        self.alpha = 0.5
-        self.beta = 0.5
+        self.memory_window = []
+        self.receptive_field = []
+
+        # mixing parameters
+        self.alpha = 0.8
+        self.beta = 0.2
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -33,7 +41,6 @@ class RecSom:
                                    self.beta * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
 
                 self.current_step_activities = np.append(self.current_step_activities, np.exp(-current_distance))
-
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
                     winner_row = i
@@ -49,14 +56,15 @@ class RecSom:
 
         if trace:
             ion()
-            (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
+            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
             redraw()
 
-        cumulated_quantization_error = []
+        quantizations_errors = []
+        memory_spans = []
         adjustments = []
 
-        for ep in range(eps):
 
+        for ep in range(eps):
             self.memory_window = [[[] for x in range(self.columns_count)] for y in
                                   range(self.rows_count)]
 
@@ -81,7 +89,6 @@ class RecSom:
                 if window_size < 0:
                     window_size = 0
                 self.memory_window[winner_row][winner_column].append(inputs[window_size:i])
-
 
                 # quantization error
                 sum_of_distances += self.alpha * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
@@ -108,6 +115,7 @@ class RecSom:
 
                         self.previous_step_activities = self.current_step_activities
                         self.weights[row_index, column_index] += current_weight_adjustment
+
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
 
                         adjustment_deltas.append(current_weight_adjustment - last_adjustment)
@@ -115,7 +123,8 @@ class RecSom:
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
-            cumulated_quantization_error.append(quantization_error)
+            quantizations_errors.append(quantization_error)
+            memory_spans.append(self.calculate_memory_span_of_net())
 
             average_amount_of_adjustments = 0
             for delta in adjustment_deltas:
@@ -130,33 +139,58 @@ class RecSom:
             print(self.columns_count)
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
+
+            # receptive field
+            self.create_receptive_field()
+            print("Receptive field")
+            print(np.matrix(self.receptive_field))
+
+
             if trace and ((ep + 1) % trace_interval == 0):
-                (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
+                (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                plot_errors('Quantization error', cumulated_quantization_error, block=False)
-                plot_errors('Adjustments changes', adjustments, block=False)
+                # plot_errors('Quantization error', cumulated_quantization_error, block=False)
+                # plot_errors('Adjustments changes', adjustments, block=False)
+                # plot_errors('Memory spans over time', memory_spans, block=False)
+                # plot_receptive_field(self.receptive_field)
 
         if trace:
             ioff()
 
-    def calculate_memory_span_of_net(self):
+    def create_receptive_field(self):
         lcs = LongestCommonSubsequence()
-        sum_of_weighted_lcs = 0
+        # creates empty receptive field
+        self.receptive_field = [['' for x in range(self.rows_count)] for y in range(self.columns_count)]
 
         for i in range(self.rows_count):
             for j in range(self.columns_count):
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
-                # sequences = self.memory_window[i][j]
                 if not sequences:
                     continue
-                longest_common_subsequence_length = lcs.get_longest_subsequence_length(sequences)
-                print(longest_common_subsequence_length)
+                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                self.receptive_field[i][j] = longest_common_subsequence
+
+    def calculate_memory_span_of_net(self):
+        longest_common_subsecquence = LongestCommonSubsequence()
+        sum_of_weighted_lcs = 0
+        sum_of_weigths = 0
+
+        for i in range(self.rows_count):
+            for j in range(self.columns_count):
+                sequences = list(filter(str.strip, self.memory_window[i][j]))
+                if not sequences:
+                    continue
+                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
                 if longest_common_subsequence_length == 0:
                     continue
                 weight = len(sequences) / longest_common_subsequence_length
+                print(len(sequences))
+                print(longest_common_subsequence_length)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
+                sum_of_weigths += weight
 
-        memory_span = sum_of_weighted_lcs / (self.rows_count * self.columns_count)
-        return memory_span
+        if sum_of_weigths == 0:
+            return sum_of_weighted_lcs
+        return sum_of_weighted_lcs / sum_of_weigths
 
