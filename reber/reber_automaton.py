@@ -28,3 +28,13 @@ class ReberAutomaton:
                   [{-1: 'E'}]]
         return states
 
+    def _generate_reber_strings(self, number_of_strings):
+        generated_string = ''
+        for i in range(number_of_strings):
+            generated_string += self.generate_reber_string() + ' '
+        return generated_string
+
+    def generate_reber_strings_dataset(self, number_of_strings):
+        generated_reber_string = self._generate_reber_strings(number_of_strings)
+        with open('data/sequences/reber_strings', 'w') as file:
+            file.write(generated_reber_string)
