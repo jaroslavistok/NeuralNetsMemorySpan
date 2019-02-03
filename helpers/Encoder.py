@@ -20,3 +20,10 @@ class Encoder:
     def decode_character(encoded_character):
         index = encoded_character.tolist().index(1)
         return Encoder.alphabet[index]
+
+    @staticmethod
+    def transform_input(input_string):
+        transformed_input = []
+        for character in input_string:
+            transformed_input.append(Encoder.encode_character(character))
+        return np.array(transformed_input)
