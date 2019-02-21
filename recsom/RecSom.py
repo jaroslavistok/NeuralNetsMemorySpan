@@ -8,7 +8,6 @@ from plotting_helpers.plot_utils import *
 class RecSom:
     def __init__(self, input_dimension, rows_count, columns_count):
         self.input_dimension = input_dimension
-
         self.rows_count = rows_count
         self.columns_count = columns_count
 
@@ -49,9 +48,8 @@ class RecSom:
         return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=20):
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
 
-        # (_, count) = inputs.shape
         count = len(inputs)
 
         if trace:
@@ -62,7 +60,6 @@ class RecSom:
         quantizations_errors = []
         memory_spans = []
         adjustments = []
-
 
         for ep in range(eps):
             self.memory_window = [[[] for x in range(self.columns_count)] for y in
@@ -125,7 +122,6 @@ class RecSom:
 
             quantizations_errors.append(quantization_error)
             memory_spans.append(self.calculate_memory_span_of_net())
-
             average_amount_of_adjustments = 0
             for delta in adjustment_deltas:
                 average_amount_of_adjustments += np.linalg.norm(np.array(delta))
