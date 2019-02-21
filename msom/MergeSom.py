@@ -12,16 +12,23 @@ class MergeSom:
         self.columns_count = columns_count
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
+        # weight vectors
         self.weights = np.random.randn(rows_count, columns_count, input_dimension)
-
         self.context_weights = np.random.randn(rows_count, columns_count, input_dimension)
 
+        # context
         self.previous_winner_context = np.zeros(self.input_dimension)
         self.previous_winner_weights = np.zeros(self.input_dimension)
 
+        self.previous_step_activities = np.zeros(self.number_of_neurons_in_map)
+        self.current_step_activities = np.array([])
+
+        self.memory_window = []
+        self.receptive_field = []
+
         # meta parameters
-        self.beta = 0.5
-        self.alpha = 0.5
+        self.beta = 0.8
+        self.alpha = 0.2
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -42,22 +49,19 @@ class MergeSom:
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
               lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
-
         count = len(inputs)
-
         if trace:
             ion()
-            (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
+            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
             redraw()
 
-        cumulated_quantization_error = []
+        quantization_errors = []
+        memory_spans = []
         adjustments = []
 
         for ep in range(eps):
-
             self.memory_window = [[['' for x in range(count)] for x in range(self.columns_count)] for y in
                                   range(self.rows_count)]
-
             alpha_t = alpha_s * (alpha_f / alpha_s) ** ((ep - 1) / (eps - 1))
             lambda_t = lambda_s * (lambda_f / lambda_s) ** ((ep - 1) / (eps - 1))
 
@@ -71,17 +75,12 @@ class MergeSom:
 
             for i in range(count):
                 x = Encoder.encode_character(inputs[i])
-
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
-
                 window_size = i - sliding_window_size
                 if window_size < 0:
                     window_size = 0
-
-                self.memory_window[winner_row][winner_column][i] = inputs[window_size:i]
-                print(self.memory_window[winner_row][winner_column][i])
-
+                self.memory_window[winner_row][winner_column].append(inputs[window_size:i])
                 if np.count_nonzero(self.previous_winner_context) == 0:
                     context = np.zeros(self.input_dimension)
                 else:
@@ -90,10 +89,9 @@ class MergeSom:
                 self.previous_winner_weights = self.weights[winner_row][winner_column]
                 self.previous_winner_context = context
 
-
                 # quantization error.
                 sum_of_distances += (1 - self.beta) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
-                                    self.beta * np.linalg.norm(context - self.context_weights[winner_row][winner_column])
+                                        self.beta * np.linalg.norm(context - self.context_weights[winner_row][winner_column])
 
                 winner_position = np.array([winner_row, winner_column])
                 for row_index in range(self.rows_count):
@@ -112,8 +110,7 @@ class MergeSom:
 
                         current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = alpha_t * (
-                                self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
@@ -123,7 +120,8 @@ class MergeSom:
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
-            cumulated_quantization_error.append(quantization_error)
+            quantization_errors.append(quantization_error)
+            memory_spans.append(self.calculate_memory_span_of_net())
 
             average_amount_of_adjustments = 0
             for delta in adjustment_deltas:
@@ -136,31 +134,56 @@ class MergeSom:
             print("Quantization error: {}".format(quantization_error))
             print(self.rows_count)
             print(self.columns_count)
+            print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
+
+            # receptive field
+            self.create_receptive_field()
+            print("Receptive field")
+            print(np.matrix(self.receptive_field))
 
             if trace and ((ep + 1) % trace_interval == 0):
-                (plot_grid_3d if in3d else plot_grid_2d)(inputs, self.weights, block=False)
+                (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                plot_errors('Quantization error', cumulated_quantization_error, block=False)
+                plot_errors('Quantization error', quantization_error, block=False)
                 plot_errors('Adjustments changes', adjustments, block=False)
 
         if trace:
             ioff()
 
-        def calculate_memory_span_of_net(self):
-            lcs = LongestCommonSubsequence()
-            sum_of_weighted_lcs = 0
+    def calculate_memory_span_of_net(self):
+        longest_common_subsecquence = LongestCommonSubsequence()
+        sum_of_weighted_lcs = 0
+        sum_of_weigths = 0
 
-            for i in range(self.rows_count):
-                for j in range(self.columns_count):
-                    sequences = list(filter(str.strip, self.memory_window[i][j]))
-                    if not sequences:
-                        continue
-                    longest_common_subsequence_length = lcs.get_longest_subsequence_length(sequences)
-                    if longest_common_subsequence_length == 0:
-                        continue
-                    weight = len(sequences) / longest_common_subsequence_length
-                    longest_common_subsequence_length *= weight
-                    sum_of_weighted_lcs += longest_common_subsequence_length
+        for i in range(self.rows_count):
+            for j in range(self.columns_count):
+                sequences = list(filter(str.strip, self.memory_window[i][j]))
+                if not sequences:
+                    continue
+                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(
+                    sequences)
+                if longest_common_subsequence_length == 0:
+                    continue
+                weight = len(sequences) / longest_common_subsequence_length
+                print(len(sequences))
+                print(longest_common_subsequence_length)
+                longest_common_subsequence_length *= weight
+                sum_of_weighted_lcs += longest_common_subsequence_length
+                sum_of_weigths += weight
 
-            memory_span = sum_of_weighted_lcs / (self.rows_count * self.columns_count)
-            return memory_span
+        if sum_of_weigths == 0:
+            return sum_of_weighted_lcs
+        return sum_of_weighted_lcs / sum_of_weigths
+
+    def create_receptive_field(self):
+        lcs = LongestCommonSubsequence()
+        # creates empty receptive field
+        self.receptive_field = [['' for x in range(self.rows_count)] for y in range(self.columns_count)]
+
+        for i in range(self.rows_count):
+            for j in range(self.columns_count):
+                sequences = list(filter(str.strip, self.memory_window[i][j]))
+                if not sequences:
+                    continue
+                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                self.receptive_field[i][j] = longest_common_subsequence

@@ -1,66 +1,24 @@
+from helpers.DataLoader import DataLoader
 from msom.MergeSom import MergeSom
 from plotting_helpers.plot_utils import *
+from helpers.norms import *
 
-def L1_norm(X, Y):
-    return np.abs(X[0] - X[1]) + np.abs(Y[0] - Y[1])
-
-
-def L2_norm(X, Y):
-    return ((X[0] - X[1]) ** 2 + (Y[0] - Y[1]) ** 2) ** .5
-
-
-def Lmax_norm(X, Y):
-    return max(abs(X[0] - X[1]), abs(Y[0] - Y[1]))
-
-
-## load data
-
-# skewed square
-# inputs = np.random.rand(2, 100)
-# inputs[1,:] += 0.5 * inputs[0,:]
-
-# # circle
-# inputs = 2*np.random.rand(2, 100) - 1
-# inputs = inputs[:,np.abs(np.linalg.norm(inputs, axis=0)) < 1]
-
-# # first two features of iris
-# inputs = np.loadtxt('data/iris.dat').T[:3]
-
-# inputs = np.loadtxt('../data/seeds_dataset.txt').T[:7]
-# print(inputs.shape)
-# print(inputs)
-
-
-# # first three features of iris
-# inputs = np.loadtxt('data/iris.dat').T[:2]
-
-# # all features of iris
-# inputs = np.loadtxt('data/iris.dat').T
-
-# (dim, count) = inputs.shape
-
-# number of letter in alphabet
-
-
-# inputs for training merge som
-lorem_ipsum_training_example = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 dim = 26
-
-## train model
-rows = 20
-cols = 15
-
-metric = L2_norm
+rows = 5
+cols = 5
+metric = euclidean_distance
 
 top_left = np.array((0, 0))
 bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
+train_data = DataLoader.load_data('simple_sequences')
+
 model = MergeSom(dim, rows, cols)
-model.train(lorem_ipsum_training_example, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=50, in3d=False, trace=False, trace_interval=20)
+model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
+            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=5, sliding_window_size=5)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())
