@@ -1,0 +1,46 @@
+Text anglickeho textu nie je nahodny
+Ked sa opakuju slova, tak si siet vytvori reprezentaciu slov.. a tam sa siet moze naucit nejkau postupnost
+Skusit vytvorit aj cisto nahdony text ako benchmark.. ze co to spravi.
+
+
+
+Sliding window ma zmysel zvysovat iba do urcitej velkosti (pokym hlbka pamatae rastie)
+Vykreslenie receptive field.
+
+Alpha potobeta parametre (vykreslenie senzitivity na parametre)
+Vykreslit si graf pamatovych hlbok pre rozne kombinacie hodnot tychto zmiesavacich parametrov
+Zacat mapovanim po 0.1, m neskor po 0.01
+
+Najskor treba najst pre kazdu architekturu najlepsie parametre a potom uz budeme
+porovnavat jednotlive siete na zaklade tychto parametrov. + ake moze byt zlepsenie.
+Pochopit od coho zavisi hlbka pamate a ako ju zlepsit.
+Potom zistit, ci v msomke je nejaky rozdiel medzi jednotlivymi implementaciami
+
+Vytvorit folder, kde budu vziaulizacie a ten nazdielat potom skolitelovi.
+
+----
+Hlbka pamate pri elmanovej sieti:
+Podobne ako v somke viem zobrazit na ktory neuron sa zobrazi aka cast podpostupnosti
+Pri elmanovej sieti mame contextovu vrstvu.
+
+Reberove stringy
+Netrenovali vahy, iba sa pozerali ako sa vstupy s kontextom zobrazuju na skrytu vrstvu
+Vytvoril sa "frakrtal" toho, ako sa zobrazuju jednotlive pismena vzhladom na kontext.
+Prilis blizke vzstupy nevieme rozlisit.. pri trenovani sa ich snazime "oddialit" v hyperkocke.
+SRN si vie vytvorit stavovy automat vo svojom stavovom priestore na skrytej vrstve.
+Vie si reberov automat vytvorit vo skrytej vrstve.. preto sa ho vie naucit 100%.
+Aktivita neuronu je pravdepodobnost: o_i = p () je nejaka pravdepodobnost.
+Rozdelenie pravdepodobnosti.
+Potom sa moze siet pouzit ako generator textu. (podla nejakeho romanu napriklad)
+
+Skryta vrstva z predosleho kroku = kontext
+
+Decaying context v msomke.
+ Beriem vstup a C z predchadzajuceho kroku a nie vahy
+ rekurzivna zabalena reprezentacia vsetkych predchadzaucich krokov
+
+ Nezavisi od trenovania, nezavisi od toho co sme sa naucili
+
+
+
+
