@@ -6,7 +6,7 @@ from plotting_helpers.plot_utils import *
 
 
 class MergeSom:
-    def __init__(self, input_dimension, rows_count, columns_count, inputs=None):
+    def __init__(self, input_dimension, rows_count, columns_count, alpha=0.5, beta=0.5):
         self.input_dimension = input_dimension
         self.rows_count = rows_count
         self.columns_count = columns_count
@@ -27,8 +27,8 @@ class MergeSom:
         self.receptive_field = []
 
         # meta parameters
-        self.beta = 0.8
-        self.alpha = 0.2
+        self.beta = beta
+        self.alpha = alpha
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -48,7 +48,7 @@ class MergeSom:
         return winner_row, winner_column
 
     def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3):
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3, log=True, log_file_name=''):
         count = len(inputs)
         if trace:
             ion()
@@ -140,6 +140,18 @@ class MergeSom:
             self.create_receptive_field()
             print("Receptive field")
             print(np.matrix(self.receptive_field))
+
+            with open(log_file_name, 'w') as file:
+                file.write('Aplha: {}'.format(self.alpha))
+                file.write('Beta: {}'.format(self.beta))
+                file.write('Epoch {}'.format(ep))
+                file.write('\n')
+                file.write('Quantization error: {}'.format(quantization_error))
+                file.write('\n')
+                file.write('Memory span: {}'.format(self.calculate_memory_span_of_net()))
+                file.write('\n')
+                file.write(str(np.matrix(self.receptive_field)))
+                file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)

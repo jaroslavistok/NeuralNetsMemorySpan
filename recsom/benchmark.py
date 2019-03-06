@@ -20,10 +20,15 @@ lambda_s = metric(top_left, bottom_right) * 0.5
 
 train_data = DataLoader.load_data('simple_sequences')
 
-model = RecSom(dim, rows, cols)
-model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=100, in3d=False, trace=False, trace_interval=5, sliding_window_size=5,
-            log=True)
+values1 = [x*.1 for x in range(1, 11)]
+values2 = [x*.1 for x in range(1, 11)]
+for alpha in values1:
+    for beta in values2:
+        log_file_name = 'log_{}_{}.log'.format(alpha, beta);
+        model = RecSom(dim, rows, cols, alpha, beta)
+        model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
+                    lambda_f=1, eps=100, in3d=False, trace=False, trace_interval=5, sliding_window_size=5, log=True,
+                    log_file_name=log_file_name)
 
 
 # print(model.distances_between_adjacent_neurons_horizontal())
