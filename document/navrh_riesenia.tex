@@ -1,4 +1,5 @@
 \chapter{Návrh riešenia}
+
 \section{Meranie hĺbky pamäte samorganizujúcich sa máp}
 Ako trénovaciu množinu budem používať sekvenciu písmen abecedy (26 písmen) zostavenú nenáhodným spôsobom (napr. tvoriacu anglické slová z nejakého korpusu).
 Vstupmi (trénovacie príklady) pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
@@ -33,6 +34,24 @@ Druhou sadou budú slová generované Reberovým automatom.
 Treťou sadou trénovacích príkladov budú najzložitejšie sekvencie, resp. náhodný text s
 veľkým množstvom rôznych písmen. Túto sadu budem používať ako performance benchmark. 
 
-Slova generovane Reberovou grmaatikou
+\section{mSOM s leaky integration contextom}
+Pre potreby testovania pamäťovej hĺbky sme si vytvorili modifikovanú verziu mSOM, ktorá používa iný kontext.
+V pôvodnej mSOM bol kontext tvorený vlastnosťami víťazného neurónu z predchádzajúceho kroku.
+V našej modifikovanej verzii mSOM budú kontext tvoriť samotné vstupné vektory z predchádzajúcich krokov.
+Všetko ostatné zostane rovnaké ako v pôvodnej mSOM.
+
+Samotný kontext budem počítať pomocou nasledujúceho rekurzívneho vzťahu:
+\begin{equation}
+	c = \beta^{0} \cdot x_{t} + \beta^{1} \cdot x_{t-1} + 
+	\beta^{2} \cdot x_{t-2}....
+\end{equation}
+
+$\beta$ parameter je číslo $\beta < 1$
+
+Tým zabezpečím, že kontext bude tvorený nejakou lineárnou kombináciou 
+predchádzajúcich vstupov a čím ďalej idem do minulosti, tým majú tieto vstupy 
+menšiu váhu (vďaka umocňovaniu beta parametra). 
+
+
 
 
