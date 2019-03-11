@@ -1,0 +1,10 @@
+Graf pamatovych hlbok v zavislosti od hodnot alpha a beta parametrov.
+
+Na x-ovej osy budu alphy
+Na y-ovej osy budu bety
+Na z-ovej osy budu pamatove hlbky
+
+Potrebujem subor kde budu v kazdom riadku
+vysledky pre jednu kombinaciu parametrov.
+
+alpha beta pamatova_hlbka

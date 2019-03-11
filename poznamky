@@ -2,10 +2,8 @@ Text anglickeho textu nie je nahodny
 Ked sa opakuju slova, tak si siet vytvori reprezentaciu slov.. a tam sa siet moze naucit nejkau postupnost
 Skusit vytvorit aj cisto nahdony text ako benchmark.. ze co to spravi.
 
-
-
 Sliding window ma zmysel zvysovat iba do urcitej velkosti (pokym hlbka pamatae rastie)
-Vykreslenie receptive field.
+Vykreslenie - field.
 
 Alpha potobeta parametre (vykreslenie senzitivity na parametre)
 Vykreslit si graf pamatovych hlbok pre rozne kombinacie hodnot tychto zmiesavacich parametrov
