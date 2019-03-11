@@ -141,17 +141,22 @@ class MergeSom:
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-            with open(log_file_name, 'w') as file:
-                file.write('Aplha: {}'.format(self.alpha))
-                file.write('Beta: {}'.format(self.beta))
-                file.write('Epoch {}'.format(ep))
+            with open('merge_som.log', 'a') as file:
+                file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                             round(self.calculate_memory_span_of_net(), 2)))
                 file.write('\n')
-                file.write('Quantization error: {}'.format(quantization_error))
-                file.write('\n')
-                file.write('Memory span: {}'.format(self.calculate_memory_span_of_net()))
-                file.write('\n')
-                file.write(str(np.matrix(self.receptive_field)))
-                file.write('\n')
+
+            # with open(log_file_name, 'w') as file:
+            #     file.write('Aplha: {}'.format(self.alpha))
+            #     file.write('Beta: {}'.format(self.beta))
+            #     file.write('Epoch {}'.format(ep))
+            #     file.write('\n')
+            #     file.write('Quantization error: {}'.format(quantization_error))
+            #     file.write('\n')
+            #     file.write('Memory span: {}'.format(self.calculate_memory_span_of_net()))
+            #     file.write('\n')
+            #     file.write(str(np.matrix(self.receptive_field)))
+            #     file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)

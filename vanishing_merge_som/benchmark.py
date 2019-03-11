@@ -1,13 +1,12 @@
 import sys
 sys.path.append('/home/jaro/school/memory_span')
+from vanishing_merge_som.VanishingMergeSom import VanishingMergeSom
 
 from msom.MergeSom import MergeSom
 from helpers.DataLoader import DataLoader
 from recsom.RecSom import RecSom
 from plotting_helpers.plot_utils import *
 from helpers.norms import *
-
-
 
 dim = 26
 rows = 5
@@ -26,7 +25,7 @@ values2 = [x*.1 for x in range(1, 11)]
 for alpha in values1:
     for beta in values2:
         log_file_name = 'log_{}_{}.log'.format(alpha, beta);
-        model = MergeSom(dim, rows, cols, alpha, beta)
+        model = VanishingMergeSom(dim, rows, cols, alpha, beta)
         model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
                     lambda_f=1, eps=100, in3d=False, trace=False, trace_interval=5, sliding_window_size=5, log=True,
                     log_file_name=log_file_name)
