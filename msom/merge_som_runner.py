@@ -5,8 +5,8 @@ from helpers.norms import *
 
 
 dim = 26
-rows = 5
-cols = 5
+rows = 10
+cols = 10
 metric = euclidean_distance
 
 top_left = np.array((0, 0))
@@ -14,11 +14,11 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-train_data = DataLoader.load_data('simple_sequences')
+train_data = DataLoader.load_data('rft')
 
 model = MergeSom(dim, rows, cols)
-model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=5, sliding_window_size=5)
+model.train(train_data, discrete=False, metric=metric, alpha_s=0.6, alpha_f=0.001, lambda_s=lambda_s,
+            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=1, sliding_window_size=30)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())

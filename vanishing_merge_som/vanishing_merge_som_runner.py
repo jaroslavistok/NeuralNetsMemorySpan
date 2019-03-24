@@ -15,8 +15,8 @@ lambda_s = metric(top_left, bottom_right) * 0.5
 train_data = DataLoader.load_data('simple_sequences')
 
 model = VanishingMergeSom(dim, rows, cols)
-model.train(train_data, discrete=False, metric=metric, alpha_s=0.7, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=5, sliding_window_size=5)
+model.train(train_data, discrete=False, metric=metric, alpha_s=0.01, alpha_f=0.001, lambda_s=lambda_s,
+            lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=1, sliding_window_size=30)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())

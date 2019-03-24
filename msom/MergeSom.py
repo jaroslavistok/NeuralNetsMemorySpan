@@ -6,7 +6,7 @@ from plotting_helpers.plot_utils import *
 
 
 class MergeSom:
-    def __init__(self, input_dimension, rows_count, columns_count, alpha=0.5, beta=0.5):
+    def __init__(self, input_dimension, rows_count, columns_count, alpha=0.3, beta=0.5):
         self.input_dimension = input_dimension
         self.rows_count = rows_count
         self.columns_count = columns_count
@@ -29,6 +29,10 @@ class MergeSom:
         # meta parameters
         self.beta = beta
         self.alpha = alpha
+
+        self.learning_rate = 0.8
+
+        self.sliding_window_size = 30
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -73,18 +77,19 @@ class MergeSom:
             last_adjustment = 0
             adjustment_deltas = []
 
-            for i in range(count):
+            for i in range(sliding_window_size, count):
                 x = Encoder.encode_character(inputs[i])
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
-                window_size = i - sliding_window_size
-                if window_size < 0:
-                    window_size = 0
-                self.memory_window[winner_row][winner_column].append(inputs[window_size:i])
+
+                self.memory_window[winner_row][winner_column].append(inputs[i - sliding_window_size:i])
+                self.sliding_window_size = sliding_window_size
+
                 if np.count_nonzero(self.previous_winner_context) == 0:
-                    context = np.zeros(self.input_dimension)
+                    # context = np.zeros(self.input_dimension)
+                    context = np.random.rand(self.input_dimension)
                 else:
-                    context = (1 - self.alpha) * self.previous_winner_weights + self.alpha * self.previous_winner_context
+                    context = ((1 - self.alpha) * self.previous_winner_weights) + (self.alpha * self.previous_winner_context)
 
                 self.previous_winner_weights = self.weights[winner_row][winner_column]
                 self.previous_winner_context = context
@@ -108,9 +113,9 @@ class MergeSom:
                             argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                             h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = self.learning_rate * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = self.learning_rate * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
@@ -130,10 +135,7 @@ class MergeSom:
             adjustments.append(average_amount_of_adjustments)
 
             print("adjustments: {}".format(adjustments))
-
             print("Quantization error: {}".format(quantization_error))
-            print(self.rows_count)
-            print(self.columns_count)
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
@@ -141,11 +143,13 @@ class MergeSom:
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-            with open('merge_som.log', 'a') as file:
-                file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
-                                             round(self.calculate_memory_span_of_net(), 2)))
-                file.write('\n')
-
+            """
+            if ep == eps - 1:
+                with open('merge_som_benchmark.csv', 'a') as file:
+                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                 round(self.calculate_memory_span_of_net(), 2)))
+                    file.write('\n')
+            """
             # with open(log_file_name, 'w') as file:
             #     file.write('Aplha: {}'.format(self.alpha))
             #     file.write('Beta: {}'.format(self.beta))
@@ -181,9 +185,7 @@ class MergeSom:
                     sequences)
                 if longest_common_subsequence_length == 0:
                     continue
-                weight = len(sequences) / longest_common_subsequence_length
-                print(len(sequences))
-                print(longest_common_subsequence_length)
+                weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
                 sum_of_weigths += weight

@@ -30,6 +30,10 @@ class VanishingMergeSom:
         self.beta = beta
         self.alpha = alpha
 
+        self.learning_rate = 0.4
+        self.sliding_window_size = 0
+
+
     def find_winner_for_given_input(self, x):
         winner_row = -1
         winner_column = -1
@@ -81,22 +85,11 @@ class VanishingMergeSom:
 
                 # find a winner
                 winner_row, winner_column = self.find_winner_for_given_input(x)
-                window_size = i - sliding_window_size
-                if window_size < 0:
-                    window_size = 0
-                self.memory_window[winner_row][winner_column].append(inputs[window_size:i])
+                self.memory_window[winner_row][winner_column].append(inputs[i - sliding_window_size:i])
+                self.sliding_window_size = sliding_window_size
 
                 beta = 0.5
                 context = self.calculate_context(beta, inputs_history, i+1)
-
-                """
-                if np.count_nonzero(self.previous_winner_context) == 0:
-                    context = np.zeros(self.input_dimension)
-                else:
-                    context
-                    # TODO Upravit tak aby sa pocital kontext po novom
-                    context = (1 - self.alpha) * self.previous_winner_weights + self.alpha * self.previous_winner_context
-                """
 
                 self.previous_winner_weights = self.weights[winner_row][winner_column]
                 self.previous_winner_context = context
@@ -120,9 +113,9 @@ class VanishingMergeSom:
                             argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                             h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = self.learning_rate * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = self.learning_rate * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
@@ -142,10 +135,7 @@ class VanishingMergeSom:
             adjustments.append(average_amount_of_adjustments)
 
             print("adjustments: {}".format(adjustments))
-
             print("Quantization error: {}".format(quantization_error))
-            print(self.rows_count)
-            print(self.columns_count)
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
@@ -153,9 +143,7 @@ class VanishingMergeSom:
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-            with open('vanishing_msom.log', 'a') as file:
-                file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2), round(self.calculate_memory_span_of_net(), 2)))
-                file.write('\n')
+
 
             # if (log):
             #     with open(log_file_name, 'w') as file:
@@ -169,6 +157,14 @@ class VanishingMergeSom:
             #         file.write('\n')
             #         file.write(str(np.matrix(self.receptive_field)))
             #         file.write('\n')
+
+            """
+            if ep == eps - 1:
+                with open('vanishing_msom_benchmark.csv', 'a') as file:
+                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                 round(self.calculate_memory_span_of_net(), 2)))
+                    file.write('\n')
+            """
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
@@ -199,9 +195,7 @@ class VanishingMergeSom:
                     sequences)
                 if longest_common_subsequence_length == 0:
                     continue
-                weight = len(sequences) / longest_common_subsequence_length
-                print(len(sequences))
-                print(longest_common_subsequence_length)
+                weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
                 sum_of_weigths += weight
