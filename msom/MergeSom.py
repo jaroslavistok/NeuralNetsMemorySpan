@@ -62,6 +62,7 @@ class MergeSom:
         quantization_errors = []
         memory_spans = []
         adjustments = []
+        sum_of_memory_spans = 0
 
         for ep in range(eps):
             self.memory_window = [[['' for x in range(count)] for x in range(self.columns_count)] for y in
@@ -143,13 +144,15 @@ class MergeSom:
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-            """
-            if ep == eps - 1:
-                with open('merge_som_benchmark.csv', 'a') as file:
-                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
-                                                 round(self.calculate_memory_span_of_net(), 2)))
-                    file.write('\n')
-            """
+            sum_of_memory_spans += self.calculate_memory_span_of_net()
+
+            if log:
+                if ep == eps - 1:
+                    with open('merge_som_benchmark.csv', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                     round(sum_of_memory_spans / eps, 2)))
+                        file.write('\n')
+
             # with open(log_file_name, 'w') as file:
             #     file.write('Aplha: {}'.format(self.alpha))
             #     file.write('Beta: {}'.format(self.beta))

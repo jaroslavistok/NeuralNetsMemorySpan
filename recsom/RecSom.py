@@ -11,6 +11,8 @@ class RecSom:
         self.rows_count = rows_count
         self.columns_count = columns_count
 
+        # self.logger = Logger('recsom_log')
+
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
         # weights vectors
@@ -27,9 +29,9 @@ class RecSom:
         self.alpha = alpha
         self.beta = beta
 
-        self.sliding_window_size = 0
+        self.sliding_window_size = 30
 
-        self.learning_rate = 0.5
+        self.learning_rate = 0.4
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -66,6 +68,8 @@ class RecSom:
         quantizations_errors = []
         memory_spans = []
         adjustments = []
+
+        sum_of_memory_spans = 0
 
         for ep in range(eps):
             self.memory_window = [[[] for x in range(self.columns_count)] for y in
@@ -163,12 +167,14 @@ class RecSom:
             #     file.write(str(np.matrix(self.receptive_field)))
             #     file.write('\n')
 
-            """
-            if ep == eps - 1:
-                with open('rec_som_benchmark.csv', 'a') as file:
-                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2), round(self.calculate_memory_span_of_net(), 2)))
-                    file.write('\n')
-            """
+            sum_of_memory_spans += self.calculate_memory_span_of_net()
+
+            if log:
+                if ep == eps - 1:
+                    with open('rec_som_benchmark.csv', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2), round(sum_of_memory_spans / eps, 2)))
+                        file.write('\n')
+
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
