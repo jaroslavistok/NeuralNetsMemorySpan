@@ -3,26 +3,30 @@
 \section{Motivácia}
 V strojovom učení nastávajú situácie, kedy potrebujeme predikovať výsledok nie len na 
 základe aktuálneho vstupu, 
-ale aj na základe historického kontextu. Kontextom sú väčšinou stavy modelu z minulých krokov.
-Príkladom takejto úlohy môže byť spracovanie tzv. časových radov či generovanie postupností.
+ale aj na základe historického kontextu. 
+Kontext je väčšinou reprezentovaný stavmi modelu z minulých krokov alebo kombináciou predchádzajúcich vstupov.
+Príkladom takejto úlohy môže byť spracovanie tzv. časových radov či generovanie postupností znakov.
 Predstavme si úlohu, v ktorej chceme model strojového učenia naučiť predikovať ďalšie písmeno v určitom slove. 
 Ako príklad si môžeme zobrať slovo \uv{Bratislava}. 
-Trénovanie modelu strojového učenia bez využitia kontextu by mohlo prebiehať napríklad takto:
-Trénovaciou množinu by tvorili písmená daného slova kde očakávanou hodnotou pre nejaké písmeno by bolo ďalšie písmeno, ktoré za ním v slove nasleduje.
+Trénovanie modelu strojového učenia bez využitia historického kontextu by mohlo prebiehať napríklad takto:
+Trénovaciou množinu by tvorili písmená daného slova, kde očakávanou hodnotou pre nejaké písmeno by bolo ďalšie písmeno, ktoré za ním v slove nasleduje.
 Čiže pre písmeno \uv{B} poviem, že očakávame \uv{r} a takto pokračujem ďalej cez všetky písmená v slove.
 
 Problém nastane pri druhom písmene \uv{a} v slove Bratislava. Pri prvom výskyte písmena \uv{a} sme modelu tvrdili, že očakávam písmeno \uv{t} a 
 pri druhom výskyte písmena \uv{a} tvrdíme, že očakávame \uv{v}. 
-Tento prípad sa model, ktorý nevyužíva žiadny historický kontext, nevie naučiť, pretože nemá žiadnu pamäť (okno do minulosti).
+Tento prípad sa model, ktorý nevyužíva žiadny historický kontext, nevie naučiť, pretože nemá žiadnu "pamäť" (okno do minulosti). 
+Historický kontext umožňuje modelom strojového učenia pracovať s pamäťou.
 
-V mojej práci sa budem zaoberať jedným z~modelov strojového učenia, ktorý pracuje s kontextom: rekurentnými neurónovými sieťami viacerých typov a budem merať ich 
-pamäťovú hĺbku. Pamäťová hĺbka neurónovej siete vo všeobecnosti vyjadruje to, s akým dlhým kontextom do minulosti dokáže pracovať.
+V mojej práci sa budem zaoberať jedným z modelov strojového učenia, ktorý pracuje s kontextom: rekurentnými neurónovými sieťami viacerých typov pričom
+budem merať ich pamäťovú hĺbku. 
+Pamäťová hĺbka neurónovej siete vo všeobecnosti vyjadruje to, s akým dlhým kontextom do minulosti dokáže pracovať.
 
-Konkrétne pôjde o nasledujúcim tri typy rekurentných neurónových sietí:
+Konkrétne pôjde o nasledujúcim štyri typy rekurentných neurónových sietí:
 \begin{itemize}
 	\item Elmanova sieť
 	\item RecSOM
 	\item MergeSOM
+	\item Leaky integration MergeSOM
 \end{itemize}
 
 \section{Úvod do neurónových sietí}
@@ -38,7 +42,7 @@ Výstup perceptrón vyjadruje rovnica:
 	y = f (\sum_{j=1}^{n+1} w_{i} x_{j}) \quad x_{n+1} = -1
 \end{equation}
 Funkcia $f$ sa nazýva aj aktivačná funkcia perceptrónu, ktorá môže byť spojitá alebo diskrétna. 
-Podľa toho, či je  aktivačná funkcia spojitá alebo diskrétna, rozlišujeme spojitý alebo diskrétny
+Podľa toho, či je aktivačná funkcia spojitá alebo diskrétna, rozlišujeme spojitý alebo diskrétny
 perceptrón.
 
 \begin{figure}[H]
@@ -58,7 +62,7 @@ f(net) = sign(net) =
 \]
 
 
-Aktivačná funkcia spojitého perceptrónu je sigmoida.
+Aktivačná funkcia spojitého perceptrónu môže byť napríklad sigmoida.
 \begin{equation}
 f(net) = \frac{1}{1 + \exp^{-net}}  
 \end{equation}
@@ -89,7 +93,6 @@ Pravidlo pre adaptáciu váh v spojitom perceptróne:
 \end{equation}
 
 Kde $p$ je index vzoru v trénovacej množine, $y$ je skutočný výstup a $d$ je požadovaný výstup.
-
 
 Perceptrón je veľmi jednoduchým modelom. 
 Nevieme ním vyriešiť celú škálu úloh. Napríklad dokáže klasifikovať 
@@ -454,9 +457,11 @@ Kontext mSOM vyjadríme vzťahom:
 $\beta$ je zlučovací parameter, ktorý určuje váhu kombinovaných vlastností
 víťazného neurónu z predchádzajúceho kroku. Typická hodnota tohto parametra
 počas trénovania je $\beta = 0.5$, čiže taká, aby obe zložky mali približne 
-rovnakú váhu. Kontextom pri mSOM je teda lineárna kombinácia váhového vektora a 
+rovnakú váhu. 
+Kedže vlastnosti víťazného neurónu sú reprezentované jeho váhovým vektorom, 
+kontextom pri mSOM je lineárna kombinácia váhového vektora víťazného neurónu a 
 kontextového vektora víťazného neurónu z predchádzajúceho kroku.
-Pravidlá pre zmenu váh a kontextových váh zostávajú rovnaké ako pri RecSom, resp. SOM. Líšia sa iba v kontexte.
+Pravidlá pre adaptáciu váh váhového vektora a kontextových váh zostávajú rovnaké ako pri RecSom, resp. SOM. Líšia sa iba v kontexte.
 \begin{equation}
 	w_i(t + 1) = w_i(t) + \alpha(t)h(i^*, i)[s(t) - w_i(t)]
 \end{equation}
@@ -465,9 +470,37 @@ Pravidlo pre zmenu kontextových váh:
 	c_i(t + 1) = c_i(t) + \alpha(t)h(i^*, i)[y(t - 1) - c_i(t)]
 \end{equation}
 
-Kontext pri mSOM obsahuje odlišné informácie ako pri RecSom.
-Na rozdiel od recSom, kde kontext tvorí vektor aktivít neurónov z predchádzajúceho kroku, pri
-mSOM je kontext tvorený iba lineárnou kombináciou vlastností víťazného neurónu z minulého kroku.
-Má však menšiu dimenziu (dimenziu vstupu), vďaka čomu je trénovanie mSOM rýchlejšie a teda je možné použiť 
-viacrozmerné mapy a viac epoch trénovania. Rozdielne typy kontextov a ich 
-vplyv na pamäťovú hĺbku rekurentných sietí je jedným z cieľov mojej diplomovej práce.
+Kontext pri štandartnej mSOM obsahuje odlišné informácie ako pri RecSom.
+Na rozdiel od RecSom, kde kontext tvorí vektor aktivít všetkých neurónov z predchádzajúceho kroku, pri
+mSOM je kontext tvorený iba lineárnou kombináciou vlastností víťazného neurónu z minulého kroku. Z toho vyplýva, že
+kontext v mSOM uchováva menšie množstvo informácii ako kontext v RecSOM.
+Má však značne menšiu dimenziu (dimenzia kontextu pri mSOM je rovnaká ako dimenzia vstupov),
+vďaka čomu je trénovanie mSOM rýchlejšie (výpočtovo menej náročné) a teda je možné experimentovať 
+s viacrozmernými mapami, vyskúšať viac epoch trénovania, alebo použiť väčšie trénovacie množiny.
+
+\subsection{Leaky integration mSOM}
+Pre potreby testovania pamäťovej hĺbky sme si vytvorili modifikovanú verziu mSOM, 
+ktorá používa odlišný kontext.
+Je to modfikovaná verzia mSOM, ktorej kontext je tvorený minulými vstupmi.
+V pôvodnej mSOM bol kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku.
+V našej modifikovanej verzii mSOM bude kontext tvoriť kombinácia všetkých vstupných vektorov z predchádzajúcich krokov.
+Zvyšné vlastnosti siete zostávajú rovnaké ako v pôvodnej mSOM. 
+
+Samotný kontext počítame pomocou nasledujúceho rekurzívneho vzťahu:
+\begin{equation}
+	c = \beta^{0} \cdot x_{t} + \beta^{1} \cdot x_{t-1} + 
+	\beta^{2} \cdot x_{t-2}....
+\end{equation}
+
+$\beta$ parameter je číslo z intervalu $\beta < 1 \wedge \beta > 0$ a
+$x_t, x_{t-1}, x_{t-2} ...$ sú vstupné vektory.
+
+Zo rekurzívneho vzťahu vyplýva, že kontext je tvorený kombináciou predchádzajúcich vstupov
+pričom čím dávnejší je vstup, tým menšiu váhu má v kontexte, čo je zabezpečené umocňovaním
+$\beta$ parametra. Toto sa nazýva v matematike leaky integration. V našom prípade
+to znamená, že dávne vstupy postupne strácajú na dôležitosti pričom sa stále sa podieľajú 
+na vytváraní výsledného kontextu.
+
+
+Rozdielne typy kontextov a ich vplyv na pamäťovú hĺbku rekurentných 
+umelých neurónových sietí je hlavným cieľom mojej diplomovej práce.

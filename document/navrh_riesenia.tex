@@ -1,36 +1,56 @@
 \chapter{Návrh riešenia}
 
-\section{Meranie hĺbky pamäte samorganizujúcich sa máp}
+\section{Metóda merania hĺbky pamäte samorganizujúcich sa máp}
 
 \subsection{Trénovacie dáta}
-Vstupné sekvencie teda pozostávajú zo sekvencie písmen anglickej abecedy (26 písmen).
-Čo budú mať tieto trénovacie množiny spoločné je, že sú tvorené/generované určitým nenáhodným spôsobom 
+Trénovacie sekvencie pozostávajú zo sekvencie písmen anglickej abecedy (26 písmen).
+Spoločnou vlasťnosťou týchto trénovacích množín je, že sú tvorené/generované určitým nenáhodným spôsobom (obsahujú napríklad opakujúce sa podsekvencie)
 a teda môžeme na nich natrénovať rekurentné neurónové siete. Inými slovami dokážu v nich 
-neurónové siete zachytiť nejakú vnútornú reprezentáciu.
-Samotné vstupy (trénovacie príklady) pre sieť budú zakódované jednotlivé písmená z trénovacej sekvencie.
-Písmená kódujem do 26 prvkového vektora, ktorého prvky budú nuly a jednotka (pre každé písmeno na unikátnej pozícii).
+neurónové siete zachytiť určité vzory správania.
+Samotné vstupy (trénovacie príklady) pre sieť sú zakódované jednotlivé písmená z trénovacej sekvencie.
+Keďže neurónové siete vedia pracovať iba s číselnými hodnotami, jednotlivé písmená zo 
+vstupnej sekvencie kódujeme počas trénovania do 26 prvkového vektora, 
+ktorého prvky sú nuly a jednotka (pre každé písmeno je jednotka na unikátnej pozícii).
+Napríklad písmeno A bude reprezentované vektorom
+$[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]$
+Tento spôsob reprezentácie vstupov pre sieť je jednoduchý a efektívny.
 
-\subsection{Spôsob uchovávania informácii s SOM}
+\subsection{Spôsob uchovávania informácii v SOM}
+Na to aby sme boli schopný odmerať pamäťovú hĺbku siete si potrebujeme pamätať v jednotlivých
+neurónoch informáciu o tom, pre ktoré vstupy bol daný neurón víťazom.
 Každý neurón bude mať množinu, v ktorej si bude pamätať pre aký vstup bol víťazom. 
-Nebude si však ukladať iba aktuálny vstup (aktuálne písmeno), 
-ale $k$ posledných písmen z trénovacej množiny - posuvné okno (ang. sliding window). 
+Nestačí však ukladať iba samotný vstup, pretože by sme stratili historický kontext pre daný vstup, 
+ktorý je dôležitý pri určovaní pamäťovej hĺbky. 
+Preto si nebudeme ukladať iba aktuálny vstup (aktuálne písmeno), 
+ale $k$ posledných písmen z trénovacej sekvencie. 
+Toto sa nazýva posuvné okno (ang. sliding window). 
 
-Z týchto dát si viem potom ďalej vytvoriť hitmapu, ktorá mi bude vizualizovať, na aké vstupy neuróny reagovali.
+Z týchto pamäťových okien si viem potom ďalej vygenerovať hitmapu, 
+ktorá mi bude vizualizovať, na aké vstupy (resp. okná) neuróny reagovali.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{assets/receptive_field}
-	\caption{Hitmapa}
+	\caption{Ukážka hitmapy}
 \end{figure}
 
-Mierou hĺbky pamäte mapy bude potom vážený priemer dĺžky najdlhších spoločných podpostupností písmen v množinách jednotlivých neurónov. Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, %s väčším počtom víťazov mali vyššiu váhu ako neuróny s menším počtom víťazov.
-ktoré zvíťazili pre viac vstupov, mali vyššiu váhu ako víťazné neuróny pre menší počet vstupov.
+Hĺbku pamäte pre konkrétny neurón v siete vypočítame ako vážený priemer dĺžky najdlhších spoločných 
+podpostupností písmen v množine okien vstupov neurónu.
+Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. 
+Pamäťovú hĺbku siete potom určím ako vážený priemer pamäťových hĺbok jednotlivých neurónov, kde váhami budú veľkosti
+množín.
+Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, 
+ktoré boli víťazmi pre väčší počet vstupov mali vyššiu váhu ako neuróny, ktoré boli víťazmi pre menší počet vstupov.
 Po každej trénovacej epoche (prechode trénovacou množinou) budem vedieť určiť pamäťovú hĺbku mapy.
-Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, ktoré uchovávajú informáciu z predchádzajúceho kroku,  môže sa stať, že rovnaké písmeno zo vstupu bude mať rôzne víťazné neuróny počas trénovania.
+Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, 
+ktoré uchovávajú informácie z predchádzajúcich krokov, môže sa stať, že rovnaké písmeno zo vstupu 
+bude mať rôzne víťazné neuróny počas trénovania.
 
-Samotná pamäťová hĺbka je relatívna a závisí od veľkosti posuvného okna.
+% do dalsej kapitoly
+
+Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna.
 Veľkosť posuvného okna má zmysel zvyšovať iba pokiaľ nám stúpa pamäťová hĺbka, inými
-slovami toto okno musí byť minimálne tak veľké ako je pamäťová hĺbka siete.
+slovami toto okno musí byť minimálne tak veľké ako je najdlhšia nájdená podpostupnosť v jednotlivých neurónoch.
 
 Počet neurónov v mape volíme podľa množstva rôznych slov v použitej trénovacej
 množine.
@@ -45,26 +65,6 @@ Napríklad sekvencie ako $aaabbb$,  $bbbaaaaa$.
 Druhou sadou budú slová generované Reberovým automatom.
 Treťou sadou trénovacích príkladov budú najzložitejšie sekvencie, resp. slová z určitého korpusu. 
 Túto sadu budem používať ako performance benchmark. 
-
-\section{mSOM s leaky integration contextom}
-Pre potreby testovania pamäťovej hĺbky sme si vytvorili modifikovanú verziu mSOM, ktorá používa iný kontext.
-V pôvodnej mSOM bol kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku.
-V našej modifikovanej verzii mSOM budú kontext tvoriť samotné vstupné vektory z predchádzajúcich krokov.
-
-Všetko ostatné zostane rovnaké ako v pôvodnej mSOM.
-Samotný kontext budem počítať pomocou nasledujúceho rekurzívneho vzťahu:
-\begin{equation}
-	c = \beta^{0} \cdot x_{t} + \beta^{1} \cdot x_{t-1} + 
-	\beta^{2} \cdot x_{t-2}....
-\end{equation}
-
-$\beta$ parameter je číslo $\beta < 1$
-nufka
-
-Tým zabezpečím, že kontext bude tvorený lineárnou kombináciou 
-predchádzajúcich vstupov a čím ďalej idem do minulosti, tým majú tieto vstupy 
-menšiu váhu (vďaka umocňovaniu beta parametra). Preto sme túto modifikovanú mSOM nazvali 
-mSOM s miznúcim kontextom (vanishing mSom).
 
 \section{Hľadanie ideálnych (hyper) parametrov}
 Ako prvý parameter potrebujem zoptimalizovať veľkosť posuvného okna, tak aby bol väčší ako
