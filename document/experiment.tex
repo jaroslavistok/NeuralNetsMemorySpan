@@ -1,1 +1,44 @@
+% podobne prace?
+
 \chapter{Experiment}
+Experimentom v našej práci je meranie hĺbky pamäte a vyhodnotenie vplyvu rôznych
+parametrov a typov kontextov na hĺbku pamäte. Súčasťou nášho experimentu je aj nájdenie 
+optimálnej kombinácie parametrov pre všetky typy porovnávaných sietí.
+
+\section{Hľadanie optimálnych parametrov sietí}
+Na to aby sme mohli porovnať hĺbku pamäte rôznych sietí sme museli nájsť kombináciu parametrov
+pri ktorých daný typ siete dosahujú najlepšie výsledky. 
+Pri trénovaní SOM môžeme meniť a optimalizovať veľké množstvo parametrov. 
+Experimentami sme zistili, že na hĺbku pamäte siete majú vplyv iba niektoré z nich. 
+Najdôležitejšie parametre, ktoré vplývajú na hĺbku pamäte neurónovej siete sú parametre $\alpha$ a $\beta$
+vo vzťahu pre výpočet vzdialenosti vstupného vektora od určitého neurónu v siete (čiže od jeho váhového a kontextového vektora).
+% TODO pridat rovnicu na ilustraciu
+Tieto dva parametre určujú pomer dôležitosti aktuálneho vstupu a dôležitosť kontextu, pri výpočte vzdialenosti (kvantizačnej chyby).
+
+Experiment prebiehal nasledujúcim spôsobom:
+\begin{itemize}
+    \item Vybrali sme vhodnú trénovaciu sekvenciu, počet epôch trénovania a dostatočnú veľkosť pamäťového okna
+    \item Spustili sme trénovanie na všetkých kombináciach týchto dvoch parametrov s krokom 0.1
+    \item Hodnoty pamäťovej hĺbky sme ukladali do súboru
+    \item Na záver sme vykreslili heatmapu, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
+\end{itemize}
+
+% TODO vyber rychlosti ucenia (konstantna / postupne zmensujuca?)
+
+Počet epôch sme určili na základe kvantizačnej chyby.
+Počet epôch sme postupne zvyšovali a keď kvantizačná chyba prestala signifikantne klesať, resp. dosiahla 
+svoje minimum zastavali sme ho na tejto hodnote a ďalej nezvyšovali. SOM sa dokážu relatívne rýchlo učiť a 
+teda počet epôch nemusí byť vysoký, čo je veľkou výhodou pri experimentovaní, kedže trénovanie netrvá príliš dlhú dobu
+a tým pádom sme mohli vyskúšať viac kombinácii a modifikácii.
+
+Dostatočnú veľkosť pamäťového okna sme určili podobne ako počet epôch. Parameter sme postupne zvyšovali
+a zastavili na hodnote, keď pamäťová hĺbka siete prestala stúpať, čiže veľkosť pamäťového okna už
+neovplyvňovala hĺbku pamäte a ďalšie zvyšovanie parametra nemalo zmysel. 
+
+Na základe tohto sme zistili, že pre každý typ siete sú ideálne hodnoty týchto parametrov odlišné.
+
+
+\section{Experiment so SRN a Reberovým automatom}
+
+
+
