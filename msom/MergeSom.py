@@ -114,9 +114,9 @@ class MergeSom:
                             argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                             h = np.exp(argument)
 
-                        current_weight_adjustment = self.learning_rate * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = self.learning_rate * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
@@ -148,7 +148,7 @@ class MergeSom:
 
             if log:
                 if ep == eps - 1:
-                    with open('merge_som_benchmark.csv', 'a') as file:
+                    with open(log_file_name, 'a') as file:
                         file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
                                                      round(sum_of_memory_spans / eps, 2)))
                         file.write('\n')
