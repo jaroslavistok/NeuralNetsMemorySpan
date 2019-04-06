@@ -6,7 +6,7 @@ from plotting_helpers.plot_utils import *
 
 
 class MergeSom:
-    def __init__(self, input_dimension, rows_count, columns_count, alpha=0.3, beta=0.5):
+    def __init__(self, input_dimension, rows_count, columns_count):
         self.input_dimension = input_dimension
         self.rows_count = rows_count
         self.columns_count = columns_count
@@ -26,11 +26,11 @@ class MergeSom:
         self.memory_window = []
         self.receptive_field = []
 
-        # meta parameters
-        self.beta = beta
-        self.alpha = alpha
+        # alpha "distance" parameter initialisation
+        self.alpha = 0.5
 
-        self.learning_rate = 0.8
+        # beta "context" parameter initialisation
+        self.beta = 0.5
 
         self.sliding_window_size = 30
 
@@ -51,17 +51,22 @@ class MergeSom:
 
         return winner_row, winner_column
 
-    def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3, log=True, log_file_name=''):
+    def train(self, inputs, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
+              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3, log=True,
+              log_file_name='', alpha=0.5, beta=0.5):
         count = len(inputs)
+
+        self.alpha = alpha
+        self.beta = beta
+
         if trace:
             ion()
             (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
+            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.context_weights, block=False)
             redraw()
 
         quantization_errors = []
         memory_spans = []
-        adjustments = []
         sum_of_memory_spans = 0
 
         for ep in range(eps):
@@ -75,9 +80,6 @@ class MergeSom:
             print('  alpha_t = {:.3f}, lambda_t = {:.3f}'.format(alpha_t, lambda_t))
 
             sum_of_distances = 0
-            last_adjustment = 0
-            adjustment_deltas = []
-
             for i in range(sliding_window_size, count):
                 x = Encoder.encode_character(inputs[i])
                 # find a winner
@@ -87,17 +89,16 @@ class MergeSom:
                 self.sliding_window_size = sliding_window_size
 
                 if np.count_nonzero(self.previous_winner_context) == 0:
-                    # context = np.zeros(self.input_dimension)
                     context = np.random.rand(self.input_dimension)
                 else:
-                    context = ((1 - self.alpha) * self.previous_winner_weights) + (self.alpha * self.previous_winner_context)
+                    context = (self.beta * self.previous_winner_weights) + ((1 - self.beta) * self.previous_winner_context)
 
                 self.previous_winner_weights = self.weights[winner_row][winner_column]
                 self.previous_winner_context = context
 
                 # quantization error.
-                sum_of_distances += (1 - self.beta) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
-                                        self.beta * np.linalg.norm(context - self.context_weights[winner_row][winner_column])
+                sum_of_distances += (1 - self.alpha) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
+                                        self.alpha * np.linalg.norm(context - self.context_weights[winner_row][winner_column])
 
                 winner_position = np.array([winner_row, winner_column])
                 for row_index in range(self.rows_count):
@@ -105,14 +106,8 @@ class MergeSom:
                         current_position = np.array([row_index, column_index])
                         distance_from_winner = metric(winner_position, current_position)
 
-                        if discrete:
-                            if distance_from_winner < lambda_t:
-                                h = 1
-                            else:
-                                h = 0
-                        else:
-                            argument = -((distance_from_winner ** 2) / lambda_t ** 2)
-                            h = np.exp(argument)
+                        argument = -((distance_from_winner ** 2) / lambda_t ** 2)
+                        h = np.exp(argument)
 
                         current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
@@ -121,7 +116,6 @@ class MergeSom:
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
 
-                        adjustment_deltas.append(current_weight_adjustment - last_adjustment)
                         last_adjustment = current_weight_adjustment
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
@@ -129,13 +123,6 @@ class MergeSom:
             quantization_errors.append(quantization_error)
             memory_spans.append(self.calculate_memory_span_of_net())
 
-            average_amount_of_adjustments = 0
-            for delta in adjustment_deltas:
-                average_amount_of_adjustments += np.linalg.norm(np.array(delta))
-
-            adjustments.append(average_amount_of_adjustments)
-
-            print("adjustments: {}".format(adjustments))
             print("Quantization error: {}".format(quantization_error))
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
@@ -153,23 +140,10 @@ class MergeSom:
                                                      round(sum_of_memory_spans / eps, 2)))
                         file.write('\n')
 
-            # with open(log_file_name, 'w') as file:
-            #     file.write('Aplha: {}'.format(self.alpha))
-            #     file.write('Beta: {}'.format(self.beta))
-            #     file.write('Epoch {}'.format(ep))
-            #     file.write('\n')
-            #     file.write('Quantization error: {}'.format(quantization_error))
-            #     file.write('\n')
-            #     file.write('Memory span: {}'.format(self.calculate_memory_span_of_net()))
-            #     file.write('\n')
-            #     file.write(str(np.matrix(self.receptive_field)))
-            #     file.write('\n')
-
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                plot_errors('Quantization error', quantization_error, block=False)
-                plot_errors('Adjustments changes', adjustments, block=False)
+                plot_errors('Quantization error', quantization_errors, block=False)
 
         if trace:
             ioff()
