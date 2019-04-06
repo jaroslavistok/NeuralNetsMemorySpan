@@ -6,12 +6,10 @@ from plotting_helpers.plot_utils import *
 
 
 class RecSom:
-    def __init__(self, input_dimension, rows_count, columns_count, alpha=0.5, beta=0.6):
+    def __init__(self, input_dimension, rows_count, columns_count):
         self.input_dimension = input_dimension
         self.rows_count = rows_count
         self.columns_count = columns_count
-
-        # self.logger = Logger('recsom_log')
 
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
@@ -25,13 +23,10 @@ class RecSom:
         self.memory_window = []
         self.receptive_field = []
 
-        # mixing parameters
-        self.alpha = alpha
-        self.beta = beta
+        # mixing parameter initialisation
+        self.alpha = 0.5
 
         self.sliding_window_size = 30
-
-        self.learning_rate = 0.4
 
     def find_winner_for_given_input(self, x):
         winner_row = -1
@@ -42,11 +37,10 @@ class RecSom:
 
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
-                current_distance = self.alpha * np.linalg.norm(x - self.weights[i][j]) + \
-                                   self.beta * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
+                current_distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
+                                   self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
 
                 self.current_step_activities = np.append(self.current_step_activities, np.exp(-current_distance))
-
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
@@ -55,14 +49,18 @@ class RecSom:
 
         return winner_row, winner_column
 
-    def train(self, inputs, discrete=True, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
-              lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3, log=True, log_file_name=''):
+    def train(self, inputs, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
+              lambda_f=1, eps=10, in3d=False, trace=False, trace_interval=10, sliding_window_size=10,
+              log=False, log_file_name='', alpha=0.5):
+
+        self.alpha = alpha
 
         count = len(inputs)
 
         if trace:
             ion()
             (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
+            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.context_weights, block=False)
             redraw()
 
         quantizations_errors = []
@@ -97,8 +95,8 @@ class RecSom:
                 self.sliding_window_size = sliding_window_size
 
                 # quantization error
-                sum_of_distances += self.alpha * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
-                                    self.beta * np.linalg.norm(self.previous_step_activities - self.context_weights[winner_row][winner_column])
+                sum_of_distances += (1 - self.alpha) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
+                                    self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[winner_row][winner_column])
 
                 winner_position = np.array([winner_row, winner_column])
                 for row_index in range(self.rows_count):
@@ -106,20 +104,8 @@ class RecSom:
                         current_position = np.array([row_index, column_index])
                         distance_from_winner = metric(winner_position, current_position)
 
-                        if discrete:
-                            if distance_from_winner < lambda_t:
-                                h = 1
-                            else:
-                                h = 0
-                        else:
-                            argument = -((distance_from_winner ** 2) / lambda_t ** 2)
-                            h = np.exp(argument)
-
-                        """
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index] ) * h
-                        current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
-                                                                    self.context_weights[row_index, column_index]) * h
-                        """
+                        argument = -((distance_from_winner ** 2) / lambda_t ** 2)
+                        h = np.exp(argument)
 
                         current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
                         current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
@@ -137,51 +123,31 @@ class RecSom:
 
             quantizations_errors.append(quantization_error)
             memory_spans.append(self.calculate_memory_span_of_net())
-            average_amount_of_adjustments = 0
-            for delta in adjustment_deltas:
-                average_amount_of_adjustments += np.linalg.norm(np.array(delta))
-
-            adjustments.append(average_amount_of_adjustments)
 
             print("adjustments: {}".format(adjustments))
             print("Quantization error: {}".format(quantization_error))
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
-            print("Memory span of the net {}:".format(self.calculate_memory_span_without_weights()))
 
             # receptive field
             self.create_receptive_field()
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-
-
-            # with open(log_file_name, 'w') as file:
-            #     file.write('Aplha: {}'.format(self.alpha))
-            #     file.write('Beta: {}'.format(self.beta))
-            #     file.write('Epoch {}'.format(ep))
-            #     file.write('\n')
-            #     file.write('Quantization error: {}'.format(quantization_error))
-            #     file.write('\n')
-            #     file.write('Memory span: {}'.format(self.calculate_memory_span_of_net()))
-            #     file.write('\n')
-            #     file.write(str(np.matrix(self.receptive_field)))
-            #     file.write('\n')
-
             sum_of_memory_spans += self.calculate_memory_span_of_net()
 
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
-                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2), round(sum_of_memory_spans / eps, 2)))
+                        file.write('{},{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                                                     round(sum_of_memory_spans / eps, 2), quantization_error))
                         file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                # plot_errors('Quantization error', cumulated_quantization_error, block=False)
-                # plot_errors('Adjustments changes', adjustments, block=False)
-                # plot_errors('Memory spans over time', memory_spans, block=False)
-                # plot_receptive_field(self.receptive_field)
+                plot_errors('Quantization error', quantizations_errors, block=False)
+                plot_errors('Memory spans over time', memory_spans, block=False)
+                plot_receptive_field(self.receptive_field)
 
         if trace:
             ioff()
@@ -221,21 +187,4 @@ class RecSom:
             return sum_of_weighted_lcs
         return sum_of_weighted_lcs / sum_of_weigths
 
-    def calculate_memory_span_without_weights(self):
-        longest_common_subsecquence = LongestCommonSubsequence()
-
-        sum_of_lengths = 0
-
-        for i in range(self.rows_count):
-            for j in range(self.columns_count):
-                sequences = list(filter(str.strip, self.memory_window[i][j]))
-                if not sequences:
-                    continue
-                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(
-                    sequences)
-                if longest_common_subsequence_length == 0:
-                    continue
-                sum_of_lengths += longest_common_subsequence_length
-
-        return sum_of_lengths / (self.rows_count * self.columns_count)
 
