@@ -1,10 +1,10 @@
 from helpers.DataLoader import DataLoader
 from helpers.norms import *
-from vanishing_merge_som.VanishingMergeSom import VanishingMergeSom
+from decay_msom.DecayMergeSom import DecayMergeSom
 
 dim = 26
-rows = 5
-cols = 5
+rows = 10
+cols = 10
 metric = euclidean_distance
 
 top_left = np.array((0, 0))
@@ -14,7 +14,7 @@ lambda_s = metric(top_left, bottom_right) * 0.5
 
 train_data = DataLoader.load_data('simple_sequences')
 
-model = VanishingMergeSom(dim, rows, cols)
+model = DecayMergeSom(dim, rows, cols)
 model.train(train_data, discrete=False, metric=metric, alpha_s=0.01, alpha_f=0.001, lambda_s=lambda_s,
             lambda_f=1, eps=50, in3d=False, trace=True, trace_interval=1, sliding_window_size=30)
 
