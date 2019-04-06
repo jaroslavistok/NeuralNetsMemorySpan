@@ -38,33 +38,31 @@ class ActivityRecSom:
 
         self.current_step_activities = np.array([])
 
+        sum_of_activities = self.calculate_sum_of_activities(x)
+
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
                 current_distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
                                    self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
 
                 self.current_step_activities = np.append(self.current_step_activities,
-                                                         self.calculate_activity(x, current_distance))
+                                                 (np.exp(-self.beta * (current_distance ** 2)) / sum_of_activities))
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
                     winner_row = i
                     winner_column = j
 
-
         return winner_row, winner_column
 
-    def calculate_activity(self, x, current_distance):
-        return np.exp(-self.beta*(current_distance ** 2)) / self.calculate_sum_of_activities(x)
 
     def calculate_sum_of_activities(self, x):
         sum_of_activations = 0
-        distance = 0
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
                 distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
                                    self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
-        sum_of_activations += np.exp(-self.beta*(distance ** 2))
+                sum_of_activations += np.exp(-self.beta*(distance ** 2))
         return sum_of_activations
 
     def train(self, inputs, metric=lambda x, y: 0, alpha_s=0.01, alpha_f=0.001, lambda_s=None,
@@ -84,7 +82,6 @@ class ActivityRecSom:
 
         quantizations_errors = []
         memory_spans = []
-        adjustments = []
 
         sum_of_memory_spans = 0
 
@@ -100,8 +97,6 @@ class ActivityRecSom:
             print('  alpha_t = {:.3f}, lambda_t = {:.3f}'.format(alpha_t, lambda_t))
 
             sum_of_distances = 0
-            last_adjustment = 0
-            adjustment_deltas = []
 
             for i in range(sliding_window_size, count):
                 x = Encoder.encode_character(inputs[i])
@@ -135,15 +130,12 @@ class ActivityRecSom:
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
 
-                        adjustment_deltas.append(current_weight_adjustment - last_adjustment)
-                        last_adjustment = current_weight_adjustment
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
             quantizations_errors.append(quantization_error)
             memory_spans.append(self.calculate_memory_span_of_net())
 
-            print("adjustments: {}".format(adjustments))
             print("Quantization error: {}".format(quantization_error))
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
@@ -157,7 +149,7 @@ class ActivityRecSom:
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
-                        file.write('{},{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                        file.write('{},{},{},{}'.format(round(1 - self.alpha, 2), round(self.beta, 2),
                                                      round(sum_of_memory_spans / eps, 2), quantization_error))
                         file.write('\n')
 

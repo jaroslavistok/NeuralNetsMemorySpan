@@ -6,8 +6,8 @@ from helpers.DataLoader import DataLoader
 from helpers.norms import *
 
 dimension = 26
-number_of_rows = 7
-number_of_columns = 7
+number_of_rows = 10
+number_of_columns = 10
 metric = euclidean_distance
 
 top_left = np.array((0, 0))
