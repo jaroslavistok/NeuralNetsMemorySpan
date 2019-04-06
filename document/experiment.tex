@@ -5,6 +5,20 @@ Experimentom v našej práci je meranie hĺbky pamäte a vyhodnotenie vplyvu rô
 parametrov a typov kontextov na hĺbku pamäte. Súčasťou nášho experimentu je aj nájdenie 
 optimálnej kombinácie parametrov pre všetky typy porovnávaných sietí.
 
+\section{Výber trénovacích množín pre experiment}
+Trénovacie množiny nie sú vybrané náhodne, ale snažili sme sa ich vytvoriť
+takým spôsobom aby sme na nich vedeli otestovať rôzne vlastnosti rekurentných sietí.
+
+Najednoduchším datasetom je jednoduchý dataset obsahujúci malý počet rôznych znakov a veľa
+opakujúcich sa sekvencií písmen.
+Stredne zložitý dataset je tvorený reberovým stringom, ktorý je generovaný z reberovho automatu.
+Tento bude dôležitý najmä pri trénovaní a testovaní SRN, kde by sme mohli dostať zaujímavé výsledky.
+
+
+Najzložitejší dataset, ktorý slúži ako "benchmark" je úryvok textu. Keďže ide o reálny zmysluplný textu
+nie je to úplne náhodná postupnosť znakov, ale obsahuje určité vzory a opakovania, ktoré by siete mohli vedieť zachytiť.
+
+
 \section{Hľadanie optimálnych parametrov sietí}
 Na to aby sme mohli porovnať hĺbku pamäte rôznych sietí sme museli nájsť kombináciu parametrov
 pri ktorých daný typ siete dosahujú najlepšie výsledky. 
