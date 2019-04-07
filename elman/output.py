@@ -8,9 +8,9 @@ class Softmax:
 
     def loss(self, x, y):
         probs = self.predict(x)
-        return -np.log(probs[y])
+        return -np.log(probs[int(y)])
 
     def diff(self, x, y):
         probs = self.predict(x)
-        probs[y] -= 1.0
+        probs[int(y)] -= 1.0
         return probs
