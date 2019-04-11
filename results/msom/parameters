@@ -1,0 +1,15 @@
+Beta values (parameter in context calculating equation):
+0.0 - 1.0
+
+Alpha values (parameter in distance measure)
+0.0 - 1.0
+
+Number of epochs: 20
+
+Net size: 10x10
+
+Slowly descending learning rate during training
+
+Sliding window size: 30
+
+

@@ -1,0 +1,15 @@
+Beta values (parameter in activity function):
+11.0, 12.0, 13.0, 14.0, 15.0, 20.0, 30.0, 40.0, 50.0, 100.0
+
+Alpha values (parameter in distance measure)
+0.0 - 1.0
+
+Number of epochs: 20
+
+Net size: 10x10
+
+Slowly descending learning rate during training
+
+Sliding window size: 30
+
+
