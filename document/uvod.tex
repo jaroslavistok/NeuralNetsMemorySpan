@@ -2,9 +2,8 @@
 
 \section{Motivácia}
 V strojovom učení nastávajú situácie, kedy potrebujeme predikovať výsledok nie len na 
-základe aktuálneho vstupu, 
-ale aj na základe historického kontextu. 
-Kontext je väčšinou reprezentovaný stavmi modelu z minulých krokov alebo kombináciou predchádzajúcich vstupov.
+základe aktuálneho vstupu, ale aj na základe historického kontextu. 
+Kontext je väčšinou reprezentovaný stavmi modelu strojového učenia z minulých krokov alebo kombináciou predchádzajúcich vstupov.
 Príkladom takejto úlohy môže byť spracovanie tzv. časových radov či generovanie postupností znakov.
 Predstavme si úlohu, v ktorej chceme model strojového učenia naučiť predikovať ďalšie písmeno v určitom slove. 
 Ako príklad si môžeme zobrať slovo \uv{Bratislava}. 
@@ -15,18 +14,18 @@ Trénovaciou množinu by tvorili písmená daného slova, kde očakávanou hodno
 Problém nastane pri druhom písmene \uv{a} v slove Bratislava. Pri prvom výskyte písmena \uv{a} sme modelu tvrdili, že očakávam písmeno \uv{t} a 
 pri druhom výskyte písmena \uv{a} tvrdíme, že očakávame \uv{v}. 
 Tento prípad sa model, ktorý nevyužíva žiadny historický kontext, nevie naučiť, pretože nemá žiadnu "pamäť" (okno do minulosti). 
-Historický kontext umožňuje modelom strojového učenia pracovať s pamäťou.
+Historický kontext umožňuje modelom strojového učenia pracovať s určitou formou pamäte.
 
-V mojej práci sa budem zaoberať jedným z modelov strojového učenia, ktorý pracuje s kontextom: rekurentnými neurónovými sieťami viacerých typov pričom
-budem merať ich pamäťovú hĺbku. 
-Pamäťová hĺbka neurónovej siete vo všeobecnosti vyjadruje to, s akým dlhým kontextom do minulosti dokáže pracovať.
+V našej práci sa budeme zaoberať jedným z modelov strojového učenia, 
+ktorý pracuje s kontextom: rekurentnými neurónovými sieťami viacerých typov pričom
+budem merať a porovnávať ich pamäťovú hĺbku. 
+Pamäťová hĺbka neurónovej siete vo všeobecnosti vyjadruje s akým dlhým kontextom do minulosti dokáže pracovať.
 
-Konkrétne pôjde o nasledujúcim štyri typy rekurentných neurónových sietí:
+Konkrétne pôjde o nasledujúce tri typy rekurentných neurónových sietí a ich modifikácie:
 \begin{itemize}
-	\item Elmanova sieť
 	\item RecSOM
 	\item MergeSOM
-	\item Leaky integration MergeSOM
+	\item Elmanova sieť
 \end{itemize}
 
 \section{Úvod do neurónových sietí}
@@ -177,11 +176,11 @@ Váhy medzi skrytou a výstupnou vrstvou:
 
 \subsection{Rekurentné neurónové siete}
 Rekurentná neurónová sieť je akákoľvek neurónová sieť, ktorá obsahuje množinu neurónov
-v ktorých sa uchováva informácia o aktiváciách neurónov z predošlých krokov. Takéto neuróny
-nazývame aj rekurentné neuróny a tvoria vrstvu, ktorá sa nazýva kontextová vrstva.
+v ktorých je ochovávaná informácia o aktiváciách neurónov alebo predchádzajúcich vstupoch z predošlých krokov. 
+Takéto neuróny nazývame aj rekurentné neuróny a tvoria vrstvu, ktorá sa nazýva kontextová vrstva.
 Týmto spôsobom je sieť rozšírená o vnútornú pamäť.
 
-V mojej práci budem skúmať vlastnosti a pamäťovú hĺbku rekurentnej siete s Elmanovou architektúrou, 
+V našej práci budeme skúmať vlastnosti a skúšať zmerať pamäťovú hĺbku rekurentnej siete s Elmanovou architektúrou, 
 ktorá je znázornená na nasledujúcom diagrame.
 
 \begin{figure}[H]
@@ -266,7 +265,7 @@ Váhy medzi rozvinutými vrstvami a medzi vstupom a rozvinutými vrstvami sa upr
 Ďalším typom rekurentných neurónových sietí, ktorých pamäťovú hĺbku budeme 
 skúmať v našej práci, sú rekurentné samoorganizujúce sa mapy, 
 ktoré sú rozšírením základnej nerekurentnej verzie samoorganizujúcich sa máp (ďalej iba SOM). 
-Preto najskôr popíšem základný nerekurentný model SOM.
+Preto najskôr popíšem základný model nerekurentný model SOM.
 
 SOM je typ neurónovej siete, v ktorej sú jednotlivé neuróny usporiadané do (väčšinou) dvojrozmernej štvorcovej mriežky. Samoorganizujúce sa mapy (ďalej iba SOM) sú trénované bez učiteľa, čiže váhy jednotlivých neurónov sú upravované iba na základe dát z trénovacej množiny. 
 Čo je zaujímavé na spôsobe trénovania SOM je, že je veľmi podobný učeniu neurónov v mozgovej kôre živočíchov. Je to biologicky inšpirovaný model.
@@ -292,7 +291,7 @@ w_i(t+1) = w_i(t) + \alpha(t)h(i^*, i)([x(t) - w_i(t)])
 \end{equation}
 
 Váhové vektory víťazného neurónu a jeho topologických susedov sa posúvajú smerom k aktuálnemu vstupu.
-$\alpha(t)$ predstavuje rýchlosť učenia, ktorá môže klesať v~čase alebo môže zostať konštantná. Na funkcii, ktorá je použitá pre $\alpha$, v praxi veľmi nezáleží, mala by to byť nejaká monotónne klesajúca funkcia (napríklad exponenciálna funkcia). 
+$\alpha(t)$ predstavuje rýchlosť učenia, ktorá môže klesať v čase alebo môže zostať konštantná. Na funkcii, ktorá je použitá pre $\alpha$, v praxi veľmi nezáleží, mala by to byť nejaká monotónne klesajúca funkcia (napríklad exponenciálna funkcia). 
 $h(i^*, i)$ je funkcia okolia (tzv. excitačná funkcia), ktorá definuje koľko neurónov v okolí víťaza bude trénovaných a do akej miery. Inými slovami, excitačná funkcia definuje rozsah kooperácie medzi neurónmi. Používajú sa najčastejšie 2 typy okolia:
 \begin{itemize}
 \item pravouhlé(štvorcové) okolie
@@ -317,18 +316,19 @@ $d_{E}(i^{*}, i)$ je euklidovská vzdialenosť (L2 norma) neurónov v mriežke. 
 
 $[x(t) - w_i(t)]$ je euklidovská vzdialenosť medzi vstupným vektorom a váhovým vektorom.
 
-Na vyhodnocovanie trénovania SOM používame kvantizačnú chybu. Je to euklidovská vzdialenosť vstupu
+Na vyhodnocovanie trénovania SOM používame kvantizačnú chybu. 
+Pri SOM je kvantizačná chyba euklidovská vzdialenosť vstupu
 od váh víťazného neurónu. 
 Po každej epoche učenia vieme určiť celkovú kvantizačnú chybu siete pre danú trénovaciu množinu.
 %Vypočítame pre každý vstup vzdialenosť od každého neurónu v sieti. 
-Pre každý príklad z trénovacej množiny vypočítame kvantizačnú chybu a spriemerujeme. %Spravíme priemer týchto vzdialeností pre každý vstup. Urobím súčet týchto hodnôt a vydelím počtom trénocích príkladov. 
+Pre každý príklad z trénovacej množiny vypočítame kvantizačnú chybu a nakoniec spravíme priemer kvantizačných chýb. %Spravíme priemer týchto vzdialeností pre každý vstup. Urobím súčet týchto hodnôt a vydelím počtom trénocích príkladov. 
 %Tým dostanem priemernu kvantizačnú chybu pre celú sieť. 
- Táto by mala po každej epoche učenia (po natrénovaní a adaptácii váh na celej trénovacej množine) postupne klesať.
+ Táto by mala po každej epoche učenia (po natrénovaní a adaptácii váh na celej trénovacej množine) postupne klesať k určitému minimu.
 
 Pri učení rozlišujeme všeobecne dve fázy:
 \begin{itemize}
-	\item usporiadavanie - s časom klesá veľkosť okolia víťazných neurónov 
-	\item dolaďovanie - veľkosť okolia sa zafixuje na nejakej malej hodnote až pokým učenie neskončí.
+	\item fáza usporiadavania - s časom klesá veľkosť okolia víťazných neurónov 
+	\item fáza dolaďovania - veľkosť okolia sa zafixuje na nejakej malej hodnote až pokým učenie neukončí
 \end{itemize}
 
 Kohonen odhadol na základe pokusov, že počet iterácií trénovania, by mal byť rádovo 500-násobok počtu neurónov v sieti.
@@ -373,8 +373,8 @@ Počas trénovania SOM môžu nastať špeciálne situácie:
 Rekurentné samoorganizujúce sa mapy sú modifikáciou nerekurentnej SOM.
 Rozdiel oproti nerekurentnej verzii je v tom, že vstupy sú porovnávané
 nielen s váhovým vektorom jednotlivých neurónov, ale aj s kontextom.
-Rôzne verzie rekurentných SOM sa líšia iba v type kontextu, ktorý je v nich použítý. 
-V kontexte je spravidla uložený stav siete alebo časti siete z minulého časového kroku.
+Rôzne verzie rekurentných SOM sa líšia v type kontextu, ktorý je v nich použítý. 
+V kontexte rekurentnej SOM je spravidla uložené vlastnosti siete z minulého časového kroku alebo kombinácia minulých vstupov.
 
 V mojej práci budem porovnávať 2 základné typy rekuretných SOM.
 
@@ -407,7 +407,7 @@ vstupu od váhového vektoru a kontextu z predchádzajúceho kroku od kontextov�
 
 $N$ je počet neurónov v sieti (pretože kontextom je kópia celej mapy)
 \begin{equation}
-	d_i = \alpha \cdot ||x(t) - w_i||^{2} + b \cdot ||y(t-1) - c_i||^{2} \quad c \in R^{N}
+	d_i = (1 - \alpha) \cdot ||x(t) - w_i||^{2} + \alpha \cdot ||y(t-1) - c_i||^{2} \quad c \in R^{N}
 \end{equation}
 $\alpha$ a $\beta$ sú parametre, ktoré určujú akú váhu pri trénovaní bude mať kontext a akú váhu bude mať
 aktuálny krok.
@@ -495,7 +495,7 @@ Samotný kontext počítame pomocou nasledujúceho rekurzívneho vzťahu:
 $\beta$ parameter je číslo z intervalu $\beta < 1 \wedge \beta > 0$ a
 $x_t, x_{t-1}, x_{t-2} ...$ sú vstupné vektory.
 
-Zo rekurzívneho vzťahu vyplýva, že kontext je tvorený kombináciou predchádzajúcich vstupov
+Z rekurzívneho vzťahu vyplýva, že kontext je tvorený kombináciou predchádzajúcich vstupov
 pričom čím dávnejší je vstup, tým menšiu váhu má v kontexte, čo je zabezpečené umocňovaním
 $\beta$ parametra. Toto sa nazýva v matematike leaky integration. V našom prípade
 to znamená, že dávne vstupy postupne strácajú na dôležitosti pričom sa stále sa podieľajú 

@@ -37,7 +37,7 @@ ktorá mi bude vizualizovať, na aké vstupy (resp. okná) neuróny reagovali.
 Hĺbku pamäte pre konkrétny neurón v siete vypočítame ako vážený priemer dĺžky najdlhších spoločných 
 podpostupností písmen v množine okien vstupov neurónu.
 Dĺžku najdlhšej podpostupnosti budem určovať od konca sekvencií v množine. 
-Pamäťovú hĺbku siete potom určím ako vážený priemer pamäťových hĺbok jednotlivých neurónov, kde váhami budú veľkosti
+Pamäťovú hĺbku siete potom určím ako vážený priemer nameraných pamäťových hĺbok jednotlivých neurónov, kde váhami budú veľkosti
 množín.
 Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, 
 ktoré boli víťazmi pre väčší počet vstupov mali vyššiu váhu ako neuróny, ktoré boli víťazmi pre menší počet vstupov.
@@ -48,12 +48,11 @@ bude mať rôzne víťazné neuróny počas trénovania.
 
 % do dalsej kapitoly
 
-Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna.
+Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna (sliding window).
 Veľkosť posuvného okna má zmysel zvyšovať iba pokiaľ nám stúpa pamäťová hĺbka, inými
-slovami toto okno musí byť minimálne tak veľké ako je najdlhšia nájdená podpostupnosť v jednotlivých neurónoch.
+slovami, toto okno musí byť minimálne tak veľké ako je najdlhšia nájdená podpostupnosť v jednotlivých neurónoch.
 
-Počet neurónov v mape volíme podľa množstva rôznych slov v použitej trénovacej
-množine.
+Počet neurónov v mape volíme podľa množstva rôznych znakov v použitej trénovacej množine.
 
 Tradeoff medzi rozlišovaciou schopnosťou jednotlivých slov a schopnosťou
 zachovať podobné slová topologicky čo najbližšie pri sebe.
@@ -63,20 +62,23 @@ trénovacích príkladov.
 Prvá sada sú najednoduchšie sekvenice (slová), ktoré obsahujú veľké množstvo regularít a malé množstvo rôznych písmen.
 Napríklad sekvencie ako $aaabbb$,  $bbbaaaaa$.
 Druhou sadou budú slová generované Reberovým automatom.
-Treťou sadou trénovacích príkladov budú najzložitejšie sekvencie, resp. slová z určitého korpusu. 
+Treťou sadou trénovacích príkladov budú najzložitejšie sekvencie, resp. slová z určitého korpusu anglického textu (napríklad úryvok z knihy). 
 Túto sadu budem používať ako performance benchmark. 
 
 \section{Hľadanie ideálnych (hyper) parametrov}
-Ako prvý parameter potrebujem zoptimalizovať veľkosť posuvného okna, tak aby bol väčší ako
-maximálna pamäťová hĺbka. Toto docielim jednoducho tým, že ho dám rozumne veľký, resp. v prípade
-potreby ho budem zvyšovať.
+Ako prvé je potrebné zvoliť vhodnú veľkosť posuvného okna na trénovacej množine, tak aby bolo väčšie ako
+najdlhšia nájdená spoločná podpostupnosť znakov. 
+Toto je jednoducho docieliteľné postupným zvyšovaním veľkosti tohto pamäťového okna až pokým pamäťová hĺbka stúpa.
 
-Ďaľšie dôležité parametre, ktoré potrebujem optimalizovať sú $alpha$ a $beta$ parametre, ktoré 
-sa používajú pri počítaní vzdialenosti a určujú akú váhu má aktuálny vstup a akú váhu má kontext.
+Ďaľšie dôležité parametre, ktoré potrebujem optimalizovať sú $alpha$ a $beta$ parametre, ktoré
+sa používajú pri počítaní výslednej vzdialenosti vstupného vektora od váhového vektora neurónu.
+Táto vzdialenosť je pri rekurentných SOM určená ako kombinácia vzdialenosti vstupu od váhového vektora neurónu a vzdialenosti
+kontextu od contextového vektora neurónu.
+Jednotlivé parametre určujú akú váhu má aktuálny vstup a akú váhu má kontext pri výpočte výslednej vzdialenosti.
 Toto neviem spraviť nijak inak, iba postupním skúšaním rôznych kombinácii týchto parametrov. 
 $alpha$ aj $beta$.
 
-Optimálne $alpha$ a $beta$ parametre, ktoré dávajú najlepšie výsledky som hľadal nasledujúcim
+Optimálne $alpha$ a $beta$ parameters, ktoré dávajú najlepšie výsledky som hľadal nasledujúcim
 spôsobom:
 
 Naprogramoval som si skript, pomocou ktorého trénujem sieť s rôznymi parametrami.
@@ -84,7 +86,7 @@ Výsledky som si počas trénovania zaznamenával.
 Následne som si vykreslil 3D grafy pre každý typ trénovanej siete (msom, recsom, vmsom), 
 kde na x-ovej osy sú hodnoty alpha parametra, na y-ovej osy sú hodnoty beta parametra a
 na z-ovej osy sú hodnoty pamäťových hĺbok.
-Na začiatok som zvyšoval parametre po hodnote $0.1$.
+Na začiatok som zvyšoval parameters po hodnote $0.1$.
 
 % TODO ukazky grafov parametrov pre jednotlive siete
 

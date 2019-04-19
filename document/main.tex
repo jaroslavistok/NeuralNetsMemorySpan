@@ -45,8 +45,8 @@ backend=bibtex
 \def\mfrok{2019}
 \def\mfnazov{Porovnanie niekoľkých typov rekurentných sietí z hľadiska hĺbky pamäte}
 \def\mftyp{Diplomová práca}
-\def\mfautor{Jaroslav Ištok}
-\def\mfskolitel{školitel}
+\def\mfautor{Bc. Jaroslav Ištok}
+\def\mfskolitel{doc. RNDr. Martin Takáč, PhD.}
 
 
 %ak mate konzultanta, odkomentujte aj jeho meno na titulnom liste
@@ -152,7 +152,7 @@ backend=bibtex
 \newpage 
 ~
 \vfill
-{\bf Čestné vyhlásenie }
+{\bf Čestné vyhlásenie: Čestne vyhlasujem, že som túto diplomovú prácu vypracoval samostatne pod vedením školiteľa diplomovej práce, s použitím poznatkov z uvedenej literatúry.}
 
 % --- Koniec čestného  výhlásenia
 
@@ -161,12 +161,14 @@ backend=bibtex
 % -------------------
 %   Poďakovanie - nepovinné
 % -------------------
-\setcounter{page}{3}
-\newpage 
+ \setcounter{page}{3}
+ \newpage 
 
-~
-\vfill
-{\bf Poďakovanie }
+ ~
+
+ \vfill
+ {\bf Poďakovanie: Chcel by som poďakovať svojmu školiteľovi, doc. RNDr. Martin Takáčovi, PhD., za jeho 
+ pomoc, čas, poskytné materiály a hlavne za skvelé nápady počas experimentu.}
 
 % --- Koniec poďakovania
 
@@ -177,10 +179,11 @@ backend=bibtex
 \newpage 
 \section*{Abstrakt}
 
-Abstrakt - obsah
- 
+V našej práci implementujeme niekoľko typov neurónových sietí a porovnávame ich z hľadiska hĺbky pamäte.
+Hľadáme optimálne parametre, pri ktorých majú rôzne typy neurónových sietí najvyššie pamäťové hĺbky.
+Následne analyzujeme a porovnávame výsledky pre testované typy sietí.
 
-\paragraph*{Kľúčové slová:} rekurentné neurónové siete, hĺbka pamäte
+\paragraph*{Kľúčové slová:} rekurentné neurónové siete, hĺbka pamäte, samorganizujúca sa mapa
 % --- Koniec Abstrakt - Slovensky
 
 
@@ -190,9 +193,11 @@ Abstrakt - obsah
 \newpage 
 \section*{Abstract}
 
-Abstract
+In our work we are implementing a several types of neural nets which we are comparing in terms of their memory span.
+We are finding optimal parameters for which have different types of tested neural nets highest memory span values.
+Then, we are analyzing and comparing results for tested neural nets.
 
-\paragraph*{Keywords:} neural net, machine learning, memory span
+\paragraph*{Keywords:} neural net, machine learning, memory span, self organizing map
 
 % --- Koniec Abstrakt - Anglicky
 
@@ -244,8 +249,6 @@ Abstract
 \input podobne_prace.tex
 \input navrh_riesenia.tex
 \input experiment.tex
-\input vyhodnotenie.tex
-
 \input zaver.tex
 
 % -------------------
