@@ -1,43 +1,51 @@
 \chapter{Implementácia}
 
-\section{Implementácia SOM}
-Keďže pre potreby merania pamäťovej hĺbky sme potrebovali 
-veľmi modifikované verzie sietí, rozhodli sme sa pre vlastnú implementáciu sietí
-v jazyku Python, ktorá nám umožnila skúšať rôzne modifikácie, čo 
-s existujúcimi modelmi neboli možné. Patrí medzi ne napríklad použitie odlišného kontextu pri mSOM, 
+\section{Implementácia neurónových sietí}
+Pre potreby merania pamäťovej hĺbky sme potrebovali 
+veľmi modifikované implementácie neurónových sietí, 
+preto sme sa rozhodli pre ich vlastnú implementáciu. 
+Vlastná implementácia nám umožnila experimentovať s rôznymi typmi kontextov a rôznymi spôsobmi 
+trénovania sietí, čo s existujúcimi implementáciami bolo veľmi nepraktické a v istých prípadoch nemožné.
+Medzi špeciálne prípady patrí napríklad použitie modifikovaných kontextov, 
 úprava excitačnej funkcie počas trénovania (zmenšovanie okolia), dynamické znižovanie rýchlosti
-učenia siete počas trénovania a ďalšie modifikácie parametrov.
+učenia siete počas trénovania/po jednotlivých epochách trénovania, vytvorenie pamäťového okna v jednotlivých neurónoch 
+a samotné meranie pamäťovej hĺbky.
 
 \section{Voľba programovacieho jazyka}
-Zvolili sme si jazyk Python pretože preň existuje veľké množstvo kvalitných knižníc pre prácu
+Ako implementačný jazyk sme zvolili Python pretože preň existuje veľké množstvo kvalitných knižníc pre prácu
 s maticami a vektormi, či vykresľovanie grafov.
-Python je veľmi populárny v oblasti strojového učenia. Ďaľšou výhodou je jednoduché spustenie skriptov
-na linuxovom serveri, čo urýchľuje samotné trénovanie a hľadanie najoptimálnejších parametrov a umožňuje vyskúšať 
-veľké množstvo kombinácii parametrov.
+Python je veľmi populárny v oblasti strojového učenia. 
+Ďaľšou výhodou je jednoduché spustenie skriptov
+na linuxovom serveri, čo urýchľuje samotné trénovanie a hľadanie najoptimálnejších parametrov a umožnilo nám otestovať 
+veľké množstvo kombinácii rôznych parametrov.
 \subsection{Python}
+
 Python je interpretovaný vysokoúrovňový programovací jazyk. 
 Python kladie dôraz na jednoduchosť a čitateľnosť programov, ktoré sú v ňom naprogramované.
-Je to jazyk, ktorý využíva dynamické typovanie a automatizovaný memory managment. Je to tiež multiplatformový 
+Je to jazyk, ktorý využíva dynamické typovanie a automatizovanú správu pamäte. Je to tiež multiplatformový 
 jazyk a beží na všetkých bežne používaných platformách (Windows, Mac, Linux)
 
 \section{Použíté knižnice}
 Používame štandartný set knižníc pre implementáciu neurónových sietí: numpy, scipy.
-Knižnice matplotlib a seaborn používame na vykreslovanie a vizualizáciu dát.
+Na vykresľovanie a vizualizáciu dát používame knižnice matplotlib a seaborn.
 \subsection{Numpy}
-Je knižnica umožňujúca prácu s maticami, používaná takmer všetkými
-frameworkami, ktoré implementujú modely strojového učenia.
+Je knižnica, ktorá uľahčuje prácu s maticami, používaná je takmer všetkými existujúcimi
+knižnicami, ktoré implementujú modely strojového učenia v Pythone. Má vysokú úroveň optimalizácie
+a požíva veľmi optimalizované funkcie na prácu s maticami, ktoré sú naprogramované v jazyku C.
 \subsection{Matplotlib}
-Je knižnica na vykresľovanie grafov a vizualizáciu dát
+Je knižnica na vykresľovanie grafov a vizualizáciu dát.
 \subsection{Seaborn}
-Je nadstavbou Matplotlib knižnice, umožňuje jednoduchšie vykresľovanie rôznych grafov.
+Je nadstavbou Matplotlib knižnice a zjednodušuje vykresľovanie rôznych grafov.
 
 \section{Algoritmus hľadania najdlhšej spoločnej podpostupnosti viacerých reťazcov}
-Na hľadanie najdlhšej spoločnej podpostupnosti viacerých reťazcov som použil relatívne jednoduchý prístup. 
-Z každej sekvencie som si vytvoríme všetky možné n-gramy (podpostupnosti), ktoré si uložíme do množiny.
-Pre každú sekvenciu vytvoríme takúto množinu n-gramov. Potom spravíme prienik týchto množín a dĺžka najdlhšieho 
+Na hľadanie najdlhšej spoločnej podpostupnosti viacerých reťazcov som použil relatívne jednoduchý naivný prístup. 
+Z každej sekvencie sme si vytvorili všetky možné n-gramy (podpostupnosti), ktoré si ukladáme do množiny.
+Pre každú sekvenciu v množine vytvoríme takúto množinu n-gramov. Potom spravíme prienik týchto množín a dĺžka najdlhšieho 
 reťazca z tohto prieniku je dĺžka najdlhšej spoločnej podpostupnosti. Ide o naivný algoritmus, ktorý by bol pri
-dlhých reťazcoch pamäťovo aj výpočtovo veľmi náročný, avšak pre potreby merania pamäťovej hĺbky neurónových sietí
-je postačujúci a dostatočne efektívny, keďže posuvné okná nie sú zvyčajne príliš dlhé (do 50 znakov maximálne)
+dlhých reťazcoch pamäťovo aj výpočtovo neoptimálny, avšak pre potreby merania pamäťovej hĺbky neurónových sietí
+je postačujúci a dostatočne efektívny, keďže sekvencie v pamäťových oknách 
+jednotlivých neurónov nie sú dlhé (do 30 znakov maximálne)
+Použitie tohto algoritmu malo veľmi malý vplyv na rýchlosť trénovania.
 
 \section{Reberov automat}
 Na vytvorenie trénovacej množiny, ktorá pozotáva z reberových reťazcov sme si vytvorili vlastnú implementáciu pravdepodobnostného nedeterministického

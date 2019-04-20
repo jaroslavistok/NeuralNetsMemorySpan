@@ -28,7 +28,7 @@ Konkrétne pôjde o nasledujúce tri typy rekurentných neurónových sietí a i
 	\item Elmanova sieť
 \end{itemize}
 
-\section{Úvod do neurónových sietí}
+\section{Úvod do umelých neurónových sietí}
 
 \subsection{Perceptrón}
 Je základným modelom neurónu, ktorý je používaný v neurónových sieťach.
@@ -432,10 +432,12 @@ na kontextové vektory:
 	c_i(t + 1) = c_i(t) + \alpha(t)h(i^*, i)[y(t - 1) - c_i(t)]
 \end{equation}
 
-Pri RecSom majú kontext aj kontextové váhy veľkú dimenziu (rovnú počtu neurónov v sieti), čo môže spomaľovať
-proces trénovania.
+Pri RecSom majú kontext aj kontextové váhy veľkú dimenziu (rovnú počtu neurónov v sieti, keďže kontextom je vektor aktivácii všetkých neurónov z predchádzajúceho kroku), 
+čo spomaľuje výrazne proces trénovania takejto siete.
 Výhodou môže byť, že kontext RecSOM obsahuje veľa informácií a teda môže mať v niektorých prípadoch
 lepšie vlastnosti. 
+Jedným z cieľov našej práce je zistiť či je skutočne tento rozšírený kontext potrebný a či 
+má nejaký vplyv na pamäťovú hĺbku.
 
 
 \subsection{mSOM}
@@ -478,6 +480,14 @@ Má však značne menšiu dimenziu (dimenzia kontextu pri mSOM je rovnaká ako d
 vďaka čomu je trénovanie mSOM rýchlejšie (výpočtovo menej náročné) a teda je možné experimentovať 
 s viacrozmernými mapami, vyskúšať viac epoch trénovania, alebo použiť väčšie trénovacie množiny.
 
+Cieľom našej práce je aj zistiť, či redukovaný kontext pri mSOM je postačujúci a či sme s ním 
+schopní dosiahnuť podobné výsledky ako pri recSOM, kde kontext tvorí aktivácia všetkých neurónov v sieti.
+
+Rozdielne typy kontextov a ich vplyv na pamäťovú hĺbku rekurentných 
+neurónových sietí je hlavným cieľom mojej diplomovej práce.
+
+
+% presunut niekam inam
 \subsection{Leaky integration mSOM}
 Pre potreby testovania pamäťovej hĺbky sme si vytvorili modifikovanú verziu mSOM, 
 ktorá používa odlišný kontext.
@@ -502,5 +512,4 @@ to znamená, že dávne vstupy postupne strácajú na dôležitosti pričom sa s
 na vytváraní výsledného kontextu.
 
 
-Rozdielne typy kontextov a ich vplyv na pamäťovú hĺbku rekurentných 
-umelých neurónových sietí je hlavným cieľom mojej diplomovej práce.
+
