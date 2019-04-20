@@ -1,37 +1,52 @@
-% podobne prace?
-
 \chapter{Experiment}
-Experimentom v našej práci je meranie hĺbky pamäte a vyhodnotenie vplyvu rôznych
-hyper parametrov a typov kontextov na hĺbku pamäte sietí. 
-Cieľom nášho experimentu je aj nájdenie 
-optimálnej kombinácie parametrov pre všetky typy porovnávaných sietí a porovnanie sietí.
 
-\section{Výber trénovacích množín pre experiment}
-Trénovacie množiny nie sú vybrané náhodne, ale snažili sme sa ich vytvoriť
+Experimentom v našej práci je určovanie hĺbky pamäte a vyhodnotenie vplyvu rôznych
+hyper parametrov a typov kontextov na hĺbku pamäte rekurentných SOM.
+Cieľom nášho experimentu je aj nájdenie 
+optimálnej kombinácie parametrov pre všetky typy porovnávaných sietí a ich vzájomné porovnanie.
+
+\section{Výber konkrétnych trénovacích množín pre experiment}
+Trénovacie množiny sme sa snažili zvoliť
 takým spôsobom aby sme na nich vedeli otestovať rôzne vlastnosti rekurentných sietí.
 
-Prvý dataset pozostáva z náhodne generovanej sekvencie znakov "abcd" dlhej 1000 znakov.
-Druhý dataset pozostáva z reberovým stringom, ktoré sú generované reberovým automatom.
+Pre náš experiment sme vybrali 3 trénovacie množiny.
+Hlavnou trénovaciou množinou, ktorú používame v našom experimente je náhodne generovaná 
+sekvencia dlhá 1000 znakov, ktorá pozostáva z písmen $abcd$.
+Táto sekvencia obsahuje dostatočné množstvo regularít a malé množstvo unikátnych znakov a teda
+aj siete s relatívne malým počtom neurónov sa na nej vedia dobre natrénovať.
+Používame ju pri hľadaní optimálných parametrov pre jednotlivé typy sietí.
 
-Tento bude dôležitý najmä pri trénovaní a testovaní SRN, kde by sme mohli dostať zaujímavé výsledky.
+Ako druhú trénovaciu množinu sme zvolili sekvenciu dlhú 1000 znakov, pričom znaky sú generované
+špeciálnym pravdepodobnostným stavovým automatom (Reberov automat). Automat generuje znaky z množiny znakov $ptvxse$.
+Táto sekvencia je pre SOMky ťažšia na naučenie a používame ju na overenie toho, či sú siete schopné natrénovať sa aj
+na zložitejších nenáhodných sekvenciách. Pri SRN je použitie tejto trénovacej množiny zaujímavejšie,
+vďaka vlastnostiam, ktoré SRN má.
 
-Tretí dataset je úryvok textu z nejakého korpusu angli ckého textu. 
+Tretí dataset je úryvok z korpusu anglického textu.
 Keďže ide o reálny zmysluplný text, nie je to úplne náhodná postupnosť znakov, ale obsahuje určité vzory a opakovania, ktoré by siete mohli vedieť zachytiť
 vo svojej vnútorenej reprezentácii.
-Tento dataset slúži iba ako "benchmark", ktorý nám povie, či sa sieť dokáže naučiť aj na reálnych textoch.
+Tento dataset používame čisto iba na overenie, či 
+sú SOMky schopné zachytiť vzory aj v prirodzenom jazyku a teda či sú použiteľné aj pre 
+reálne dáta.
 
 \section{Hľadanie optimálnych parametrov sietí}
-Na to aby sme mohli porovnať hĺbku pamäte rôznych typov sietí museli sme nájsť kombináciu parametrov
-pri ktorých daný typ siete dosahuje najlepšie výsledky. 
+Na to aby sme mohli porovnať hĺbku pamäte rôznych typov sietí museli sme najskôr
+nájsť kombináciu parametrov pri ktorých daný typ siete dosahuje najnižšiu kvantizačnú chybu a 
+najvyššie hodnoty pamäťových hĺbok. 
+
 Pri trénovaní samoorganizujúcich sa máp môžeme meniť a optimalizovať veľké množstvo parametrov. 
 
-Všeobecne pri trénovaní SOM je dôležité 
-nastaviť správnu veľkosť okolia, ktorá by mala počas trénovania postupne klesať.
-Veľkosť okolie neurónu v určitom kroku trénovania určuje excitačná funkcia, ktorá používa
-spojité gausovské okolie.
+Ako prvé sme museli správne nastaviť veľkosť okolia víťazného neurónu.
+Veľkosť okolia by nemala byť počas trénovania konštantná, ale mala by sa postupne zmenšovať.
+Vo fáze doľaďovania by mala byť čo najmenšia.
+Excitáciu neurónu v určitom kroku trénovania určuje excitačná funkcia. Zvolili sme spojitú
+excitačnú funkciu so spojitým gausovským okolím. 
 \begin{equation}
     N(i^{*}, i) = \exp^{- \frac{d^{2}_{E}(i^{*}, i)}{\lambda^{2}(t)}}
 \end{equation}
+Najvyššiu hodnotu má excitačná funkcia pre víťazný neurón, hodnota excitačnej funkcie pre ostatné 
+neuróny v sieti závisí od ich euklidovskej vzdialenosti v mriežke neurónov od ich víťaza. Veľmi vzdialené neuróny 
+majú takmer nulovú excitáciu a updatujú svoje váhy minimálne.
 Dôležitý je parameter $\lambda$, ktorým znižujem veľkosť okolia postupne v jednotlivých epochách.
 Najlepšie výsledky (najnižšie hodnoty kvantizačnej chyby) sme dosiahli pri použití nasledujúceho vzťahu pre výpočet hodnoty tohto parametra
 v jednotlivých epochách:
@@ -40,31 +55,34 @@ v jednotlivých epochách:
 \end{equation}
 Kde $\lambda_{f}$ je konštanta, ktorá určuje rýchlosť klesania. 
 $\lambda_{i}$ je polovica maximálnej vzdialenosti dvoch neurónov v mape, resp. 
-vzdialenosť dvoch neurónov na koncoch diagonály.
-$t$ je číslo aktuálnej epochy trénovania. Parametrer $t_{max}$ je počet 
+vzdialenosť dvoch neurónov na koncoch diagonály mriežky neurónov.
+$t$ je číslo aktuálnej epochy trénovania. Parametrer $t_{max}$ je celkový počet 
 epôch trénovania.
 
 
-\subsection{RecSOM parametre}
-Pri RecSOM kontext tvorí vektor excitácii neurónov z predchádzajúceho kroku.
-Excitácia neurónu $y$ je určená vzťahom a neobsahuje žiadny meniteľný parameter. 
-$d_{i}$ je súčet vzdialenosti vstupného vektora od váhového vektora a kontextového vektora od 
-kontextového vektora. So zmenšujúcou sa vzdialenosťou excitácia neurónu rastie exponenciálne, čo 
-znamená, že víťaz bude mať najvyššiu excitáciu.
+\subsection{Parametre pre RecSOM}
+Pri RecSOM kontext tvorí vektor aktivít neurónov z predchádzajúceho kroku.
+Aktivita neurónu $y$ je určená vzťahom:
+
 \begin{equation}
     y_{i} = \exp{(-d_{i})}
 \end{equation}
 
-Môžeme meniť parameter $\alpha$, ktorý sa používa pri samotnej výpočte vzdialenosti
+Neobsahuje žiadny meniteľný parameter. Hodnota $d_{i}$ je súčet vzdialenosti vstupného vektora od váhového vektora a kontextového vektora od 
+kontextového vektora. So zmenšujúcou sa vzdialenosťou excitácia neurónu rastie exponenciálne, čo 
+znamená, že víťaz a susedné neuróny budú mať najvyššiu excitáciu a vzdialené neuróny budú mať malú excitáciu.
+Výpočet kontextu pri RecSOM nevieme ovplyvnovať žiadnym parametrom.
+
+Môžeme však meniť parameter $\alpha$, ktorý sa používa pri samotnom výpočte vzdialenosti
 vstupu od váhového vektora a kontextu od vkontextového vektora. Tento parameter určuje váhu aktuálneho vstupu a váhu kontextu
 vo výslednej vzdialenosti.
 \begin{equation}
 	d_i = (1 - \alpha) \cdot ||x(t) - w_i||^{2} + \alpha \cdot ||y(t-1) - c_i||^{2} \quad c \in R^{N}
 \end{equation}
 V našich experimentoch sme testovali všetky hodnoty parametra $\alpha$ z uzavretého intervalu
-$<0, 1>$ s krokom $0.01$ (100 experimentov).
+$<0, 1>$ s krokom $0.01$ (dokopy 100 experimentov).
 
-% tabulka, konkrtetne pouzite parametre
+% TODO tabulka, konkrtetne pouzite parametre, vysledky
 
 Výsledky: \\
 
