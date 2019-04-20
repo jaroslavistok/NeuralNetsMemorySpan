@@ -41,8 +41,8 @@ class MergeSom:
 
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
-                current_distance = (1 - self.beta) * np.linalg.norm(x - self.weights[i][j]) + \
-                                   self.beta * np.linalg.norm(self.previous_winner_context - self.context_weights[i][j])
+                current_distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
+                                   self.alpha * np.linalg.norm(self.previous_winner_context - self.context_weights[i][j])
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
@@ -55,6 +55,9 @@ class MergeSom:
               lambda_f=1, eps=100, in3d=True, trace=True, trace_interval=10, sliding_window_size=3, log=True,
               log_file_name='', alpha=0.5, beta=0.5):
         count = len(inputs)
+
+        print("Alpha {}".format(alpha))
+        print("Beta {}".format(beta))
 
         self.alpha = alpha
         self.beta = beta
@@ -78,6 +81,8 @@ class MergeSom:
             print()
             print('Ep {:3d}/{:3d}:'.format(ep + 1, eps))
             print('  alpha_t = {:.3f}, lambda_t = {:.3f}'.format(alpha_t, lambda_t))
+
+            base_learning_rate = 1
 
             sum_of_distances = 0
             for i in range(sliding_window_size, count):
@@ -109,35 +114,51 @@ class MergeSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        # current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        # current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = base_learning_rate * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
 
                         last_adjustment = current_weight_adjustment
 
+                base_learning_rate -= 0.001
+
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
             quantization_errors.append(quantization_error)
-            memory_spans.append(self.calculate_memory_span_of_net())
+
+            memory_span = self.calculate_memory_span_of_net()
+            memory_spans.append(memory_span)
 
             print("Quantization error: {}".format(quantization_error))
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
             self.create_receptive_field()
-            print("Receptive field")
-            print(np.matrix(self.receptive_field))
-
-            sum_of_memory_spans += self.calculate_memory_span_of_net()
+            # print("Receptive field")
+            # print(np.matrix(self.receptive_field))
+            sum_of_memory_spans += memory_span
 
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
                         file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
-                                                     round(sum_of_memory_spans / eps, 2)))
+                                                     round(memory_span, 2)))
+                        file.write('\n')
+
+                    with open(log_file_name + '_max', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                     round(max(memory_spans), 2)))
+                        file.write('\n')
+
+                    with open(log_file_name + '_errors', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                    round(quantization_error, 2)))
                         file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
@@ -158,8 +179,7 @@ class MergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(
-                    sequences)
+                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
                 if longest_common_subsequence_length == 0:
                     continue
                 weight = len(sequences)
@@ -181,5 +201,5 @@ class MergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence
