@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 # matplotlib.use('TkAgg') # todo: remove or change if not working
 import matplotlib.pyplot as plt
+import seaborn
 from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D
 import os
@@ -11,6 +12,7 @@ import time
 ## plotting
 
 palette = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999']
+
 
 
 def plot_errors(title, errors, test_error=None, block=True):
@@ -171,6 +173,25 @@ def plot_sequence(targets, outputs=None, split=None, title=None, block=True):
     plt.gcf().canvas.set_window_title(title or ('Prediction' if outputs is not None else 'Sequence'))
     plt.show(block=block)
 
+
+def plot_receptive_field(receptive_field):
+    seaborn.heatmap(receptive_field)
+    plt.show(bbox_inches='tight')
+
+def plot_results(x, y, z, color='#24AF48'):
+    figure = plt.figure()
+    axis1 = figure.add_subplot(111, projection='3d')
+
+    # x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    # y = [2, 3, 4, 5, 1, 6, 2, 1, 7]
+
+    dx = np.ones(len(x))
+    dy = np.ones(len(x))
+    dz = z
+    z = np.zeros(len(x))
+
+    axis1.bar3d(x, y, z, dx, dy, dz, color=color)
+    plt.show()
 
 ## interactive drawing, very fragile....
 
