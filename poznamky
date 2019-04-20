@@ -34,11 +34,28 @@ Potom sa moze siet pouzit ako generator textu. (podla nejakeho romanu napriklad)
 Skryta vrstva z predosleho kroku = kontext
 
 Decaying context v msomke.
- Beriem vstup a C z predchadzajuceho kroku a nie vahy
- rekurzivna zabalena reprezentacia vsetkych predchadzaucich krokov
+Beriem vstup a C z predchadzajuceho kroku a nie vahy
+rekurzivna zabalena reprezentacia vsetkych predchadzaucich krokov
 
- Nezavisi od trenovania, nezavisi od toho co sme sa naucili
+Nezavisi od trenovania, nezavisi od toho co sme sa naucili
 
+----
+Popisat vplyvy parametrov
+Najlepsie somky porovnat na zaklade parametrov
+Inicializacia vah
 
+Chcelis me porovnat somky aj s srn, ale nepodarilo sa
+Lebo je podobna somke v niecom
 
+Zoberiem konretnu podpostupnost
+
+Uviest poznamku pod ciarou
+Rozhodli sme sa to preskumat
+Recsom a msom z hladiska hlbky pamate
+
+Spracovanie postupnosti
+somky su biologicky  motivovane, daju sa vizualizovat
+preto nas zaujima ci sa daju aj oni pouzit na sekvencie
+
+Ma to vyuzitie aj v priemyslel
 

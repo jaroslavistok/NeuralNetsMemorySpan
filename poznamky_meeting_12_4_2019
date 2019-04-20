@@ -1,0 +1,33 @@
+Iba z poslednej epochy
+Treba tu istu konfiguraciu vyskusat viackrat
+
+Zniznovanie learning rate v ramci jednej epochy
+
+Zvysit velkost somky
+
+Vykreslit kvantizacnu chybu, podobne ako heatmapy
+
+Bayesovska pravdepodobnost
+
+Budem prechadzat trenovaciu mnozinu, vzdy zoberiem
+oknno urcitej velkosti a budem si pamatat aktivitu na skrytej vrstve
+
+
+Disimilarity matrix
+
+pre 100 okien budem mat aktivitu
+Pre kazde dva z nich hladame vzdialenost tyh dvoch aktivit
+Bola by to tabulka 100 x 100
+Na diagonale bude nula
+a vsade inde budu vzdialenosti (euklidovske medzi jednotlivymi aktivitami na skrytej vrstve)
+NA zacaitok je vhodne zvolit male okno
+
+Nebude to take presne
+100 rozmerny priestor
+Vsetko co je v zdialenosti do 0.1
+
+AABC
+
+v_1
+Najst spolocny postfix
+Medzi nimi splocnu vzdialenost
