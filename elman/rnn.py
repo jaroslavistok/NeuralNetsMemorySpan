@@ -6,10 +6,11 @@ from elman.output import Softmax
 
 
 class Model:
-    def __init__(self, word_dim, hidden_dim=100, bptt_truncate=4):
+    def __init__(self, word_dim, hidden_dim=100, bptt_truncate=4, time_steps=5):
         self.word_dim = word_dim
         self.hidden_dim = hidden_dim
         self.bptt_truncate = bptt_truncate
+        self.time_steps = time_steps
         self.U = np.random.uniform(-np.sqrt(1. / word_dim), np.sqrt(1. / word_dim), (hidden_dim, word_dim))
         self.W = np.random.uniform(-np.sqrt(1. / hidden_dim), np.sqrt(1. / hidden_dim), (hidden_dim, hidden_dim))
         self.V = np.random.uniform(-np.sqrt(1. / hidden_dim), np.sqrt(1. / hidden_dim), (word_dim, hidden_dim))
@@ -38,6 +39,12 @@ class Model:
         output = Softmax()
         layers = self.forward_propagation(x)
         return [np.argmax(output.predict(layer.mulv)) for layer in layers]
+
+    def get_context(self, x):
+        output = Softmax()
+        layers = self.forward_propagation(x)
+        return layers[len(layers)-1].s
+
 
     def calculate_loss(self, x, y):
         assert len(x) == len(y)
