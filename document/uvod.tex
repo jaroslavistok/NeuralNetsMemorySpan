@@ -487,29 +487,6 @@ Rozdielne typy kontextov a ich vplyv na pamäťovú hĺbku rekurentných
 neurónových sietí je hlavným cieľom mojej diplomovej práce.
 
 
-% presunut niekam inam
-\subsection{Leaky integration mSOM}
-Pre potreby testovania pamäťovej hĺbky sme si vytvorili modifikovanú verziu mSOM, 
-ktorá používa odlišný kontext.
-Je to modfikovaná verzia mSOM, ktorej kontext je tvorený minulými vstupmi.
-V pôvodnej mSOM bol kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku.
-V našej modifikovanej verzii mSOM bude kontext tvoriť kombinácia všetkých vstupných vektorov z predchádzajúcich krokov.
-Zvyšné vlastnosti siete zostávajú rovnaké ako v pôvodnej mSOM. 
-
-Samotný kontext počítame pomocou nasledujúceho rekurzívneho vzťahu:
-\begin{equation}
-	c = \beta^{0} \cdot x_{t} + \beta^{1} \cdot x_{t-1} + 
-	\beta^{2} \cdot x_{t-2}....
-\end{equation}
-
-$\beta$ parameter je číslo z intervalu $\beta < 1 \wedge \beta > 0$ a
-$x_t, x_{t-1}, x_{t-2} ...$ sú vstupné vektory.
-
-Z rekurzívneho vzťahu vyplýva, že kontext je tvorený kombináciou predchádzajúcich vstupov
-pričom čím dávnejší je vstup, tým menšiu váhu má v kontexte, čo je zabezpečené umocňovaním
-$\beta$ parametra. Toto sa nazýva v matematike leaky integration. V našom prípade
-to znamená, že dávne vstupy postupne strácajú na dôležitosti pričom sa stále sa podieľajú 
-na vytváraní výsledného kontextu.
 
 
 

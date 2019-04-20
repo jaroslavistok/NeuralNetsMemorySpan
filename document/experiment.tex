@@ -59,6 +59,25 @@ vzdialenosť dvoch neurónov na koncoch diagonály mriežky neurónov.
 $t$ je číslo aktuálnej epochy trénovania. Parametrer $t_{max}$ je celkový počet 
 epôch trénovania.
 
+% rychlost ucenia
+Rovnako ako okolie aj rýchlosť učenia siete by mala počas
+procesu trénovania postupne klesať. Na začiatku chceme aby sa váhy menili čo najviac
+a ku koncu učenia chceme aby sa doľadovali iba detaily.
+Máme na výber 2 možnosti. Postupné znižovanie rýchlosti učenia v rámci jednej epochy, alebo 
+postupné znižovanie rýchlosti učenia v jednotlivých epochách, pričom počas každej epochy
+je rýchlosť učenia konštantná. 
+V naších experimentoch sme dosiahli lepšie výsledky postupním 
+znižovaním rýchlosti učenia v rámci jednej epochy. 
+Hodnoty rýchlosti učenia máme z intervalu $<0, 1>$.
+
+% veľkosť sliding window
+Vhodnú veľkosť posuvného okna sme určili postupním zvyšovaním jeho veľkosti pokiaľ pamäťová hĺbka stúpala. 
+Zaujímavosť, ktorú sme zistili počas experimentovania s veľkosťou pamäťového okna, bolo že 
+ak zvolíme príliš veľké posuvné okno, výsledná pamäťová hĺbka môže byť skreslená.
+Pri veľkom pamäťovom okne nám môžu neuróny, ktoré majú vo svojom pamäťovom okne uloženú iba 
+jednu sekvenciu skreslovať výslednú pamäťovú hĺbku, pretože pamäťová hĺbka takýchto
+neurónov je rovná veľkosti posuvného okna. Z tohto dôvodu nie je dobré nastaviť veľkosť pamäťového okna na 
+príliš veľkú hodnotu, ale treba určiť optimálnu hodnotu.
 
 \subsection{Parametre pre RecSOM}
 Pri RecSOM kontext tvorí vektor aktivít neurónov z predchádzajúceho kroku.
@@ -82,42 +101,280 @@ vo výslednej vzdialenosti.
 V našich experimentoch sme testovali všetky hodnoty parametra $\alpha$ z uzavretého intervalu
 $<0, 1>$ s krokom $0.01$ (dokopy 100 experimentov).
 
-% TODO tabulka, konkrtetne pouzite parametre, vysledky
+\subsection{Výsledky pre RecSOM}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+     \hline
+     Parameter & Hodnota \\ 
+     \hline\hline
+     alpha & 0 - 1  \\ 
+     \hline
+     size & 30x30  \\
+     \hline
+     počet epôch & 10  \\
+     \hline
+     veľkosť posuvného okna & 30  \\
+     \hline
+    \end{tabular}
+    \caption{Parametre RecSOM siete}
+    \label{table:1}
+    \end{table}
+    
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Pamňťová hĺbka}
+        \label{fig:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Kvantizačná chyba}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{A figure with two subfigures}
+    \label{fig:test}
+\end{figure}
+    
+% vyhodnotenie vysledkov experimentu
+
+% ukazka testov s najlepsimi parametrami
 
 Výsledky: \\
 
 % výsledky experimentu
-\subsection{Activity RecSOM parametre}
-Pri modifikovanej verzii RecSOM v ktorej počítame aktivitu neurónov
-odlišným spôsobom máme tiež $\beta$ parameter. 
-Na výpočet aktivity neurónu používame gaussovskú funkciu, ktorej priebeh ovplyvňujeme
-pomocou $\beta$ parametra. To znamená, už to nie je exponenciálna funkcia, ale má odlišný priebeh, 
-čo ovplyvňuje výsledné hodnoty aktivácii jednotlivých neurónov. Navyše výslednú hodnotu normalizujeme na
-hodnoty z intervalu $<0, 1>$.
+
+\subsection{Activity RecSOM}
+Keďže pri obyčajnej verzii RecSOM nevieme ovplyvniť žiadnym parametrom výpočet kontextu. Preto sme sa 
+rozhodli vytvoriť si modifikovanú verziu RecSOM. Rozdiel oproti pôvodnej verzii je v spôsobe počítania 
+aktivácie neurónov v kontexte. 
+Upravili sme pôvodný vzorec % (pridat poznamku pod ciarov)
 \begin{equation}
-    \exp^{-\beta \cdot d^2}
+    y_{i} = \exp{(-d_{i})}
+\end{equation}
+tak aby obsahoval parameter $\beta$.
+\begin{equation}
+    y_{i} = \exp^{(-\beta \cdot d^2)}
 \end{equation}
 
-V experimente sme skúšali všetky kombinácie parametrov $\alpha$ a $\beta$.
+Hodnota $d^2$ je umocnená euklidovská vzdialenosť neurónu v mriežke od víťazného neurónu.
+Na výpočet aktivity neurónu teda používame gaussovskú funkciu, ktorej "strmosť" ovplyvňujeme
+pomocou $\beta$ parametra. To znamená, že ovplyvňujeme rozdiely medzi hodnotami aktivácie víťazného neurónu
+a susedných neurónov. Je to v podstate excitačná funkcia pre výpočet kontextu.
 
+Pre malé hodnoty parametra $\beta$ hodnoty aktivácie neurónov so stúpajúcou vzdialenosťou od víťaza
+klesajú pomaly. Graf pre $\beta = 1$:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{assets/gaus1}
+    \caption{}
+\end{figure}
+
+Čím je $\beta$ parameter väčší tým je táto funkcia strmšia, čo znamená, že víťaz bude mať veľkú hodnotu aktivácie
+ale vzdialenejšie neuróny ju budú mať takmer nulovú.
+Pre $\beta = 30$ graf vyzerá nasledovne:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=8cm]{assets/gaus30}
+    \caption{Leaky MSOM results}
+\end{figure}
+
+Samotnú hodnotu aktivácie sme chceli ešte normalizovať sumou všetkých aktivácii:
+\begin{equation}
+    y_{i} = \frac{\exp^{(-\beta \cdot d_{i}^{2})}}{\sum_{j} \exp^{(-\beta \cdot d_{j}^{2})}}
+\end{equation}
+Pri použití normalizácie sme dostávali signifikantne horšie výsledky
+ako bez použitia normalizácie. Dôvodom bolo pravdepodobne to, že vychádzali veľmi malé
+hodnoty aktivácií a rozdiely boli takmer veľmi malé. Z tohto dôvodu sme zostali 
+pri pôvodnej nenormalizovanej verzii.
+
+\subsection{Activity RecSOM parametre}
+V našom experimente sme vyskúšali kombinácie parametrov $\alpha$ a $\beta$.
+Hodnoty parametra $\alpha$ sme zvolili z intervalu $<0, 1>$ s krokom $0.1$
+Hodnoty parametra $\beta$ sme zvolili tak aby sme otestovali rôzne strmosti aktivačnej funkcie.
+Konkrétne sme použili tieto hodnoty: $[5.0, 12.0, 13.0, 14.0, 15.0, 20.0, 30.0, 40.0, 50.0, 100.0]$
+Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta$.
+
+\subsection{Výsledky pre Activity RecSOM}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+     \hline
+     Parameter & Hodnota \\ 
+     \hline\hline
+     alpha & 0 - 1  \\ 
+     \hline
+     size & 30x30  \\
+     \hline
+     počet epôch & 10  \\
+     \hline
+     veľkosť posuvného okna & 30  \\
+     \hline
+    \end{tabular}
+    \caption{Parametre RecSOM siete}
+    \label{table:1}
+    \end{table}
+    
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Pamňťová hĺbka}
+        \label{fig:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Kvantizačná chyba}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{A figure with two subfigures}
+    \label{fig:test}
+\end{figure}
+    
+% vyhodnotenie vysledkov experimentu
+
+% ukazka testov s najlepsimi parametrami
 
 \subsection{MSOM parametre}
 Pri mSOM máme okrem $\alpha$ parametra aj $\beta$ parameter, ktorý určuje váhu
 váhového vektora víťaza z predchádzajúceho kroku $w_{i^{*}}$ a váhu kontextu
-z predchádzajúceho kroku $y_{i^{*}}$.
+z predchádzajúceho kroku $y_{i^{*}}$ pri výpočte kontextu. Je nazývaný aj ako "zmiešavací" parameter
+a určuje váhu jednotlivých zložiek kontextu pri výpočte.
 V našom experimente skúšame všetky kombinácie $\alpha$ a $\beta$ parametrov.
 Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$ (100 experimentov).
+Pri experimentovaní s mSOM sa snažíme zistiť aký vplyv má odlišný kontext, ktorý obsahuje iba informáciu
+o víťazovi z predchádzajúceho kroku, na pamäťovú hĺbku siete. mSOM má veľkú výhodu v signifikantne 
+vyššej rýchlosti učenia, vďaka zredukovanému kontextu.
 
+\subsection{Výsledky pre mSOM}
 
-\subsection{Decaying MSOM parametre}
-Pri modifikovanej verzii mSOM máme, podobne ako pri mSOM, $\beta$ parameter, ktorý vo vzťahu 
-pre výpočet kontextu určuje váhy jednotlivých minulých vstupov. Čím vyššia je hodnota $\beta$
-parametra tým vyššiu váhu majú jednotlivé minulé vstupy.
-Opäť skúšame všetky kombinácie $\alpha$ a $\beta$ parametrov.
-Hodnoty pre oba parametre sú, podobne ako pri mSOM, z uzavretého intervalu $<0, 1>$ s krokom $0.1$
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+     \hline
+     Parameter & Hodnota \\ 
+     \hline\hline
+     alpha & 0 - 1  \\ 
+     \hline
+     size & 30x30  \\
+     \hline
+     počet epôch & 10  \\
+     \hline
+     veľkosť posuvného okna & 30  \\
+     \hline
+    \end{tabular}
+    \caption{Parametre RecSOM siete}
+    \label{table:1}
+    \end{table}
+    
 
-% vysledky
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Pamňťová hĺbka}
+        \label{fig:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Kvantizačná chyba}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{A figure with two subfigures}
+    \label{fig:test}
+\end{figure}
+    
+% vyhodnotenie vysledkov experimentu
 
+% ukazka testov s najlepsimi parametrami
+
+\subsection{Decaying mSOM}
+Pre potreby nášho experimentu sme si vytvorili ďaľšiu modifikovanú verziu % prida poznamku pod ciarou
+rekurentnej SOM. Pri RecSOM kontext tvorí vektor aktivácii všetkých neurónov z predchádzajúceho kroku, 
+pri mSOM je to kombinácia vlastností víťazného neurónu z predchádzajúceho kroku. 
+Preto sme sa rozhodli použiť odlišný typ kontextu, ktorý bude tvorený kombináciou predchádzajúcih vstupov 
+siete a nie stavmi siete z minulých krokov.
+Zvyšné vlastnosti siete zostávajú rovnaké ako v iných rekurentných SOM.
+
+Kontext počítame pomocou nasledujúceho rekurzívneho vzťahu:
+\begin{equation}
+	c = \beta^{0} \cdot x_{t} + \beta^{1} \cdot x_{t-1} + 
+	\beta^{2} \cdot x_{t-2} \ddots \beta^{n} \cdot x_{t-n}
+\end{equation}
+
+$\beta$ parameter je číslo z intervalu $\beta < 1 \wedge \beta > 0$ a
+$x_t, x_{t-1}, x_{t-2} ...$ sú vstupné vektory z predchádzajúcich krokov.
+$t$ je číslo aktuálneho kroku a $n$ je veľkosť trénovacej množiny.
+
+Z rekurzívneho vzťahu vyplýva, že kontext je tvorený kombináciou predchádzajúcich vstupov
+pričom čím dávnejší je vstup, tým menšiu váhu má vo výslednom kontexte, čo je zabezpečené umocňovaním
+$\beta$ parametra. Toto sa nazýva leaky integration. V našom prípade
+to znamená, že dávne vstupy postupne strácajú na dôležitosti pričom sa stále sa podieľajú 
+na vytváraní výsledného kontextu.
+
+Čím je hodnota parametra $\beta$ vyššia, tým viac informácii z predchádzajúcich vstupov v sebe
+kontext obsahuje. Dôležitosť dávnejších vstupov exponenciálne klesá.
+
+\subsection{Decaying MSOM}
+
+V experimente opäť skúšame všetky kombinácie $\alpha$ a $\beta$ parametrov.
+Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$
+
+\subsection{Výsledky pre Decaying msom}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+     \hline
+     Parameter & Hodnota \\ 
+     \hline\hline
+     alpha & 0 - 1  \\ 
+     \hline
+     size & 30x30  \\
+     \hline
+     počet epôch & 10  \\
+     \hline
+     veľkosť posuvného okna & 30  \\
+     \hline
+    \end{tabular}
+    \caption{Parametre RecSOM siete}
+    \label{table:1}
+    \end{table}
+    
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Pamňťová hĺbka}
+        \label{fig:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_abcd}
+        \caption{Kvantizačná chyba}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{A figure with two subfigures}
+    \label{fig:test}
+\end{figure}
+    
+% vyhodnotenie vysledkov experimentu
+
+% ukazka testov s najlepsimi parametrami
 
 
 Experimentami sme zistili, že na hĺbku pamäte siete majú vplyv iba niektoré z nich. 
@@ -239,6 +496,8 @@ The table \ref{table:1} is an example of referenced \LaTeX elements.
 
 
 \section{Experiment so SRN a Reberovým automatom}
+Pri SRN sme sa pokúšali nájsť spôsob merania pamäťove hĺbky.
+
 
 
 
