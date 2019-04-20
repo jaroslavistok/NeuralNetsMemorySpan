@@ -1,6 +1,7 @@
 import numpy as np
 
 from helpers.Encoder import Encoder
+
 from helpers.LongestCommonSubsequence import LongestCommonSubsequence
 from plotting_helpers.plot_utils import *
 
@@ -45,8 +46,11 @@ class ActivityRecSom:
                 current_distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
                                    self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[i][j])
 
+                # self.current_step_activities = np.append(self.current_step_activities,
+                #                                  (np.exp(-self.beta * (current_distance ** 2)) / sum_of_activities))
+
                 self.current_step_activities = np.append(self.current_step_activities,
-                                                 (np.exp(-self.beta * (current_distance ** 2)) / sum_of_activities))
+                                                         np.exp(-self.beta * (current_distance ** 2)))
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
@@ -54,7 +58,6 @@ class ActivityRecSom:
                     winner_column = j
 
         return winner_row, winner_column
-
 
     def calculate_sum_of_activities(self, x):
         sum_of_activations = 0
@@ -71,6 +74,9 @@ class ActivityRecSom:
 
         self.alpha = alpha
         self.beta = beta
+
+        print("Alpha {}".format(alpha))
+        print("Beta {}".format(beta))
 
         count = len(inputs)
 
@@ -98,6 +104,8 @@ class ActivityRecSom:
 
             sum_of_distances = 0
 
+            base_learning_rate = 1
+
             for i in range(sliding_window_size, count):
                 x = Encoder.encode_character(inputs[i])
 
@@ -121,15 +129,15 @@ class ActivityRecSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
-                        current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
+                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = base_learning_rate * (self.previous_step_activities -
                                                                        self.context_weights[
                                                                            row_index, column_index]) * h
 
                         self.previous_step_activities = self.current_step_activities
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
-
+                base_learning_rate -= 0.001
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
@@ -140,17 +148,28 @@ class ActivityRecSom:
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
-            self.create_receptive_field()
-            print("Receptive field")
-            print(np.matrix(self.receptive_field))
+            # self.create_receptive_field()
+            # print("Receptive field")
+            # print(np.matrix(self.receptive_field))
 
-            sum_of_memory_spans += self.calculate_memory_span_of_net()
+            memory_span = self.calculate_memory_span_of_net()
+            sum_of_memory_spans += memory_span
 
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
-                        file.write('{},{},{},{}'.format(round(1 - self.alpha, 2), round(self.beta, 2),
-                                                     round(sum_of_memory_spans / eps, 2), quantization_error))
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                     round(memory_span, 2)))
+                        file.write('\n')
+
+                    with open(log_file_name + '_max', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                     round(max(memory_spans), 2)))
+                        file.write('\n')
+
+                    with open(log_file_name + '_errors', 'a') as file:
+                        file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                     round(quantization_error, 2)))
                         file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
@@ -173,7 +192,7 @@ class ActivityRecSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence
 
     def calculate_memory_span_of_net(self):

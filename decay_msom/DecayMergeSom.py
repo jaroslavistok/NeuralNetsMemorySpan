@@ -57,6 +57,11 @@ class DecayMergeSom:
 
         self.alpha = alpha
         self.beta = beta
+
+        print("Alpha {}".format(alpha))
+        print("Beta {}".format(beta))
+
+
         count = len(inputs)
 
         if trace:
@@ -81,6 +86,8 @@ class DecayMergeSom:
 
             sum_of_distances = 0
             inputs_history = []
+
+            base_learning_rate = 1
 
             for i in range(count):
                 x = Encoder.encode_character(inputs[i])
@@ -109,32 +116,44 @@ class DecayMergeSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = alpha_t * \
+                        current_context_weight_adjustment = base_learning_rate * \
                                                             (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
-
+                base_learning_rate -= 0.001
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
             quantization_errors.append(quantization_error)
-            memory_spans.append(self.calculate_memory_span_of_net())
+
+            memory_span = self.calculate_memory_span_of_net()
+            memory_spans.append(memory_span)
 
             print("Quantization error: {}".format(quantization_error))
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
-            self.create_receptive_field()
-            print("Receptive field")
-            print(np.matrix(self.receptive_field))
+            # self.create_receptive_field()
+            # print("Receptive field")
+            # print(np.matrix(self.receptive_field))
 
-            sum_of_memory_spans += self.calculate_memory_span_of_net()
+            sum_of_memory_spans += memory_span
             if ep == eps - 1:
                 with open(log_file_name, 'a') as file:
                     file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
-                                                 round(sum_of_memory_spans / eps, 2)))
+                                                 round(memory_span, 2)))
+                    file.write('\n')
+
+                with open(log_file_name+'_max', 'a') as file:
+                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                 round(max(memory_spans), 2)))
+                    file.write('\n')
+
+                with open(log_file_name+'_errors', 'a') as file:
+                    file.write('{},{},{}'.format(round(self.alpha, 2), round(self.beta, 2),
+                                                 round(quantization_error, 2)))
                     file.write('\n')
 
             if trace and ((ep + 1) % trace_interval == 0):
@@ -161,8 +180,7 @@ class DecayMergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(
-                    sequences)
+                longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
                 if longest_common_subsequence_length == 0:
                     continue
                 weight = len(sequences)
@@ -184,5 +202,5 @@ class DecayMergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence

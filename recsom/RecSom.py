@@ -55,6 +55,8 @@ class RecSom:
 
         self.alpha = alpha
 
+        print("Alpha {}".format(alpha))
+
         count = len(inputs)
 
         if trace:
@@ -84,6 +86,8 @@ class RecSom:
             last_adjustment = 0
             adjustment_deltas = []
 
+            base_learning_rate = 1
+
             for i in range(sliding_window_size, count):
                 x = Encoder.encode_character(inputs[i])
 
@@ -107,8 +111,11 @@ class RecSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
-                        current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
+                        # print("labmda {}".format(lambda_t))
+                        # print("H: {}".format(h))
+
+                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = base_learning_rate * (self.previous_step_activities -
                                                                        self.context_weights[
                                                                            row_index, column_index]) * h
 
@@ -118,29 +125,45 @@ class RecSom:
 
                         adjustment_deltas.append(current_weight_adjustment - last_adjustment)
                         last_adjustment = current_weight_adjustment
+                base_learning_rate -= 0.001
 
             quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
 
             quantizations_errors.append(quantization_error)
-            memory_spans.append(self.calculate_memory_span_of_net())
+
+            memory_span = self.calculate_memory_span_of_net()
+
+            memory_spans.append(memory_span)
 
             print("adjustments: {}".format(adjustments))
             print("Quantization error: {}".format(quantization_error))
-            print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
+            print("Memory span of the net {}:".format(memory_span))
 
             # receptive field
-            self.create_receptive_field()
+            # self.create_receptive_field()
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
-            sum_of_memory_spans += self.calculate_memory_span_of_net()
+            sum_of_memory_spans += memory_span
 
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
-                        file.write('{},{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
-                                                     round(sum_of_memory_spans / eps, 2), quantization_error))
+                        file.write('{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                                                    round(memory_span, 2)))
                         file.write('\n')
+
+                    with open(log_file_name + '_max', 'a') as file:
+                        file.write('{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                                                     round(max(memory_spans), 2)))
+                        file.write('\n')
+
+                    with open(log_file_name+'_errors', 'a') as file:
+                        file.write('{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                                                    round(quantization_error, 2)))
+                        file.write('\n')
+
+
 
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
@@ -162,7 +185,7 @@ class RecSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence
 
     def calculate_memory_span_of_net(self):
