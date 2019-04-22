@@ -79,6 +79,14 @@ jednu sekvenciu skreslovať výslednú pamäťovú hĺbku, pretože pamäťová 
 neurónov je rovná veľkosti posuvného okna. Z tohto dôvodu nie je dobré nastaviť veľkosť pamäťového okna na 
 príliš veľkú hodnotu, ale treba určiť optimálnu hodnotu.
 
+% vyber rozmerov a pocet trenovacich epoch mapy
+Rozmery mapy a počet trénovacích epôch sme zvolili na základe vlastností zvolenej trénovacej množiny. 
+Tiež sme museli brať do úvahy aj časovú náročnosť trénovania sietí (najmä pri RecSOM).
+Potrebovali sme aby sa sieť dokázala správne natrénovať na danej trénovacej množine a zároveň, aby nám experimenty dobehli v rozumnom čase.
+Keďže SOMky sa dokážu natrénovať relatívne rýchlo, zvolili sme väčšie rozmery mapy (30x30) a o niečo nižší počet trénovacích epôch (10).
+S touto kombináciou sme dosiahli nízke hodnoty kvantizačných chýb a dobré hodnoty pamäťových hĺbok.
+
+
 \subsection{Parametre pre RecSOM}
 Pri RecSOM kontext tvorí vektor aktivít neurónov z predchádzajúceho kroku.
 Aktivita neurónu $y$ je určená vzťahom:
@@ -109,43 +117,83 @@ $<0, 1>$ s krokom $0.01$ (dokopy 100 experimentov).
      \hline
      Parameter & Hodnota \\ 
      \hline\hline
-     alpha & 0 - 1  \\ 
+     alpha & 0 - 1  (krok: 0.01) \\ 
      \hline
      size & 30x30  \\
      \hline
      počet epôch & 10  \\
      \hline
-     veľkosť posuvného okna & 30  \\
+     veľkosť posuvného okna & 15  \\
      \hline
     \end{tabular}
-    \caption{Parametre RecSOM siete}
+    \caption{Trénovacie parametre RecSOM siete}
     \label{table:1}
     \end{table}
-    
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Pamňťová hĺbka}
+        \includegraphics[width=\linewidth]{assets/recsom_memory_span}
+        \caption{Recsom pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Kvantizačná chyba}
+        \includegraphics[width=\linewidth]{assets/recsom_quantization_errors}
+        \caption{Recsom kvantizačné chyby}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{A figure with two subfigures}
+    \caption{Heatmapy pre Recsom}
     \label{fig:test}
 \end{figure}
-    
-% vyhodnotenie vysledkov experimentu
 
+\subsection{Analýza výsledkov RecSOM}
+
+Hodnoty na x-ovej osy sú hodnoty $\alpha$  a na y-ovej 
+osy sú hodnoty $(\alpha - 1)$. Čísla v jednotlivých políčkach sú pamäťové hĺbky 
+pre danú kombináciu parametrov. Čím je farba políčka svetlejšia, tým je pamäťová hĺbka vyššia.
+Čím je farba tmavšia, tým je hodnota nižšia.
+
+Ak sú hodnoty oboch parametrov nulové, vtedy sieť dosahuje nízku hodnotu pamäťovej hĺbky pretože sa nedokáže správne natrénovať.
+
+
+RecSOM dosiahla najvyššiu hodnotu pamäťovej hĺbky pri 
+hodnote parametra $\alpha = 0.28$, resp. $(1 - \alpha) = 0.72$. To znamená, že
+vo výpočte vzdialenosti má vzdialenosť od vstupu od váhového vektora váhu $0.72$
+a vzdialenosť kontextového vektora od kontextových váh má váhu $0.28$.
+Hodnota pamäťovej hĺbky, ktorú recSOM dosiahla je priemerná pričom samotné 
+trénovanie bolo relatívne pomalé.
+Všeobecne vo výsledkoch vidíme, že pamäťová hĺbka RecSOM nie je veľmi ovplyvňovaná hodnotou parametra $\alpha$ a rozdiely nie sú veľké. 
+Je to pravdepodobne dané tým, že RecSOM má veľmi bohatý kontext, v ktorom sa uchováva veľké množstvo informácii (aktivita celej mapy). Skutočnosť že pamäťová hĺbka RecSOM nie
+je signifikantne ovplyvnená váhou kontextu nám napovedá aj to, že informácie uchovávané v RecSOM kontexte nie sú relevantné pre hodnotu pamäťovej hĺbky a môžu mať skôr negatívny vplyb.
+
+Pamäťovú hĺbku RecSOM ovplyvňuje váha aktuálneho vstupu
+(hodnota $(\alpha - 1)$), čím je vyššia tým je väčšia pravdepodobnosť, že sieť dosiahne horšiu hodnotu pamäťovej hĺbky. Rovnako váha aktuálneho vstupu
+ovplyvňuje aj samotné učenie siete, ako je možno vidieť na heatmape kvantizačných chýb. Pri hodnotách $>0.6$ sa už sieť v mnohých prípadoch nedokázala natrénovať správne.
+
+ 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_memory_span}
+        \caption{Recsom pamäťová hĺbka}
+        \label{fig:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{assets/recsom_quantization_errors}
+        \caption{Recsom kvantizačné chyby}
+        \label{fig:sub2}
+    \end{subfigure}
+    \caption{Heatmapy pre Recsom}
+    \label{fig:test}
+\end{figure}
+
+% todo ukazka priebehu klesacujec kvantizacnej chyby pri najvhodnejsej kombinacii parametrov
+% todo priemer kvantizacnych chyb s hodnotou najlepsieho parametra
 % ukazka testov s najlepsimi parametrami
-
-Výsledky: \\
 
 % výsledky experimentu
 
@@ -195,6 +243,9 @@ ako bez použitia normalizácie. Dôvodom bolo pravdepodobne to, že vychádzali
 hodnoty aktivácií a rozdiely boli takmer veľmi malé. Z tohto dôvodu sme zostali 
 pri pôvodnej nenormalizovanej verzii.
 
+Hodnotu aktivácie určitého neurónu pri Activity RecSOM môžeme interpretovať aj nasledovne:
+Aktivita neurónu vyjadruje bayesovskú pravdepdobnosť, že neurón bude víťazným neurónom.
+
 \subsection{Activity RecSOM parametre}
 V našom experimente sme vyskúšali kombinácie parametrov $\alpha$ a $\beta$.
 Hodnoty parametra $\alpha$ sme zvolili z intervalu $<0, 1>$ s krokom $0.1$
@@ -210,16 +261,18 @@ Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta
      \hline
      Parameter & Hodnota \\ 
      \hline\hline
-     alpha & 0 - 1  \\ 
+     alpha & 0 - 1 (krok 0.1) \\ 
+     \hline
+     beta & [5.0, 12.0, 13.0, 14.0, 15.0, 20.0, 30.0, 40.0, 50.0, 100.0]\\ 
      \hline
      size & 30x30  \\
      \hline
      počet epôch & 10  \\
      \hline
-     veľkosť posuvného okna & 30  \\
+     veľkosť posuvného okna & 15  \\
      \hline
     \end{tabular}
-    \caption{Parametre RecSOM siete}
+    \caption{Parametre Activity RecSOM siete}
     \label{table:1}
     \end{table}
     
@@ -228,34 +281,47 @@ Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Pamňťová hĺbka}
+        \includegraphics[width=\linewidth]{assets/activity_recsom_memory_span}
+        \caption{Activity Recsom pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Kvantizačná chyba}
+        \includegraphics[width=\linewidth]{assets/activity_recsom_quantization_errors}
+        \caption{Activity Recsom kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{A figure with two subfigures}
+    \caption{Heatmapy pre Activity RecSOM}
     \label{fig:test}
 \end{figure}
     
-% vyhodnotenie vysledkov experimentu
+\subsection{Analýza výsledkov Activity RecSOM}
+Na x-ovej osy sú hodnoty parametra $\beta$ a na y-ovej osy sú hodnoty parametra $\alpha$.
+
+Výsledky Activity RecSOM z hľadiska maximálnej hĺbky pamäte sú podobné výsledkom klasickej RecSOM a nie sú príliš 
+zaujímavé. Keď je parameter $\alpha = 0$ je pamäťová hĺbka na minime, keďže kontext vtedy prakticky neexistuje.
+Čo je však zaujimavé, je vplyv $\beta$ parametra na hodnoty pamäťovej hĺbky. Najvyššie hodnoty pamäťovej hĺbky sieť 
+dosahuje pri vysokých hodnotách $\beta$ parametra $\beta > 20.0$. Čím vyššia je hodnota tohto parametra tým je aktivita
+víťazného neurónu v kontexte viac odlíšená od aktivity ostatných neurónov (gausovská funkcia je strmšia), čo potvrdzuje naše predpoklady z 
+experimentu s RecSOM sieťou. Príliš veľké množstvo nerelevantných informácii v kontexte má negatívny vplyv na pamäťovú hĺbku siete.
+Čím viac sú vlastnosti kontextu sústredené na víťazný neurón, tým lepšie vyššie hodnoty pamäťovej hĺbky sieť dosahuje a naopak.
+
+Na výsledkoch je vidno aj to, že čím má kontext vo výpočte vzdialenosti vyššiu váhu, tým sieť dosahuje horšie 
+výsledky a tiež rastie aj kvantizačná chyba (sieť sa ťažšie učí), čo opäť potvrdzuje to, že príliš informačne bohatý kontext má negatívny vplyv
+na pamäťovú hĺbku siete.
 
 % ukazka testov s najlepsimi parametrami
 
 \subsection{MSOM parametre}
-Pri mSOM máme okrem $\alpha$ parametra aj $\beta$ parameter, ktorý určuje váhu
+Pri mSOM máme okrem $\alpha$ parametra, používaného pri výpočte vzdialenosti, opäť aj $\beta$ parameter, ktorý určuje váhu
 váhového vektora víťaza z predchádzajúceho kroku $w_{i^{*}}$ a váhu kontextu
 z predchádzajúceho kroku $y_{i^{*}}$ pri výpočte kontextu. Je nazývaný aj ako "zmiešavací" parameter
-a určuje váhu jednotlivých zložiek kontextu pri výpočte.
+a určuje váhu jednotlivých zložiek vlastností víťazného neurónu v kontexte.
 V našom experimente skúšame všetky kombinácie $\alpha$ a $\beta$ parametrov.
 Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$ (100 experimentov).
 Pri experimentovaní s mSOM sa snažíme zistiť aký vplyv má odlišný kontext, ktorý obsahuje iba informáciu
 o víťazovi z predchádzajúceho kroku, na pamäťovú hĺbku siete. mSOM má veľkú výhodu v signifikantne 
-vyššej rýchlosti učenia, vďaka zredukovanému kontextu.
+vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
 
 \subsection{Výsledky pre mSOM}
 
@@ -265,16 +331,18 @@ vyššej rýchlosti učenia, vďaka zredukovanému kontextu.
      \hline
      Parameter & Hodnota \\ 
      \hline\hline
-     alpha & 0 - 1  \\ 
+     alpha & 0 - 1 (krok 0.1)  \\ 
+     \hline
+     beta & 0 - 1  (krok 0.1) \\ 
      \hline
      size & 30x30  \\
      \hline
      počet epôch & 10  \\
      \hline
-     veľkosť posuvného okna & 30  \\
+     veľkosť posuvného okna & 15  \\
      \hline
     \end{tabular}
-    \caption{Parametre RecSOM siete}
+    \caption{Parametre mSOM siete}
     \label{table:1}
     \end{table}
     
@@ -283,20 +351,42 @@ vyššej rýchlosti učenia, vďaka zredukovanému kontextu.
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Pamňťová hĺbka}
+        \includegraphics[width=\linewidth]{assets/msom_memory_span}
+        \caption{mSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Kvantizačná chyba}
+        \includegraphics[width=\linewidth]{assets/msom_quantization_errors}
+        \caption{mSOM kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{A figure with two subfigures}
+    \caption{Heatmapy pre mSOM}
     \label{fig:test}
 \end{figure}
-    
+ Na x-ovej osy sú hodnoty parametra $\alpha$ a na y-ovej osy sú hodnoty parametra $\beta$. 
+ Pamäťová hĺbka pri mSOM dosahuje minimá v ak je jeden z parametrov $\alpha$ alebo $\beta$ nulový a teda sieť nemá
+ žiadny alebo len minimálny kontext. Ak je $\alpha = 0$, tak sa zanedbáva kontextová zložka pri výpočte vzdialenosti a 
+ teda aj pri samotnom trénovaní siete a keď je $\beta = 0$ tak sa zanedbávajú váhy víťaza z predchádzajúceho kroku pri výpočte kontextu.
+ Minimum pamäťovej hĺbky mSOM dosahuje ak sú $\alpha$ aj $\beta$ nulové.
+
+ mSOM dosahuje najvyššie hodnoty pamäťovej hĺbky celkovo zo všetkých testovaných sietí, pričom je to zároveň 
+ výpočtovo najefektívnejšia verzia rekurentnej SOM. 
+ Maximálne hodnoty pamäťovej hĺbky dosahuje pri nízkych hodnotách $\alpha = 0.2 $, čo znamená že pri výpočte vzdialenosti má vyššiu váhu vzdialenosť vstupu od 
+ váhového vektora ako vzdialenosť kontextu od kontextového vektora. 
+ Pri maximách sú hodnoty parametra $\beta$ sú okolo hodnoty $0.5$, čo znamená, že obe zložky kontextu 
+ (vlastnosti víťazného neurónu z predchádzajúceho kroku a samotný kontext z predchádzajceho kroku) sú rovnako dôležité.
+ Pri maximách má sieť aj nízku kvantizačnú chybu a teda učí sa správne. 
+ Najvyššie hodnoty kvantizačnej chyby sieť dosahuje ak sú oba parametre vysoké. Toto opäť potvrdzuje, že ak majú rekurentné
+ siete príliš veľa informácii o kontexte a príliš málo informácii z aktuálneho vstupu, tak sa horšie trénujú.
+
+
+ Čo je pri mSOM najzaujímavejšie je to, že nám tieto výsledky opäť potvrdili predpoklady, ktoré sme zistili pre recSOM a Activity recSOM a to že
+ kontext nemusí obsahovať príliš veľa informácii. Pri mSOM kontext obsahuje iba kombináciu vlastností víťazného neurónu z predchádzajúceho kroku a teda tento 
+ experiment s mSOM nám potvrdil, že pre pamäťovú hĺbku siete sú najdôležitejšie vlastnosti víťazného neurónu.
+
+ mSOm dosiahla najlepšie výsledky spomedzi všetkých testovaných sietí.
+
 % vyhodnotenie vysledkov experimentu
 
 % ukazka testov s najlepsimi parametrami
@@ -329,9 +419,8 @@ na vytváraní výsledného kontextu.
 kontext obsahuje. Dôležitosť dávnejších vstupov exponenciálne klesá.
 
 \subsection{Decaying MSOM}
-
 V experimente opäť skúšame všetky kombinácie $\alpha$ a $\beta$ parametrov.
-Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$
+Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$.
 
 \subsection{Výsledky pre Decaying msom}
 \begin{table}[h!]
@@ -340,45 +429,57 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$
      \hline
      Parameter & Hodnota \\ 
      \hline\hline
-     alpha & 0 - 1  \\ 
+     alpha & 0 - 1 (krok 0.1)  \\ 
+     \hline
+     beta & 0 - 1  (krok 0.1) \\ 
      \hline
      size & 30x30  \\
      \hline
      počet epôch & 10  \\
      \hline
-     veľkosť posuvného okna & 30  \\
+     veľkosť posuvného okna & 15 \\
      \hline
     \end{tabular}
     \caption{Parametre RecSOM siete}
     \label{table:1}
     \end{table}
     
-
 \begin{figure}[H]
     \centering
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Pamňťová hĺbka}
+        \includegraphics[width=\linewidth]{assets/decay_msom_memory_span}
+        \caption{Decay mSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{assets/recsom_abcd}
-        \caption{Kvantizačná chyba}
+        \includegraphics[width=\linewidth]{assets/decay_msom_quantization_errors}
+        \caption{Decay mSOM kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{A figure with two subfigures}
+    \caption{Heatmapy pre Decay mSOM}
     \label{fig:test}
 \end{figure}
     
+Na x-ovej osy sú hodnoty parametra $\beta$ a na y-ovej osy sú hodnoty parametra $\alpha$.
+Najvyššie dosiahnuté hodnoty pamäťovej hĺbky pri decay SOM sú porovnateľné s recSOM, resp. Activity recSOM.
+Na grafe pamäťovej hĺbky je vidno, že hodnoty pamäťovej hĺbky závisia iba od hodnoty parametra $\beta$ v rekurzívnom vzťahu
+pre výpočet kontextu.
+Maximálne hodnoty pamäťovej hĺbky sieť dosahuje parameter $\beta = 1$. To znamená, že všetky predchádzajúce vstupy v kontexte majú
+rovnakú váhu, avšak sieť sa pri takto bohatom kontexte minulých vstupov nedokáže dobre natrénovať, čo je vidno na grafe kvantizačných chýb.
+Týmto experimentom sme vyskúšali aký vplyv na pamäťovú hĺbku siete má úplne odlišný druh kontextu a či sme s ním schopný sieť natrénovať.
+Ukázalo sa, že s takýmto kontextom dokážeme dosiahnuť podobné výsledky ako s RecSOM. 
+Pri RecSOM kontext obsahuje reprezentáciu vplyvov jednotlivých minulých vstupov na sieť a tu je to kombinácia samotných vstupov. 
+
 % vyhodnotenie vysledkov experimentu
 
 % ukazka testov s najlepsimi parametrami
 
 
-Experimentami sme zistili, že na hĺbku pamäte siete majú vplyv iba niektoré z nich. 
-Najdôležitejšie parameters, ktoré vplývajú na hĺbku pamäte neurónovej siete sú parameters $\alpha$ a $\beta$
+Experimentami sme zistili, že na hĺbku pamäte siete má najväčší vplyv samotné zloženie kontextu.
+
+Najdôležitejšie parameter, ktoré vplývajú na hĺbku pamäte neurónovej siete sú parameters $\alpha$ a $\beta$
 vo vzťahu pre výpočet vzdialenosti vstupného vektora od určitého neurónu v siete (čiže od jeho váhového a kontextového vektora).
 % TODO pridat rovnicu na ilustraciu
 Tieto dva parameters určujú pomer dôležitosti aktuálneho vstupu a dôležitosť kontextu, pri výpočte vzdialenosti (kvantizačnej chyby).
@@ -391,112 +492,56 @@ Experiment prebiehal nasledujúcim spôsobom:
     \item Na záver sme vykreslili heatmapu, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
 \end{itemize}
 
-% TODO vyber rychlosti ucenia (konstantna / postupne zmensujuca?)
-
-Počet epôch sme určili na základe kvantizačnej chyby.
-Počet epôch sme postupne zvyšovali a keď kvantizačná chyba prestala signifikantne klesať, resp. dosiahla 
-svoje minimum zastavali sme ho na tejto hodnote a ďalej nezvyšovali. SOM sa dokážu relatívne rýchlo učiť a 
-teda počet epôch nemusí byť vysoký, čo je veľkou výhodou pri experimentovaní, kedže trénovanie netrvá príliš dlhú dobu
-a tým pádom sme mohli vyskúšať viac kombinácii a modifikácii.
-
-Dostatočnú veľkosť pamäťového okna sme určili podobne ako počet epôch. Parameter sme postupne zvyšovali
-a zastavili na hodnote, keď pamäťová hĺbka siete prestala stúpať, čiže veľkosť pamäťového okna už
-neovplyvňovala hĺbku pamäte a ďalšie zvyšovanie parametra nemalo zmysel. 
-
-Na základe tohto sme zistili, že pre každý typ siete sú ideálne hodnoty týchto parametrov odlišné.
-
-
-\section{Vyhodnotenie rôznych kombinácii alpha a beta parametrov}
-
-The table \ref{table:1} is an example of referenced \LaTeX elements.
- 
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|} 
- \hline
- Parameter & Hodnota \\ 
- \hline\hline
- 1 & 6  \\ 
- \hline
- 2 & 7   \\
- \hline
- 3 & 545  \\
- \hline
- 4 & 545  \\
- \hline
- 5 & 88 \\  
- \hline
-\end{tabular}
-\caption{Parametre RecSOM siete}
-\label{table:1}
-\end{table}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=8cm]{assets/recsom_abcd}
-    \caption{Rec SOM results}
-\end{figure}
-
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|} 
-     \hline
-     Parameter & Hodnota \\ 
-     \hline\hline
-     1 & 6  \\ 
-     \hline
-     2 & 7   \\
-     \hline
-     3 & 545  \\
-     \hline
-     4 & 545  \\
-     \hline
-     5 & 88 \\  
-     \hline
-    \end{tabular}
-    \caption{Parametre mSOM siete}
-    \label{table:2}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=8cm]{assets/msom_abcd}
-    \caption{MSOM results}
-\end{figure}
-
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|} 
-     \hline
-     Parameter & Hodnota \\ 
-     \hline\hline
-     1 & 6  \\ 
-     \hline
-     2 & 7   \\
-     \hline
-     3 & 545  \\
-     \hline
-     4 & 545  \\
-     \hline
-     5 & 88 \\  
-     \hline
-    \end{tabular}
-    \caption{Parametre leaky mSOM siete}
-    \label{table:2}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=8cm]{assets/leakymsom_abcd}
-    \caption{Leaky MSOM results}
-\end{figure}
-
-
 \section{Experiment so SRN a Reberovým automatom}
-Pri SRN sme sa pokúšali nájsť spôsob merania pamäťove hĺbky.
+SRN má niektoré vlastnosti podobné so samoorganizujúcimi sa mapami. 
+Na svojej skrytej vrstve si vytvára akokeby vysoko rozmernú somku. 
+
+Naším hlavným cieľom pri experimente s SRN bolo preskúmať vlastnosti siete a pokúsiť sa nájsť 
+spôsob merania a vyhodnotenia pamäťovej hĺbky.
+SRN má tiež niekoľko zaujímavých vlastností, ktoré sme chceli preskúmať.
+
+Experiment prebiehal nasledujúcim spôsobom:
+Podobne ako pri experimentoch so samoorganizujúcimi sa mapami, ako prvé sme si potrebovali vytvorič vhodnú trénovaciu množinu.
+Rozhodli sme sa, že použijeme rovnakú trénovaciu množinu ako pri samoorganizujúcich sa mapách.
+
+Vstupom je vždy jedno písmeno zo sekvencie písmen $abcd$ a ako očakávaný výstup je vždy nasledujúce písmeno v sekvencii.
+Takýmto spôsobom sme vytvorili trénovacie príklady.
+Prvým krokom bolo overiť, či naša implementácia siete funguje správne. 
+Ako chybovú funkciu sme použili log loss a aktivačnú funkciu na výstupnej vrstve sme použili softmax. 
+Pri testovaní nám chyba klesala a sieť sa učila správne a predikovala korektné výsledky.
+
+Keď sme mali funkčnú implementáciu SRN Elmanovej siete, natrénovali sme ju na vytvorenej trénovacej množine.
+
+SRN si na kontextovej vrstve vytvára kontextovú reprezentáciu vstupov. Preto sme sa rozhodli, že 
+správne natrénovanej SRN budeme postupne predkladať písmená z trénovacej množiny, pričom si po každej predikcii
+, ktorú sieť spraví ukladáme kontextový vektor siete. 
+Ku každému takémuto vektoru priradíme posuvné okno daného znaku z trénovacej množiny (podobne ako pri experimentoch so SOMkami).
+Po predložení všetkých znakov z trénovacej množiny sieti sme dostali slovník posuvných okien a prislúchajúcimi kontextovými vektormi
+zo siete.
+Tieto dáta sme potrebovali nejakým spôsobom vizualizovať, aby sme videli nejaké súvislosti medzi reprezentáciou vstupov na kontextovej vrstve a 
+podobnosťou samotných vstupov, na čo je vhodné použiť reprezentáciu vo forme dendogramu.
+Na vykreslenie dendogramu je potrebné vytvoriť tzv. podobnostnú maticu (ang. similarity matrix), kde 
+riadky aj stĺpce reprezentujú jednotlivé kontextové vektory a hodnoty v samotnej matici sú euklidovské vzdialenosti medzi týmito vektormi.
+Z toho vyplýva, že na diagonále máme samé nulové hodnoty (rovnaké vektory majú nulovú vzdialenosť od seba).
+
+% pridat ukazku similarity matrix
+
+Z takejto matice potom vieme vytvoriť dendogram, ktorý znázorňuje súvislosti medzi euklidovskou vzdialenosťou jednotlivýh vektorov a samotnými posuvnými oknami z trénovacej množiny.
+Z toho vieme potom povedať, ktoré vstupy sú vo vnútornej reprezentácii SRN blízke. 
+
+
+
+
+Zaujímavou vlastnosťou SRN je aj to, že si na skrytej vrstve dokáže vytvoriť vlastnú reprezentáciu stavového automatu, ak 
+je trénovaná na trénovacej množine, ktorá je tvorená stringom generovaným reberovým automatom. Vďaka tejto vlastnosti
+by sa mala SRN natrénovať na takejto trénovacej množine s nulovou chybou.
+
+
+
+Pri SRN sme opäť použili vlastnú modifikovanú implementáciu siete, aby sme boli schopní
+ukladať si kontext siete pri predikovaní.
+
+
 
 
 
