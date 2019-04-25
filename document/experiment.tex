@@ -1,6 +1,6 @@
 \chapter{Experiment}
 
-Experimentom v našej práci je určovanie hĺbky pamäte a vyhodnotenie vplyvu rôznych
+Experimentom v našej práci je meranie hĺbky pamäte a vyhodnotenie vplyvu rôznych
 hyper parametrov a typov kontextov na hĺbku pamäte rekurentných SOM.
 Cieľom nášho experimentu je aj nájdenie 
 optimálnej kombinácie parametrov pre všetky typy porovnávaných sietí a ich vzájomné porovnanie.
@@ -85,6 +85,9 @@ Tiež sme museli brať do úvahy aj časovú náročnosť trénovania sietí (na
 Potrebovali sme aby sa sieť dokázala správne natrénovať na danej trénovacej množine a zároveň, aby nám experimenty dobehli v rozumnom čase.
 Keďže SOMky sa dokážu natrénovať relatívne rýchlo, zvolili sme väčšie rozmery mapy (30x30) a o niečo nižší počet trénovacích epôch (10).
 S touto kombináciou sme dosiahli nízke hodnoty kvantizačných chýb a dobré hodnoty pamäťových hĺbok.
+
+Pri určovaní vhodnej veľkosti siete je to vždy kompromis medzi rozlišovaciou schopnosťou jednotlivých vstupov, schopnosťou
+zachovať podobné vstupy topologicky čo najbližšie pri sebe a výpočtovou náročnosťou. 
 
 
 \subsection{Parametre pre RecSOM}
@@ -396,7 +399,8 @@ Pre potreby nášho experimentu sme si vytvorili ďaľšiu modifikovanú verziu 
 rekurentnej SOM. Pri RecSOM kontext tvorí vektor aktivácii všetkých neurónov z predchádzajúceho kroku, 
 pri mSOM je to kombinácia vlastností víťazného neurónu z predchádzajúceho kroku. 
 Preto sme sa rozhodli použiť odlišný typ kontextu, ktorý bude tvorený kombináciou predchádzajúcih vstupov 
-siete a nie stavmi siete z minulých krokov.
+siete a nie stavmi siete z minulých krokov. To znamená, že kontext nie je ovplyvnený od samotného procesu trénovania
+ani od toho čo sa sieť naučila v predchádzajúcich krokoch, ale iba od samotných vstupných dát.
 Zvyšné vlastnosti siete zostávajú rovnaké ako v iných rekurentných SOM.
 
 Kontext počítame pomocou nasledujúceho rekurzívneho vzťahu:
@@ -476,45 +480,78 @@ Pri RecSOM kontext obsahuje reprezentáciu vplyvov jednotlivých minulých vstup
 
 % ukazka testov s najlepsimi parametrami
 
+\section {Porovnanie výsledkov SOM}
+Po nájdení ideálnych parametrov pre všetky 3 typy sietí, sme spustili 5 behov s rovnakými
+parametrami a rovnakou počiatočnou inicializáciou váh a spravili priemer týchto hodnôt.
 
-Experimentami sme zistili, že na hĺbku pamäte siete má najväčší vplyv samotné zloženie kontextu.
+\subsection{RecSOM}
 
-Najdôležitejšie parameter, ktoré vplývajú na hĺbku pamäte neurónovej siete sú parameters $\alpha$ a $\beta$
-vo vzťahu pre výpočet vzdialenosti vstupného vektora od určitého neurónu v siete (čiže od jeho váhového a kontextového vektora).
-% TODO pridat rovnicu na ilustraciu
-Tieto dva parameters určujú pomer dôležitosti aktuálneho vstupu a dôležitosť kontextu, pri výpočte vzdialenosti (kvantizačnej chyby).
+\subsection{Activity RecSOM}
+\subsection{mSOM}
 
-Experiment prebiehal nasledujúcim spôsobom:
-\begin{itemize}
-    \item Vybrali sme vhodnú trénovaciu sekvenciu, počet epôch trénovania a dostatočnú veľkosť pamäťového okna
-    \item Spustili sme trénovanie na všetkých kombináciach týchto dvoch parametrov s krokom 0.1
-    \item Hodnoty pamäťovej hĺbky sme ukladali do súboru
-    \item Na záver sme vykreslili heatmapu, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
-\end{itemize}
+\subsection{Decay mSOM}
+
+
+
+\section{ Vyhodnotenie experimentu }
+Experimentami sme zistili, že na hĺbku pamäte je najviac ovplyvnená zložením samotného kontextu.
+Najdôležitejšie parametre, ktoré vplývajú na hĺbku pamäte rekurentných SOM parametre $\alpha$ a $\beta$
+$\alpha$ vystupuje vo vzťahu pre výpočet vzdialenosti vstupu od určitého neurónu v sieti.
+$\beta$ zase ovplyvňuje výpočet samotného kontextu.
+
+
 
 \section{Experiment so SRN a Reberovým automatom}
 SRN má niektoré vlastnosti podobné so samoorganizujúcimi sa mapami. 
-Na svojej skrytej vrstve si vytvára akokeby vysoko rozmernú somku. 
+Na svojej skrytej vrstve si vytvára akokeby vysoko rozmernú somku do ktorej zobrazuje jednotlivé vstupy. 
 
-Naším hlavným cieľom pri experimente s SRN bolo preskúmať vlastnosti siete a pokúsiť sa nájsť 
+Naším hlavným cieľom pri tomto experimente s SRN bolo preskúmať vlastnosti siete a pokúsiť sa nájsť 
 spôsob merania a vyhodnotenia pamäťovej hĺbky.
 SRN má tiež niekoľko zaujímavých vlastností, ktoré sme chceli preskúmať.
 
-Experiment prebiehal nasledujúcim spôsobom:
+Experiment s SRN prebiehal nasledujúcim spôsobom:
 Podobne ako pri experimentoch so samoorganizujúcimi sa mapami, ako prvé sme si potrebovali vytvorič vhodnú trénovaciu množinu.
-Rozhodli sme sa, že použijeme rovnakú trénovaciu množinu ako pri samoorganizujúcich sa mapách.
+Rozhodli sme sa, že použijeme podobné zloženie trénovacej množiny ako pri samoorganizujúcich sa mapách.
 
-Vstupom je vždy jedno písmeno zo sekvencie písmen $abcd$ a ako očakávaný výstup je vždy nasledujúce písmeno v sekvencii.
+Vstupom je vždy jedno písmeno z náhodne generovanej sekvencie písmen $abcd$ a ako očakávaný výstup je vždy nasledujúce písmeno v sekvencii.
 Takýmto spôsobom sme vytvorili trénovacie príklady.
-Prvým krokom bolo overiť, či naša implementácia siete funguje správne. 
-Ako chybovú funkciu sme použili log loss a aktivačnú funkciu na výstupnej vrstve sme použili softmax. 
-Pri testovaní nám chyba klesala a sieť sa učila správne a predikovala korektné výsledky.
+Ako prvé bolo sme museli overiť, či naša použitá implementácia SRN siete funguje správne.
 
-Keď sme mali funkčnú implementáciu SRN Elmanovej siete, natrénovali sme ju na vytvorenej trénovacej množine.
+Ako chybovú funkciu sme použili log loss.
+Ako aktivačnú funkciu na skrytej vrstve sme použili hyperbolický tangens.
+\begin{equation}
+    tanh(x) = \frac{e^{2x} - 1}{e^{2x} + 1}
+\end{equation}
+Aktivačnú funkciu na výstupnej vrstve sme použili softmax. 
 
-SRN si na kontextovej vrstve vytvára kontextovú reprezentáciu vstupov. Preto sme sa rozhodli, že 
+
+Pri testovaní nám chyba klesala a sieť po natrénovaní predikovala korektné výsledky na testovacích sekvenciách.
+
+Keď sme mali funkčnú implementáciu SRN Elmanovej siete, natrénovali sme ju na zvolenej trénovacej množine.
+
+Parametre, ktoré sme použili počas trénovania:
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+     \hline
+     Parameter & Hodnota \\ 
+     \hline
+     veľkosť skrytej vrstvy & 30  \\
+     \hline
+     počet epôch & 100  \\
+     \hline
+     veľkosť posuvného okna & 3  \\
+     \hline
+    \end{tabular}
+    \caption{Parametre SRN}
+    \label{table:1}
+\end{table}
+
+
+SRN si na skrytej vrstve vytvára určitú reprezentáciu vstupov. Preto sme sa rozhodli, že 
 správne natrénovanej SRN budeme postupne predkladať písmená z trénovacej množiny, pričom si po každej predikcii
-, ktorú sieť spraví ukladáme kontextový vektor siete. 
+, ktorú sieť spraví uložíme aktivácie skrytých neurónov siete do nejakej množiny. 
 Ku každému takémuto vektoru priradíme posuvné okno daného znaku z trénovacej množiny (podobne ako pri experimentoch so SOMkami).
 Po predložení všetkých znakov z trénovacej množiny sieti sme dostali slovník posuvných okien a prislúchajúcimi kontextovými vektormi
 zo siete.
@@ -528,6 +565,8 @@ Z toho vyplýva, že na diagonále máme samé nulové hodnoty (rovnaké vektory
 
 Z takejto matice potom vieme vytvoriť dendogram, ktorý znázorňuje súvislosti medzi euklidovskou vzdialenosťou jednotlivýh vektorov a samotnými posuvnými oknami z trénovacej množiny.
 Z toho vieme potom povedať, ktoré vstupy sú vo vnútornej reprezentácii SRN blízke. 
+Takáto reprezentácia nám hovorí o tom, ako dobre dokáže sieť reprezentovať dáta z trénovacej množiny.
+
 
 
 

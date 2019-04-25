@@ -1,19 +1,20 @@
 \chapter{Návrh riešenia}
-Na to aby sme boli schopní merať a porovnávať pamäťovú hĺbku sietí, museli sme 
-zvoliť vhodné trénovacie dáta, zadefinovať si spôsob merania pamäťovej hĺbky 
+Na to aby sme boli schopní merať a porovnávať pamäťovú hĺbku sietí, museli sme si
+zvoliť vhodné trénovacie dáta, zadefinovať si spôsob merania pamäťovej hĺbky,
 sietí a tiež spôsob vyhodnocovania výsledkov.
 
 \section{Metóda uchovávania informácii v SOM}
-Na to aby sme boli schopní odmerať pamäťovú hĺbku siete, potrebujeme si pamätať v jednotlivých
+Na to aby sme boli schopní odmerať pamäťovú hĺbku SOM, potrebujeme si pamätať v jednotlivých
 neurónoch informáciu o tom, pre ktoré vstupy bol daný neurón víťazom.
 Každý neurón bude mať množinu vstupov, v ktorej si pamätá pre aký vstup bol počas trénovania víťazom. 
 Nestačí však ukladať iba samotný vstup, pretože by sme prišli o historický kontext pre daný vstup, 
-ktorý je nevyhnutný pri určovaní pamäťovej hĺbky.
+ktorý je nevyhnutný pri určovaní pamäťovej hĺbky. 
 Preto si neukladáme iba aktuálny vstup (aktuálne písmeno), 
 ale $k$ posledných písmen z trénovacej sekvencie.
 Toto sa nazýva posuvné okno (ang. sliding window) na vstupnej množine. 
-Po natrénovaní siete viem tieto okná vizualizovať ako hitmapu, 
-ktorá nám vizualizuje, na ktoré vstupy (resp. okná) neuróny reagovali.
+Všetky takéto množiny spolu tvoria dokopy tzv. receptívne pole SOM.
+Po natrénovaní siete viem z týchto okien vytvoriť hitmapu, 
+ktorá nám vizualizuje, pre ktoré vstupy (resp. posuvné okná) boli neuróny víťazmi.
 
 \begin{figure}[H]
 	\centering
@@ -23,44 +24,42 @@ ktorá nám vizualizuje, na ktoré vstupy (resp. okná) neuróny reagovali.
  
 \section{Určovanie hĺbky pamäte rekurentnej SOM}
 Hĺbku pamäte pre konkrétny neurón v siete určíme ako dĺžku najdlhšej spoločnej
-podpostupností písmen v množine posuvných okien vstupov, pre ktoré bol neurón víťazom.
+podpostupností písmen v množine posuvných okien neurónu, pre ktoré bol neurón víťazom.
 Dĺžku najdlhšej podpostupnosti budeme určovať od konca sekvencií v množine.
 Pamäťovú hĺbku celej siete následne určíme ako vážený priemer nameraných pamäťových hĺbok jednotlivých neurónov, 
-kde váhami bude počet podpostupností v jednotlivých množinách (teda koľko krát bol nejaký neurón víťazom pre nejaký vstup).
-Neuróny, ktoré neboli víťazom pre žiadny vstup sa vo výpočte nezapočítavajú (majú nulovú váhu).
-Neuróny, ktoré boli víťazom iba pre jeden vstup, ich pamäťová hĺbka je dĺžka uloženej sekvencie, čiže dĺžka pamäťového okna.
-Vo výsledku majú však nízku váhu vzhľadom na iné neuróny.
-Priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, 
-ktoré boli víťazmi pre väčší počet vstupov mali vyššiu váhu ako neuróny, ktoré boli víťazmi pre menší počet vstupov.
-Po každej trénovacej epoche (prechode trénovacou množinou) budeme vedieť určiť pamäťovú hĺbku mapy.
-Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy, 
-ktoré uchovávajú informácie z predchádzajúcich krokov, môže sa stať, že rovnaké písmeno zo vstupu 
-bude mať rôzne víťazné neuróny počas trénovania.
+kde váhami bude celkový počet podpostupností v jednotlivých množinách (teda koľko krát bol nejaký neurón víťazom pre nejaký vstup).
+Neuróny, ktoré neboli víťazom pre žiadny vstup sa vo výpočte nezapočítavajú (majú nulovú váhu), čiže ako keby neexistovali a nemajú žiadny vplyv na pamäťovú hĺbku siete.
+Neuróny, ktoré boli víťazom iba pre jeden vstup, ich pamäťová hĺbka je rovná dĺžke uloženej sekvencie, čiže dĺžka pamäťového okna neurónu.
+Vo výslednej pamäťovej hĺbke majú však takéto neuróny, ktoré boli víťazom iba pre jeden vstup, nízku váhu vzhľadom na iné neuróny.
+Preto priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, 
+ktoré boli víťazmi pre väčší počet vstupov mali vyššiu váhu vo výslednej pamäťovej hĺbke siete, ako neuróny, ktoré boli víťazmi pre menší počet vstupov.
+Po každej trénovacej epoche (prechode trénovacou množinou) budeme vedieť určiť veľkosť pamäťovej hĺbky mapy.
+
+Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy a samotný kontext, 
+ktoré uchovávajú informácie z predchádzajúcich krokov, môže sa stať, že rovnaké písmeno zo vstupnej sekvencie 
+bude mať rôzne víťazné neuróny počas trénovania. Táto vlastnosť rekurentných SOM umožňuje to, že majú pamäťovú hĺbku.
 
 Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna (sliding window).
-Veľkosť posuvného okna musí byť dostatočne veľká. Hľadanie dostatočnej veľkosti posuvného
+Veľkosť posuvného okna musí byť dostatočne veľká. Hľadanie optimálnej veľkosti posuvného
 okna je súčasťou nášho experimentu.
 
-\section{Určovanie hĺbky pamäte SRN}
-Pri SRN sme skúšali nájsť spôsob ako odmerať pamäťovú hĺbku. 
-Navrhli sme riešienie pri ktorom si vizualizujeme vnútorné stavy siete, ale
-nevedeli sme rozumne kvantifikovať pamäťovú hĺbku takejto siete. Kontextovú vrstvu v SRN si 
-môžeme predstaviť ako veľa viacrozmernú SOM, kde sa zobrazujú informácie zo vstupu
-vo viacrozmernom priestore.
+\section{Pamäťová hĺbka SRN s Elamnovou architektúrou}
+SRN s Elmanovou architektúrou sme chceli porovnať s rekurentnými SOM najmä z toho dôvodu, že má niektoré vlastnosti spoločné 
+so SOM. Napríklad skrytú v SRN si môžeme predstaviť ako viacrozmernú SOM, na ktorú sa zobrazujú vstupy do vysokorozmerného priestoru.
+Prekážkou je, že odmerať a hlavne porovnať pamäťovú hĺbku takejto siete s inými sieťami nie je jednoduché, keďže má úplne odlišnú architektúru.
+Pokúšali sme sa nájsť spôsob ako odmerať pamäťovú hĺbku takejto siete.
+Navrhli sme riešenie pomocou, ktorého vieme vizualizovať vzdialenosti medzi stavmi na kontextovej vrstve siete, ale
+na základe týchto informácii sme nedokázali rozumne kvantifikovať pamäťovú hĺbku takejto siete a teda 
+ani ju porovnať s rekurentnými SOM.
 
-Tradeoff medzi rozlišovaciou schopnosťou jednotlivých slov a schopnosťou
-zachovať podobné slová topologicky čo najbližšie pri sebe.
 
-
-% do dalsej kapitoly
-
-\section{Výber vhodných trénovacích dát a ich reprezentácia}
+\section{Výber vhodných trénovacích dát}
 Trénovacie sekvencie sú tvorené písmenami anglickej abecedy (26 písmen).
-Spoločnou vlasťnosťou týchto trénovacích množín je, že sú tvorené/generované určitým nenáhodným spôsobom (obsahujú napríklad opakujúce sa podsekvencie)
+Spoločnou vlasťnosťou týchto trénovacích sekvencií je, že sú tvorené/generované určitým nenáhodným spôsobom (obsahujú napríklad opakujúce sa podsekvencie)
 a teda môžeme na nich trénovať rekurentné neurónové siete. 
-Inými slovami dokážu v nich rekurentné neurónové siete zachytiť určité vzory, ktoré si pamätajú vo svojom kontexte.
-Samotné vstupy (trénovacie príklady) pre sieť sú zakódované jednotlivé písmená z trénovacej sekvencie.
-Keďže neurónové siete vedia najlepšie pracovať iba s číselnými hodnotami, jednotlivé vstupy zo 
+Inými slovami dokážu v nich rekurentné neurónové siete zachytiť určité vzory a opakovania, ktoré si pamätajú vo svojom kontexte.
+Samotné vstupy (trénovacie príklady) pre sieť sú kódované jednotlivé písmená z trénovacej sekvencie.
+Keďže neurónové siete vedia najlepšie pracovať s vektormi číselných hodnôt, jednotlivé vstupné znaky zo 
 vstupnej sekvencie kódujeme počas trénovania do 26 prvkového vektora metódou one-hot, 
 a teda jeho prvky sú nuly a jednotka (pre každé písmeno je jednotka na unikátnej pozícii).
 Napríklad písmeno A bude reprezentované vektorom
@@ -69,6 +68,26 @@ písmeno B vektorom $[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ktorý bude na vstupe neurónovej siete.
 Tento spôsob reprezentácie vstupov pre sieť je jednoduchý a siete s ním vedia dobre pracovať.
 
+
+\section {Návrh experimentu}
+Experiment sme rozdelili na 2 hlavné časti. 
+Prvá časť experimentu sa venuje meraniu pamäťovej hĺbky rekurentných SOM a hľadanie 
+optimálnych parametrov, pri ktorých dosahujú najvyššie hodnoty pamäťových hĺbok.
+V tejto časti sa venujeme tiež analýze výsledkov a hľadaniu súvislostí medzi veľkosťou pamäťovej hĺbky 
+a hodnotami parametrov. 
+Na záver sme spravili porovnanie pamäťových hĺbok všetkých testovaných typov rekurentných SOM s 
+použitím optimálnych váh a fixnou inicializáciou váh.
+V druhej časti experimentu sa venujeme pokusu s SRN a vizualizácii vnútorných stavov siete vo forme 
+dendogramu a vyhodnoteniu výsledkov.
+
+Experiment prebieha nasledujúcim spôsobom:
+\begin{itemize}
+    \item Výber vhodnej trénovacej sekvencie, počtu epôch trénovania a vhodnú veľkosť pamäťového okna
+    \item Trénovanie siete na všetkých kombináciach týchto dvoch parametrov
+    \item Ukladanie hodnot pamäťovej hĺbky do súboru
+    \item Vykreslenie heatmapy, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
+    \item Vyhodnotenie a analýza výsledkov
+\end{itemize}
 
 %
 %\section{Hľadanie ideálnych (hyper) parametrov}
