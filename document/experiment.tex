@@ -59,28 +59,29 @@ vzdialenosť dvoch neurónov na koncoch diagonály mriežky neurónov.
 $t$ je číslo aktuálnej epochy trénovania. Parametrer $t_{max}$ je celkový počet 
 epôch trénovania.
 
-% rychlost ucenia
-Rovnako ako okolie aj rýchlosť učenia siete by mala počas
+Ďaľšie parametre:
+
+\begin{itemize}
+    \item \textbf{Rýchlosť učenia} \\
+    Rovnako ako okolie aj rýchlosť učenia siete by mala počas
 procesu trénovania postupne klesať. Na začiatku chceme aby sa váhy menili čo najviac
 a ku koncu učenia chceme aby sa doľadovali iba detaily.
-Máme na výber 2 možnosti. Postupné znižovanie rýchlosti učenia v rámci jednej epochy, alebo 
-postupné znižovanie rýchlosti učenia v jednotlivých epochách, pričom počas každej epochy
+Máme na výber 2 možnosti. Postupné znižovanie rýchlosti učenia po každom vstupe, alebo 
+postupné znižovanie rýchlosti učenia po jednotlivých epochách, pričom počas každej epochy
 je rýchlosť učenia konštantná. 
 V naších experimentoch sme dosiahli lepšie výsledky postupním 
-znižovaním rýchlosti učenia v rámci jednej epochy. 
+znižovaním rýchlosti učenia po každom vstupe. 
 Hodnoty rýchlosti učenia máme z intervalu $<0, 1>$.
-
-% veľkosť sliding window
-Vhodnú veľkosť posuvného okna sme určili postupním zvyšovaním jeho veľkosti pokiaľ pamäťová hĺbka stúpala. 
+    \item \textbf{Veľkosť posuvného okna} \\
+    Vhodnú veľkosť posuvného okna sme určili postupním zvyšovaním jeho veľkosti pokiaľ pamäťová hĺbka stúpala. 
 Zaujímavosť, ktorú sme zistili počas experimentovania s veľkosťou pamäťového okna, bolo že 
 ak zvolíme príliš veľké posuvné okno, výsledná pamäťová hĺbka môže byť skreslená.
 Pri veľkom pamäťovom okne nám môžu neuróny, ktoré majú vo svojom pamäťovom okne uloženú iba 
 jednu sekvenciu skreslovať výslednú pamäťovú hĺbku, pretože pamäťová hĺbka takýchto
 neurónov je rovná veľkosti posuvného okna. Z tohto dôvodu nie je dobré nastaviť veľkosť pamäťového okna na 
 príliš veľkú hodnotu, ale treba určiť optimálnu hodnotu.
-
-% vyber rozmerov a pocet trenovacich epoch mapy
-Rozmery mapy a počet trénovacích epôch sme zvolili na základe vlastností zvolenej trénovacej množiny. 
+    \item \textbf{Počet neurónov a počet epôch trénovania} \\
+    Rozmery mapy a počet trénovacích epôch sme zvolili na základe vlastností zvolenej trénovacej množiny. 
 Tiež sme museli brať do úvahy aj časovú náročnosť trénovania sietí (najmä pri RecSOM).
 Potrebovali sme aby sa sieť dokázala správne natrénovať na danej trénovacej množine a zároveň, aby nám experimenty dobehli v rozumnom čase.
 Keďže SOMky sa dokážu natrénovať relatívne rýchlo, zvolili sme väčšie rozmery mapy (30x30) a o niečo nižší počet trénovacích epôch (10).
@@ -88,6 +89,11 @@ S touto kombináciou sme dosiahli nízke hodnoty kvantizačných chýb a dobré 
 
 Pri určovaní vhodnej veľkosti siete je to vždy kompromis medzi rozlišovaciou schopnosťou jednotlivých vstupov, schopnosťou
 zachovať podobné vstupy topologicky čo najbližšie pri sebe a výpočtovou náročnosťou. 
+SOMky sa trénujú relatívne rýchlo, preto sme nemuseli použiť veľký počet epôch. Pre naše experimenty sme 
+použili trénovanie s 10-timi epochami.
+    \item \textbf{Inicializácia váh} \\ 
+Váhy sietí sú inicializované hodnotami z intervalu $<0, 1)$ s normálnym rozdelením.
+\end{itemize}
 
 
 \subsection{Parametre pre RecSOM}
@@ -104,10 +110,10 @@ znamená, že víťaz a susedné neuróny budú mať najvyššiu excitáciu a vz
 Výpočet kontextu pri RecSOM nevieme ovplyvnovať žiadnym parametrom.
 
 Môžeme však meniť parameter $\alpha$, ktorý sa používa pri samotnom výpočte vzdialenosti
-vstupu od váhového vektora a kontextu od vkontextového vektora. Tento parameter určuje váhu aktuálneho vstupu a váhu kontextu
+vstupu od váhového vektora a kontextu od kontextového vektora. Tento parameter určuje váhu aktuálneho vstupu a váhu kontextu
 vo výslednej vzdialenosti.
 \begin{equation}
-	d_i = (1 - \alpha) \cdot ||x(t) - w_i||^{2} + \alpha \cdot ||y(t-1) - c_i||^{2} \quad c \in R^{N}
+	d_i = (1 - \alpha) \cdot ||x(t) - w_i||^{2} + \alpha \cdot ||y(t-1) - c_i||^{2} \quad c_{i} \in R^{N}
 \end{equation}
 V našich experimentoch sme testovali všetky hodnoty parametra $\alpha$ z uzavretého intervalu
 $<0, 1>$ s krokom $0.01$ (dokopy 100 experimentov).
@@ -138,16 +144,16 @@ $<0, 1>$ s krokom $0.01$ (dokopy 100 experimentov).
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/recsom_memory_span}
-        \caption{Recsom pamäťová hĺbka}
+        \caption{RecSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/recsom_quantization_errors}
-        \caption{Recsom kvantizačné chyby}
+        \caption{RecSOM kvantizačné chyby}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{Heatmapy pre Recsom}
+    \caption{Heatmapy pre RecSOM}
     \label{fig:test}
 \end{figure}
 
@@ -181,16 +187,16 @@ ovplyvňuje aj samotné učenie siete, ako je možno vidieť na heatmape kvantiz
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/recsom_memory_span}
-        \caption{Recsom pamäťová hĺbka}
+        \caption{RecSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/recsom_quantization_errors}
-        \caption{Recsom kvantizačné chyby}
+        \caption{RecSOM kvantizačné chyby}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{Heatmapy pre Recsom}
+    \caption{Heatmapy pre RecSOM}
     \label{fig:test}
 \end{figure}
 
@@ -285,13 +291,13 @@ Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/activity_recsom_memory_span}
-        \caption{Activity Recsom pamäťová hĺbka}
+        \caption{Activity RecSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/activity_recsom_quantization_errors}
-        \caption{Activity Recsom kvantizačná chyba}
+        \caption{Activity RecSOM kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
     \caption{Heatmapy pre Activity RecSOM}
@@ -326,7 +332,7 @@ Pri experimentovaní s mSOM sa snažíme zistiť aký vplyv má odlišný kontex
 o víťazovi z predchádzajúceho kroku, na pamäťovú hĺbku siete. mSOM má veľkú výhodu v signifikantne 
 vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
 
-\subsection{Výsledky pre mSOM}
+\subsection{Výsledky pre MSOM}
 
 \begin{table}[h!]
     \centering
@@ -345,7 +351,7 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
      veľkosť posuvného okna & 15  \\
      \hline
     \end{tabular}
-    \caption{Parametre mSOM siete}
+    \caption{Parametre MSOM siete}
     \label{table:1}
     \end{table}
     
@@ -355,25 +361,25 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/msom_memory_span}
-        \caption{mSOM pamäťová hĺbka}
+        \caption{MSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/msom_quantization_errors}
-        \caption{mSOM kvantizačná chyba}
+        \caption{MSOM kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{Heatmapy pre mSOM}
+    \caption{Heatmapy pre MSOM}
     \label{fig:test}
 \end{figure}
  Na x-ovej osy sú hodnoty parametra $\alpha$ a na y-ovej osy sú hodnoty parametra $\beta$. 
- Pamäťová hĺbka pri mSOM dosahuje minimá v ak je jeden z parametrov $\alpha$ alebo $\beta$ nulový a teda sieť nemá
+ Pamäťová hĺbka pri MSOM dosahuje minimá v ak je jeden z parametrov $\alpha$ alebo $\beta$ nulový a teda sieť nemá
  žiadny alebo len minimálny kontext. Ak je $\alpha = 0$, tak sa zanedbáva kontextová zložka pri výpočte vzdialenosti a 
  teda aj pri samotnom trénovaní siete a keď je $\beta = 0$ tak sa zanedbávajú váhy víťaza z predchádzajúceho kroku pri výpočte kontextu.
- Minimum pamäťovej hĺbky mSOM dosahuje ak sú $\alpha$ aj $\beta$ nulové.
+ Minimum pamäťovej hĺbky MSOM dosahuje ak sú $\alpha$ aj $\beta$ nulové.
 
- mSOM dosahuje najvyššie hodnoty pamäťovej hĺbky celkovo zo všetkých testovaných sietí, pričom je to zároveň 
+ MSOM dosahuje najvyššie hodnoty pamäťovej hĺbky celkovo zo všetkých testovaných sietí, pričom je to zároveň 
  výpočtovo najefektívnejšia verzia rekurentnej SOM. 
  Maximálne hodnoty pamäťovej hĺbky dosahuje pri nízkych hodnotách $\alpha = 0.2 $, čo znamená že pri výpočte vzdialenosti má vyššiu váhu vzdialenosť vstupu od 
  váhového vektora ako vzdialenosť kontextu od kontextového vektora. 
@@ -384,9 +390,9 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
  siete príliš veľa informácii o kontexte a príliš málo informácii z aktuálneho vstupu, tak sa horšie trénujú.
 
 
- Čo je pri mSOM najzaujímavejšie je to, že nám tieto výsledky opäť potvrdili predpoklady, ktoré sme zistili pre recSOM a Activity recSOM a to že
- kontext nemusí obsahovať príliš veľa informácii. Pri mSOM kontext obsahuje iba kombináciu vlastností víťazného neurónu z predchádzajúceho kroku a teda tento 
- experiment s mSOM nám potvrdil, že pre pamäťovú hĺbku siete sú najdôležitejšie vlastnosti víťazného neurónu.
+ Čo je pri MSOM najzaujímavejšie je to, že nám tieto výsledky opäť potvrdili predpoklady, ktoré sme zistili pre recSOM a Activity recSOM a to že
+ kontext nemusí obsahovať príliš veľa informácii. Pri MSOM kontext obsahuje iba kombináciu vlastností víťazného neurónu z predchádzajúceho kroku a teda tento 
+ experiment s MSOM nám potvrdil, že pre pamäťovú hĺbku siete sú najdôležitejšie vlastnosti víťazného neurónu.
 
  mSOm dosiahla najlepšie výsledky spomedzi všetkých testovaných sietí.
 
@@ -397,7 +403,7 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
 \subsection{Decaying MSOM}
 Pre potreby nášho experimentu sme si vytvorili ďaľšiu modifikovanú verziu % prida poznamku pod ciarou
 rekurentnej SOM. Pri RecSOM kontext tvorí vektor aktivácii všetkých neurónov z predchádzajúceho kroku, 
-pri mSOM je to kombinácia vlastností víťazného neurónu z predchádzajúceho kroku. 
+pri MSOM je to kombinácia vlastností víťazného neurónu z predchádzajúceho kroku. 
 Preto sme sa rozhodli použiť odlišný typ kontextu, ktorý bude tvorený kombináciou predchádzajúcih vstupov 
 siete a nie stavmi siete z minulých krokov. To znamená, že kontext nie je ovplyvnený od samotného procesu trénovania
 ani od toho čo sa sieť naučila v predchádzajúcich krokoch, ale iba od samotných vstupných dát.
@@ -453,16 +459,16 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$.
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/decay_msom_memory_span}
-        \caption{Decay mSOM pamäťová hĺbka}
+        \caption{Decay MSOM pamäťová hĺbka}
         \label{fig:sub1}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{assets/decay_msom_quantization_errors}
-        \caption{Decay mSOM kvantizačná chyba}
+        \caption{Decay MSOM kvantizačná chyba}
         \label{fig:sub2}
     \end{subfigure}
-    \caption{Heatmapy pre Decay mSOM}
+    \caption{Heatmapy pre Decay MSOM}
     \label{fig:test}
 \end{figure}
     
@@ -502,83 +508,89 @@ $\beta$ zase ovplyvňuje výpočet samotného kontextu.
 
 
 \section{Experiment so SRN a Reberovým automatom}
-SRN má niektoré vlastnosti podobné so samoorganizujúcimi sa mapami. 
-Na svojej skrytej vrstve si vytvára akokeby vysoko rozmernú somku do ktorej zobrazuje jednotlivé vstupy. 
+SRN má niektoré vlastnosti podobné s RecSOM.
+V RecSOM máme vrstvu neurónov, ktorá je prepojená s kontextovou vrstvou, podobne 
+aj v SRN s Elmanovou architektúrou máme skrytú vrstvu, ktorá je prepojená s kontextovou vrstvou.
+Túto analógiu je dobre vidieť ak by sme z Elmanovej siete odstránili výstupnú vrstvu a ponechali iba 
+vstupnú, skrytú a kontextovú vrstvu, potom nám zostane architektúra RecSOM siete.
+Spôsob trénovania a rozmiestňovania vstupov v priestore je úplne odlišný v prípade Elmanovej siete.
 
 Naším hlavným cieľom pri tomto experimente s SRN bolo preskúmať vlastnosti siete a pokúsiť sa nájsť 
-spôsob merania a vyhodnotenia pamäťovej hĺbky.
-SRN má tiež niekoľko zaujímavých vlastností, ktoré sme chceli preskúmať.
+spôsob merania a vyhodnotenia jej pamäťovej hĺbky. 
+Tiež sme chceli preskúmať niekoľko zaujímavých vlastností SRN.
 
-Experiment s SRN prebiehal nasledujúcim spôsobom:
-Podobne ako pri experimentoch so samoorganizujúcimi sa mapami, ako prvé sme si potrebovali vytvorič vhodnú trénovaciu množinu.
-Rozhodli sme sa, že použijeme podobné zloženie trénovacej množiny ako pri samoorganizujúcich sa mapách.
-
-Vstupom je vždy jedno písmeno z náhodne generovanej sekvencie písmen $abcd$ a ako očakávaný výstup je vždy nasledujúce písmeno v sekvencii.
-Takýmto spôsobom sme vytvorili trénovacie príklady.
-Ako prvé bolo sme museli overiť, či naša použitá implementácia SRN siete funguje správne.
-
-Ako chybovú funkciu sme použili log loss.
-Ako aktivačnú funkciu na skrytej vrstve sme použili hyperbolický tangens.
-\begin{equation}
-    tanh(x) = \frac{e^{2x} - 1}{e^{2x} + 1}
-\end{equation}
-Aktivačnú funkciu na výstupnej vrstve sme použili softmax. 
-
-
-Pri testovaní nám chyba klesala a sieť po natrénovaní predikovala korektné výsledky na testovacích sekvenciách.
-
-Keď sme mali funkčnú implementáciu SRN Elmanovej siete, natrénovali sme ju na zvolenej trénovacej množine.
-
-Parametre, ktoré sme použili počas trénovania:
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{|c|c|} 
-     \hline
-     Parameter & Hodnota \\ 
-     \hline
-     veľkosť skrytej vrstvy & 30  \\
-     \hline
-     počet epôch & 100  \\
-     \hline
-     veľkosť posuvného okna & 3  \\
-     \hline
-    \end{tabular}
-    \caption{Parametre SRN}
-    \label{table:1}
-\end{table}
-
+Prvá časť experimentu s SRN prebiehala v nasledujúcich krokoch:
+\begin{itemize}
+    \item Podobne ako pri experimentoch so samoorganizujúcimi sa mapami, ako prvé sme si potrebovali vytvoriť vhodnú trénovaciu množinu.
+     Rozhodli sme sa, že použijeme podobné zloženie trénovacej množiny ako pri samoorganizujúcich sa mapách.
+     Vstupom je vždy jedno písmeno z náhodne generovanej sekvencie písmen $abcd$ a ako očakávaný výstup je vždy nasledujúce písmeno v sekvencii.
+     Takýmto spôsobom sme vytvorili mnnožinu trénovacích príkladov.
+     \item Zvolili sme si vhodné aktivačné funkcie:  \\
+     Ako aktivačnú funkciu na skrytej vrstve sme použili hyperbolický tangens.
+     \begin{equation}
+         tanh(x) = \frac{e^{2x} - 1}{e^{2x} + 1}
+     \end{equation}
+     Aktivačnú funkciu na výstupnej vrstve sme použili softmax. 
+     \item Následne sme museli overiť funkčnosť našej implementácie siete. Ako chybovú funkciu sme použili log loss.
+    Počas testovania nám chyba klesala a sieť po natrénovaní predikovala korektné výsledky na testovacích sekvenciách.
+     \item Keď sme mali funkčnú implementáciu SRN Elmanovej siete, natrénovali sme ju na našej trénovacej množine.
+     Parametre, ktoré sme použili počas trénovania: \\
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{|c|c|} 
+        \hline
+        Parameter & Hodnota \\ 
+        \hline
+        veľkosť skrytej vrstvy & 30  \\
+        \hline
+        počet epôch & 100  \\
+        \hline
+        veľkosť posuvného okna na trénovacej množine & 3  \\
+        \hline
+        \end{tabular}
+        \caption{Parametre SRN s Elmanovou architektúrou}
+        \label{table:1}
+    \end{table}
+\end{itemize}
 
 SRN si na skrytej vrstve vytvára určitú reprezentáciu vstupov. Preto sme sa rozhodli, že 
-správne natrénovanej SRN budeme postupne predkladať písmená z trénovacej množiny, pričom si po každej predikcii
-, ktorú sieť spraví uložíme aktivácie skrytých neurónov siete do nejakej množiny. 
-Ku každému takémuto vektoru priradíme posuvné okno daného znaku z trénovacej množiny (podobne ako pri experimentoch so SOMkami).
-Po predložení všetkých znakov z trénovacej množiny sieti sme dostali slovník posuvných okien a prislúchajúcimi kontextovými vektormi
-zo siete.
-Tieto dáta sme potrebovali nejakým spôsobom vizualizovať, aby sme videli nejaké súvislosti medzi reprezentáciou vstupov na kontextovej vrstve a 
-podobnosťou samotných vstupov, na čo je vhodné použiť reprezentáciu vo forme dendogramu.
-Na vykreslenie dendogramu je potrebné vytvoriť tzv. podobnostnú maticu (ang. similarity matrix), kde 
+správne natrénovanej SRN budeme postupne predkladať písmená z trénovacej množiny, pričom si po každej predikcii, ktorú sieť spraví,
+ uložíme aktivácie neurónov (vektor) na skrytej vrstve siete do nejakej množiny. 
+Ku každému takémuto vektoru priradíme posuvné okno daného znaku z trénovacej množiny (podobne ako pri experimentoch so SOMkami). 
+Po predložení všetkých znakov z trénovacej množiny sieti sme dostali dvojice posuvných okien s prislúchajúcimi aktiváciami neurónov
+na skrytej vrstve siete. \\
+
+Tieto dáta sme potrebovali nejakým spôsobom vizualizovať, aby sme v nich vedeli identifikovať prípadné súvislosti medzi reprezentáciou vstupov na skrytej vrstve a 
+podobnosťou samotných vstupov.
+Rozhodli sme sa, že použijeme vizualizáciu pomocou dendrogramu.
+Vizualizácie vo forme dendrogramu sa často používajú ak potrebujeme vizualizovať hierarchické klastrovanie dát.
+
+Na vytvorenie denrogramu potrebujeme vytvoriť tzv. podobnostnú maticu (ang. similarity matrix), kde 
 riadky aj stĺpce reprezentujú jednotlivé kontextové vektory a hodnoty v samotnej matici sú euklidovské vzdialenosti medzi týmito vektormi.
-Z toho vyplýva, že na diagonále máme samé nulové hodnoty (rovnaké vektory majú nulovú vzdialenosť od seba).
+Z toho vyplýva, že na diagonále sú samé nulové hodnoty (rovnaké vektory majú medzi sebou nulovú vzdialenosť).
 
-% pridat ukazku similarity matrix
+Z takejto matice potom vieme vytvoriť stromový graf, dendrogram, ktorý vizualizuje súvislosti medzi euklidovskou vzdialenosťou jednotlivých vektorov a samotnými posuvnými oknami z trénovacej množiny.
+Z toho vieme potom povedať, ktoré postupnosti vstupov sú vo vnútornej reprezentácii SRN blízke. 
 
-Z takejto matice potom vieme vytvoriť dendogram, ktorý znázorňuje súvislosti medzi euklidovskou vzdialenosťou jednotlivýh vektorov a samotnými posuvnými oknami z trénovacej množiny.
-Z toho vieme potom povedať, ktoré vstupy sú vo vnútornej reprezentácii SRN blízke. 
-Takáto reprezentácia nám hovorí o tom, ako dobre dokáže sieť reprezentovať dáta z trénovacej množiny.
+Takáto reprezentácia nám hovorí o tom, ako sieť interne reprezentuje dáta z trénovacej množiny.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/dendrogram}
+    \caption{Dendrogram pre Elmanovu sieť. Na x-ovej osy sú posuvné okná a na y-ovej osy sú vzdialenosti medzi jednotlivými vektormi}
+\end{figure}
 
+Na dendrograme vidíme, že pre sieť podobné vstupy majú rovnakú euklidovskú vzdialenosť vektorov.
+V našej sieti sa vytvorili 4 klustre podobnej veľkosti. Nehovorí nám to bohužiaľ nič o pamäťovej hĺbke Elmanovej siete.
+Nevieme ju z takejto vizualizcáie kvantifikovať.
 
-
-
+\subsection{Stavový automat na skrytej vrstve}
 Zaujímavou vlastnosťou SRN je aj to, že si na skrytej vrstve dokáže vytvoriť vlastnú reprezentáciu stavového automatu, ak 
-je trénovaná na trénovacej množine, ktorá je tvorená stringom generovaným reberovým automatom. Vďaka tejto vlastnosti
-by sa mala SRN natrénovať na takejto trénovacej množine s nulovou chybou.
-
-
-
-Pri SRN sme opäť použili vlastnú modifikovanú implementáciu siete, aby sme boli schopní
-ukladať si kontext siete pri predikovaní.
+je trénovaná na trénovacej množine, ktorá je tvorená reťazcom generovaným napríklad reberovým automatom \cite{Servan-Schreiber1991}
+Vďaka tejto vlastnosti by sa mala SRN natrénovať na takejto trénovacej množine s nulovou chybou.
+Túto vlastnosť sme sa rozhodli overiť.
+Vytvorili sme si podobnú trénovaciu množinu ako pri prvom experimente a skutočne sa sieť bola
+schopná natrénovať takmer s nulovou chybou na sekvenciách generovaných reberovým automatom.
 
 
 

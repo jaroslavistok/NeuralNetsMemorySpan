@@ -1,3 +1,40 @@
 \chapter*{Záver}
+V našej práci sme porovnali pamäťovú hĺbku niekoľkých typov neurónových sietí.
+Hlavným cieľom bolo zistiť, či sa dajú rekurentné samoorganizujúce sa mapy použiť na vizualizáciu
+sekvenčných vstupov, teda s akým dlhým kontextom do minulosti dokážu pracovať. Chceli sme tiež navrhnúť 
+spôsob ako merať a hlavne porovnať pamäťovú hĺbku Elmanovej siete so rekurentnými SOM-kami, prípadne 
+nájsť súvislosti.
+
+V našich experimentoch sme porovnávali pamäťovú hĺbku dvoch základných typov rekurentných 
+SOM - RecSOM a MSOM. Okrem toho sme si vytvorili z oboch modelov modifikované verzie - Activity RecSOM a Decaying MSOM.
+Activity RecSOM umožňuje experimentovať s hodnotami aktivít neurónov, ktoré tvoria kontext siete. Upravili sme v nej
+vzorec na výpočet aktivity, tak aby obsahoval meniteľný parameter, ktorý môžeme nastavovať na rôzne hodnoty.
+To nám umožnilo preskúmať ďaľšie vlastnosti RecSOM a vplyv zloženia kontextu na hĺbku pamäte RecSOM.
+Pri modifikácii MSOM sme sa rozhodli, že použijeme úplne odlišný kontext ako používa MSOM. Pri klasickej MSOM
+je kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku, v našej modifikovanej 
+verzii je kontext tvorený iba kombináciou minulých vstupov a teda nie je závislý od minulých stavov samotnej siete.
+
+V experimente s Elmanovou sieťou sa nám podarilo nájsť spôsob ako vizualizovať súvislosti medzi 
+aktiváciami neurónov na skrytej vrstve a posuvnými oknami na trénovacej množine.
+
+% vysledky, ktore sme dosiahli
+\section{Limity a nedostatky riešenia}
+V našej práci sme nedokázali nájsť spôsob ako zmerať a porovnať pamäťovú hĺbku Elmanovej siete.
+Otázne je, či takáto sieť má nejakú kvantifikovateľnú pamäťovú hĺbku. 
+
+
+\section{Možnosti ďaľšej práce}
+\begin{itemize}
+    \item Medzi ďaľšie možnosti patrí vyskúšanie ešte ďaľších modifikácií rekurentných SOM. Napríklad pri Acitivty RecSOM 
+    by sme mohli použiť euklidovskú vzdialenosť neurónu od víťazného neurónu a pozrieť sa na to aký vplyv by to malo 
+    na pamäťovú hĺbku siete s rôznymi hodnotami parametra $\beta$.
+    \item Experimentovať s ďaľšími kombináciami parametrov
+    \item Spraviť podrobnú matematickú analýzu experimentov
+    \item Hľadanie a skúšanie alternatívnych spôsobov ako zmerať pamäťovú hĺbku Elmanovej siete. Napríklad podrobnejšiou
+    analýzou dendrogramov.
+\end{itemize}
+
+
+
 
 
