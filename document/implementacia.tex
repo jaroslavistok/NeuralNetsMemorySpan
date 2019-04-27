@@ -16,7 +16,7 @@ Ako implementačný jazyk sme zvolili Python pretože preň existuje veľké mno
 s maticami a vektormi, či vykresľovanie grafov.
 Python je veľmi populárny v oblasti strojového učenia. 
 Ďaľšou výhodou je jednoduché spustenie skriptov
-na linuxovom serveri, čo urýchľuje samotné trénovanie a hľadanie najoptimálnejších parametrov a umožnilo nám otestovať 
+na linuxovom serveri, čo urýchľuje samotné trénovanie a hľadanie optimálnych parametrov a umožnilo nám otestovať 
 veľké množstvo kombinácii rôznych parametrov.
 \subsection{Python}
 
@@ -25,7 +25,7 @@ Python kladie dôraz na jednoduchosť a čitateľnosť programov, ktoré sú v �
 Je to jazyk, ktorý využíva dynamické typovanie a automatizovanú správu pamäte. Je to tiež multiplatformový 
 jazyk a beží na všetkých bežne používaných platformách (Windows, Mac, Linux)
 
-\section{Použíté knižnice}
+\section{Použité knižnice}
 Používame štandartný set knižníc pre implementáciu neurónových sietí: numpy, scipy.
 Na vykresľovanie a vizualizáciu dát používame knižnice matplotlib a seaborn.
 \subsection{Numpy}
@@ -37,15 +37,17 @@ Je knižnica na vykresľovanie grafov a vizualizáciu dát.
 \subsection{Seaborn}
 Je nadstavbou Matplotlib knižnice a zjednodušuje vykresľovanie rôznych grafov.
 
-\section{Algoritmus hľadania najdlhšej spoločnej podpostupnosti viacerých reťazcov}
-Na hľadanie najdlhšej spoločnej podpostupnosti viacerých reťazcov som použil relatívne jednoduchý naivný prístup. 
-Z každej sekvencie sme si vytvorili všetky možné n-gramy (podpostupnosti), ktoré si ukladáme do množiny.
-Pre každú sekvenciu v množine vytvoríme takúto množinu n-gramov. Potom spravíme prienik týchto množín a dĺžka najdlhšieho 
-reťazca z tohto prieniku je dĺžka najdlhšej spoločnej podpostupnosti. Ide o naivný algoritmus, ktorý by bol pri
-dlhých reťazcoch pamäťovo aj výpočtovo neoptimálny, avšak pre potreby merania pamäťovej hĺbky neurónových sietí
-je postačujúci a dostatočne efektívny, keďže sekvencie v pamäťových oknách 
-jednotlivých neurónov nie sú dlhé (do 30 znakov maximálne)
-Použitie tohto algoritmu malo veľmi malý vplyv na rýchlosť trénovania.
+\section{Algoritmus hľadania najdlhšej spoločnej postfixovej podpostupnosti viacerých reťazcov}
+Na hľadanie najdlhšej spoločnej podpostupnosti viacerých reťazcov som použil relatívne jednoduchý algoritmux.
+Na začiatku si inicializujeme veľkosť najdlhšej spoločnej podpostupnosti na nulu.
+V cykle prechádzame postupne všetky posuvné okná uložené v pamäťovom okne neurónu a kontrolujeme
+či sú znaky na i-tej pozícii od konca rovnaké. Ak áno inkrementujeme veľkosť najdlhšej spoločnej podpostupnosti.
+Ak nie, tak skončíme a vrátime veľkosť najdlhšej spoločnej podpostupnosti.
+V prípade, že pamäťové okno neurónu obsahuje iba jednu podpostupnosť, potom dĺžka najdlhšej podpostupnosti je 
+rovná dĺžke uloženého posuvného okna. V prípade ak je pamäťové okno neurónu prázdne, dĺžka najdlhšej spoločnej
+podpostupnosti je nulová.
+Tento algoritmus je jednoduchý a dostatočne efektívny pre meranie pamäťovej hĺbky testovaných sietí. 
+Na rýchlosť trénovania má výpočet pamäťovej hĺbky iba minimálny vplyv.
 
 \section{Reberov automat}
 Na vytvorenie trénovacej množiny, ktorá pozotáva z reberových reťazcov sme si vytvorili vlastnú implementáciu pravdepodobnostného nedeterministického
@@ -55,5 +57,5 @@ pričom v každom stave je 50\% šanca na prechod do jedného z možných stavov
 \begin{figure}[H]
     \centering
     \includegraphics[width=8cm]{assets/reber}
-    \caption{Schéma reberovho automatu}
+    \caption{Schéma reberovho automatu, Zdroj:\url{http://www.replicatedtypo.com/cultural-inheritance-in-studies-of-artifical-grammar-learning/3352.html}}
 \end{figure}
