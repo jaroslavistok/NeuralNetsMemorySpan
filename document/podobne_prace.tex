@@ -1,27 +1,38 @@
-\chapter{Analýza podobných prác}
-% popisat niektore podobne prace, ktore sa zaoberali touto tematikou
+\chapter{Podobné práce}
 
-\section{Recursive Self-organizing Map
-as a Contractive Iterative Function System}
+Do podobných prác sme vybrali vedecké články, ktoré sa zaoberajú rekurentnými neurónovými sieťami aj rekurentnými 
+samoorganizujúcimi sa mapami.
+Nasledujúce dve práce sa zaoberajú vlastnosťami SRN sietí:
+\begin{itemize}
+    \item \textbf{
+        Graded State Machines: The Representation of Temporal Contingencies in Simple Recurrent Networks \cite{Servan-Schreiber1991}}
+         \\ \\
+    Autori tejto práce analyzovali reprezentacie, 
+    ktore sa vyvinuli v skrytom stavovom priestore SRN a zistili, 
+    že výstup siete v priebehu trénovania závisí od čoraz dlhších 
+    historických kontextov. 
+    Zistili tiež, že tento typ neurónovej siete si dokáže 
+    vo svojom stavovovom priestore vytvoriť stavový automat alebo aj počítadlo.
 
-Táto práca sa zaoberá reprezentáciou receptívneho poľa v RecSOM natrénovanej na korpuse anglického textu. Autori zistili, že RecSOM trénovaná na 
-Ukazuje, že RecSOM môže vstupy organizovať vo svojom receptívnom poli ako 
-Markovovskú príponovú charakteristiku.
-\cite{rsm}
+    \item \textbf{
+        Predicting the Future of Discrete Sequences from Fractal Representations of the Past  \cite{Tino2001}} \\ \\
+    Autori tejto práce zistili, že SRN funguje podobne ako markovoský model s variabilnou dĺžkou (VLMM). 
+    To znamená, že sieť sa naučí kontexty dĺžky potrebnej pre správny výstup. 
+    Navrhli tiež tzv. fractal prediction machine, ktorou sa inšpirovali v práci Markovian architectural bias of recurrent neural networks \cite{markovnian_bias} ktorí vytvorili neural prediction machine z nantrénovanej SRN.
+    Neural prediction machines využívajú fraktálovú vlastnosť SRN, to znamená, 
+    že postupnosti so spoločným postfixom zobrazujú blízko seba v stavovom priestore siete. 
+    Čo je zaujímavé je, že takúto vlastnosť má dokonca aj nenatrénovaná sieť, čo sa nazýva architectural bias.
+\end{itemize}
 
-\section{Markovnian Architextural Bias of Reccurent Neural Networks }
-\cite{markovnian_bias}
+Doteraz sme sa zaoberali prácami, ktoré sa zaoberali vlastnosťami SRN.
+Ako poslednú uvádzame prácu, ktorá sa zaoberá RecSOM a jej vlastnosťami:
+\begin{itemize}
+    \item \textbf{Recursive Self-organizing Map
+    as a Contractive Iterative Function System \cite{rsm}}
+    Autori tejto práce analyzovali RecSOM a zistili, že za určitých 
+    špecifických podmienok má, podobne ako SRN, takisto fraktálovú organizáciu. 
+    Odvodili vzorec pre maximálnu hodnotu alpha parametra (rovnica \ref{eq:rec_som_distance}), 
+    pri ktorej je táto vlastnosť garantovaná.
+\end{itemize}
 
-\section{
-    Graded State Machines: The Representation of Temporal Contingencies in Simple Recurrent Networks
-}
-\cite{Servan-Schreiber1991}
-Táto práca sa zaoberá analýzou vlastností Elamnovej rekurentnej siete.
-Ukazuje, ako si sieť počas trénovania na určitej sekvencii dát vytvára vnútornú reprezentáciu, ktorá 
-ukkazuje podobnosti a zároveň rozdiely medzi jednotlivými vzstupmi.
-
-
-\section{
-    Unsupervised Recursive Sequence Processing
-}
 
