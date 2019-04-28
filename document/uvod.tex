@@ -10,10 +10,8 @@ Ako príklad si môžeme zobrať slovo \uv{Bratislava}.
 Trénovanie modelu strojového učenia bez využitia historického kontextu by mohlo prebiehať napríklad takto:
 Trénovaciou množinu by tvorili písmená daného slova, kde očakávanou hodnotou pre nejaké písmeno by bolo ďalšie písmeno, ktoré za ním v slove nasleduje.
 Čiže pre písmeno \uv{B} povieme, že očakávame \uv{r} a takto pokračujem ďalej cez všetky písmená v slove.
-
 Problém nastane pri druhom písmene \uv{a} v slove Bratislava. Pri prvom výskyte písmena \uv{a} sme modelu tvrdili, že očakávame písmeno \uv{t} a 
 pri druhom výskyte písmena \uv{a} tvrdíme, že očakávame \uv{v}. 
-% preformulovat
 Tento prípad sa model, ktorý nevyužíva žiadny historický kontext, 
 nevie naučiť, pretože sa učí len asociácie vstup-výstup (aktuálne písmeno - nasledujúce písmeno) a nevyužíva žiadnu ďalšiu pamäť (okno do minulosti).
 Historický kontext umožňuje modelom strojového učenia pracovať s určitou formou pamäte.
@@ -50,7 +48,7 @@ perceptrón.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=8cm]{assets/perceptron}
-	\caption{Perceptrón}
+	\caption{Model perceptrónu}
 \end{figure}
 
 Aktivačná funkcia diskrétneho perceptrónu je jednoduchá bipolárna funkcia, ktorá vráti +1 alebo 1.
@@ -113,8 +111,8 @@ Medzi neurónmi v tej istej vrstve nie sú žiadne spojenia.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=8cm]{assets/mlp}
-	\caption{Viacvrstvová dopredná neurónová sieť}
+	\includegraphics[width=\textwidth]{assets/mlp}
+	\caption{Architektúra viacvrstvovej doprednej neurónovej siete \protect\cite{haykin2009neural}}
 \end{figure}
 
 Trénovací algoritmus pomocou ktorého sa trénujú dopredné neurónové sa nazýva \uv{spätné šírenie chyby} (angl. backpropagation).

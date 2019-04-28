@@ -1,5 +1,4 @@
 \chapter{Experiment}
-
 Experimentom v našej práci je meranie hĺbky pamäte a vyhodnotenie vplyvu rôznych
 hyperparametrov a typov kontextov na hĺbku pamäte rekurentných SOM.
 Cieľom nášho experimentu je aj nájdenie 
@@ -22,7 +21,7 @@ Táto sekvencia je pre SOMky ťažšia na naučenie a používame ju na overenie
 na zložitejších nenáhodných sekvenciách. Pri SRN je použitie tejto trénovacej množiny zaujímavejšie,
 vďaka vlastnostiam, ktoré SRN má.
 
-Tretí dataset je úryvok z korpusu anglického textu.
+Tretí dataset je úryvok z korpusu anglického textu, z ktorého sú odstránené špeciálne znaky a medzery.
 Keďže ide o reálny zmysluplný text, nie je to úplne náhodná postupnosť znakov, ale obsahuje určité vzory a opakovania, ktoré by siete mohli vedieť zachytiť
 vo svojej vnútorenej reprezentácii.
 Tento dataset používame čisto iba na overenie, či 
@@ -368,18 +367,20 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
     \end{figure}
 
  Na x-ovej osy sú hodnoty parametra $\beta$ a na y-ovej osy sú hodnoty parametra $\alpha$. 
- Pamäťová hĺbka pri MSOM dosahuje minimá v ak je jeden z parametrov $\alpha$ alebo $\beta$ nulový a teda sieť nemá
+ Pamäťová hĺbka pri MSOM dosahuje minimá ak je jeden z parametrov $\alpha$ alebo $\beta$ nulový a teda sieť nemá
  žiadny alebo len minimálny kontext. Ak je $\alpha = 0$, tak sa zanedbáva kontextová zložka pri výpočte vzdialenosti a 
  teda aj pri samotnom trénovaní siete a keď je $\beta = 0$ tak sa zanedbávajú váhy víťaza z predchádzajúceho kroku pri výpočte kontextu.
  Minimum pamäťovej hĺbky MSOM dosahuje ak sú $\alpha$ aj $\beta$ nulové.
 
- MSOM dosahuje v priemere vysoké hodnoty pamäťovej hĺbky celkovo zo všetkých testovaných sietí, pričom je to zároveň 
- výpočtovo najefektívnejšia verzia rekurentnej SOM pri nízko dimenzionálnych vstupoch. 
+ MSOM dosahuje v priemere vysoké hodnoty pamäťovej hĺbky, pričom je to zároveň 
+ výpočtovo najefektívnejšia verzia rekurentnej SOM pri nízko dimenzionálnych vstupoch. Ukazuje sa, že kontext redukovaný na vlastnosti víťaza z predchádzajúceho kroku
+ neovplyvňuje negatívne pamäťvú hĺbku siete.
  Maximálne (neskreslené) hodnoty pamäťovej hĺbky dosahuje pri nízkych hodnotách $\alpha = 0.1-0.4$, čo znamená že pri výpočte vzdialenosti má vyššiu váhu vzdialenosť vstupu od 
- váhového vektora ako vzdialenosť kontextu od kontextového vektora (Pri MSOM sú hodnoty porovnateľné, keďže kontext a vstup majú rovnaké dimenzie). 
+ váhového vektora ako vzdialenosť kontextu od kontextového vektora (Pri MSOM sú hodnoty vzdialeností porovnateľné, keďže kontext a vstup majú rovnaké dimenzie). 
  Pri maximách je hodnota parametra $\beta$ sú $1.0$, čo znamená, že pre pamäťovú hĺbku MSOM je dôležité zloženie kontextu z predchádzajúceho kroku.
-
  Najvyššie hodnoty kvantizačnej chyby sieť dosahuje keď je $\alpha = 0.8$ a $\beta = 1.0$.
+
+
 
 % vyhodnotenie vysledkov experimentu
 
@@ -470,24 +471,83 @@ Pri predchádzajúcich rekurentných sieťach kontext obsahuje reprezentáciu vp
 % ukazka testov s najlepsimi parametrami
 
 \section {Porovnanie výsledkov SOM}
-Po nájdení ideálnych parametrov pre všetky 3 typy sietí, sme spustili 5 behov pre tieto kombinácie parametrov,
-pričom sme použili rovnakú počiatočnú inicializáciu váh a spravili priemer týchto hodnôt.
+Po nájdení ideálnych parametrov pre všetky 3 typy sietí, sme spustili 5 behov pre tieto kombinácie parametrov a všetky 3 trénovacie množiny,
+pričom sme použili rovnakú počiatočnú inicializáciu váh a spravili priemer týchto hodnôt. Zvyšné hodnoty parametrov sme ponechali
+rovnaké ako pri hľadaní optimálnych parametrov.
 
+Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
 \subsection{RecSOM}
+\begin{itemize}
+    \item \textbf{abcd}
+    \item \textbf{reber}
+    \item \textbf{corpus}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \caption{Graf klesajúcej kvantizačnej chyby počas trénovania}
+\end{figure}
+
+
 
 \subsection{Activity RecSOM}
+Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
+\begin{itemize}
+    \item \textbf{abcd}
+    \item \textbf{reber}
+    \item \textbf{corpus}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \caption{Graf klesajúcej kvantizačnej chyby počas trénovania}
+\end{figure}
+
+
+
 \subsection{MSOM}
+Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
+\begin{itemize}
+    \item \textbf{abcd}
+    \item \textbf{reber}
+    \item \textbf{corpus}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \caption{Graf klesajúcej kvantizačnej chyby počas trénovania abcd}
+\end{figure}
+
+
 
 \subsection{Decay MSOM}
+Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
+\begin{itemize}
+    \item \textbf{abcd}
+    \item \textbf{reber}
+    \item \textbf{corpus}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \caption{Graf klesajúcej kvantizačnej chyby počas trénovania abcd}
+\end{figure}
 
 
 
 \section{ Vyhodnotenie experimentu }
-Experimentami sme zistili, že na hĺbku pamäte je najviac ovplyvnená zložením samotného kontextu.
-Najdôležitejšie parametre, ktoré vplývajú na hĺbku pamäte rekurentných SOM parametre $\alpha$ a $\beta$
+Experimentami sme zistili, že na hĺbku pamäte je najviac ovplyvnená zložením samotného kontextu rekurentnej SOM.
+Parametre, ktoré sme testovali a ktoré vplývajú na hĺbku pamäte rekurentných SOM sú $\alpha$ a $\beta$
 $\alpha$ vystupuje vo vzťahu pre výpočet vzdialenosti vstupu od určitého neurónu v sieti.
 $\beta$ zase ovplyvňuje výpočet samotného kontextu.
-
+Pre nízkodimenzionálne vstupy je najvhodnejšie použiť MSOM, ktorá je výpočtovo najefektívnejšia a dosahuje veľmi dobré 
+výsledky.
+Pre vysokodimenzionálne vstupy je z hľadiska veľkosti kontextu a výpočtovej náročnosti vhodnejšie použiť RecSOM alebo
+Activity RecSOM.
 
 
 \section{Experiment so SRN a Reberovým automatom}
