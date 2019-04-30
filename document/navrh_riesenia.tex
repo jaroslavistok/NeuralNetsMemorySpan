@@ -12,20 +12,21 @@ Hĺbku pamäte pre konkrétny neurón v sieti určíme ako dĺžku najdlhšej sp
 podpostupností znakov v množine historii posuvných okien neurónu, pre ktoré bol neurón víťazom.
 Dĺžku najdlhšej podpostupnosti budeme určovať od konca sekvencií v množine.
 Pamäťovú hĺbku celej siete následne určíme ako vážený priemer nameraných pamäťových hĺbok jednotlivých neurónov, 
-kde váhami bude celkový počet podpostupností v jednotlivých množinách (teda koľko krát bol nejaký neurón víťazom pre nejaký vstup).
-Neuróny, ktoré neboli víťazom pre žiadny vstup sa vo výpočte nezapočítavajú (majú nulovú váhu), čiže ako keby neexistovali a nemajú žiadny vplyv na pamäťovú hĺbku siete.
-Neuróny, ktoré boli víťazom iba pre jeden vstup, ich pamäťová hĺbka je rovná dĺžke uloženej sekvencie, čiže dĺžke pamäťového okna neurónu.
-Vo výslednej pamäťovej hĺbke majú však takéto neuróny, ktoré boli víťazom iba pre jeden vstup, nízku váhu vzhľadom na iné neuróny.
+kde váha pamäťovej hĺbky neurónu bude určená počtom podpostupností uložených v pamäťovom okne neurónu.
+(teda koľko krát bol neurón víťazom počas trénovania).
+Neuróny, ktoré neboli víťazom pre žiadny vstup (majú prázdne pamäťové okno)
+sa do celkovej pamäťovej hĺbky nezapočítavajú, čiže nemajú žiadny vplyv na pamäťovú hĺbku siete.
+Neuróny, ktoré boli víťazom iba pre jeden vstup, majú pamäťovú hĺbku rovnú dĺžke uloženej sekvencie, čiže dĺžke pamäťového okna na trénovacej množine.
+Vo výslednej pamäťovej hĺbke majú mať však takéto neuróny, ktoré boli víťazom iba pre jeden vstup, nízku váhu oproti ostatným neurónom.
 Preto priemer pamäťových hĺbok jednotlivých neurónov musí byť vážený, aby neuróny, 
 ktoré boli víťazmi pre väčší počet vstupov mali vyššiu váhu vo výslednej pamäťovej hĺbke siete, ako neuróny, ktoré boli víťazmi pre menší počet vstupov.
 Po každej trénovacej epoche (prechode trénovacou množinou) budeme vedieť určiť veľkosť pamäťovej hĺbky mapy.
 
 Vďaka tomu, že neuróny rekurentných sietí majú okrem normálnych váh aj kontextové váhy a samotný kontext, 
 ktoré uchovávajú informácie z predchádzajúcich krokov, môže sa stať, že rovnaké písmeno zo vstupnej sekvencie 
-bude mať rôzne víťazné neuróny počas trénovania. Táto vlastnosť rekurentných SOM umožňuje to, že majú pamäťovú hĺbku.
+bude mať rôzne víťazné neuróny počas trénovania. Táto vlastnosť rekurentných SOM spôsobuje to, že majú pamäťovú hĺbku, ktorú dokážeme merať.
 
-Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna (sliding window), kvôli 
-neurónom, ktoré boli víťazné iba pre jeden vstup (pre také je pamäťová hĺbka rovná veľkosti posuvného okna, t.j dĺžky uloženej sekvencie).
+Samotná pamäťová hĺbka je relatívna a závisí aj od veľkosti posuvného okna (sliding window) na trénovacej množine.
 Veľkosť posuvného okna musí byť dostatočne veľká, väčšia ako maximálna nájdená
 dĺžka spoločnej postfixovej podpostupnosti pre nejaký neurón, ale zároveň nie príliš veľká, aby sme zbytočne neskresľovali výsledky neurónmi, ktoré boli víťazmi iba pre jeden vstup.
 Hľadanie optimálnej veľkosti posuvného okna je súčasťou nášho experimentu.
