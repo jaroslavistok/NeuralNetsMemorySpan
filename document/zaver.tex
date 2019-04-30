@@ -3,10 +3,10 @@ V našej práci sme porovnali pamäťovú hĺbku niekoľkých typov neurónovýc
 Hlavným cieľom bolo zistiť, či sa dajú rekurentné samoorganizujúce sa mapy použiť na vizualizáciu
 sekvenčných vstupov, teda s akým dlhým kontextom do minulosti dokážu pracovať. Chceli sme tiež navrhnúť 
 spôsob ako merať a hlavne porovnať pamäťovú hĺbku Elmanovej siete so rekurentnými SOM-kami, prípadne 
-nájsť súvislosti.
+nájsť súvislosti medzi týmito dvomi sieťami.
 
 V našich experimentoch sme porovnávali pamäťovú hĺbku dvoch základných typov rekurentných 
-SOM - RecSOM a MSOM. Okrem toho sme si vytvorili z oboch modelov modifikované verzie - Activity RecSOM a Decaying MSOM.
+SOM --- RecSOM a MSOM. Okrem toho sme si vytvorili z oboch modelov modifikované verzie --- Activity RecSOM a Decaying MSOM.
 Activity RecSOM umožňuje experimentovať s hodnotami aktivít neurónov, ktoré tvoria kontext siete. Upravili sme v nej
 vzorec na výpočet aktivity, tak aby obsahoval meniteľný parameter, ktorý môžeme nastavovať na rôzne hodnoty.
 To nám umožnilo preskúmať ďaľšie vlastnosti RecSOM a vplyv zloženia kontextu na hĺbku pamäte RecSOM.
@@ -14,10 +14,13 @@ Pri modifikácii MSOM sme sa rozhodli, že použijeme úplne odlišný kontext a
 je kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku, v našej modifikovanej 
 verzii je kontext tvorený iba kombináciou minulých vstupov a teda nie je závislý od minulých stavov samotnej siete.
 
-Našimi experimentami sme zistili rôzne zaujímavé súvislosti medzi hodnotami.
-% TODO vysledky, ktore sme dosiahli
-
-Zistili sme, že pri nízkodimenzionálnych vstupoch je vhodnejšie použiť RecSOM.
+Našimi experimentami sme zistili rôzne zaujímavé súvislosti medzi hodnotami pamäťovej hĺbky a kvantizačnými chybami.
+Pri Activity RecSOM sme zistili, že zmenou priebehu funkcie na výpočet aktivácie neurónu vieme znížiť 
+veľkosť kvantizačnej chyby.
+Decay MSOM nám ukázala, že s použitím kontextu nezávislého od stavov siete vieme dosiahnuť najvyššie hodnoty pamäťových hĺbok, pričom nezáleži od
+hodnoty kvantizačnej chyby.
+Z vlastností kontextov jednotlivých typov sietí vyplýva, že pre nízkodimenzionálne vstupy nemá zmysel používať RecSOM alebo Activity RecSOM, pretože 
+MSOM a Decay MSOM sú výpočtovo ďaleko efektívnejšie (vďaka nízkej dimenzii kontextu) a tiež dosahujú vyššie hodnoty pamäťovej hĺbky pri použití optimálnych parametrov.
 
 
 \section{Limity a nedostatky riešenia}

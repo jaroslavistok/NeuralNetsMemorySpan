@@ -475,9 +475,13 @@ Na x-ovej osi sú hodnoty parametra $\beta$ a na y-ovej osi sú hodnoty parametr
 Ako môžeme vidieť na grafe \ref{decay_memory_span} Decaying MSOM dosahuje veľmi vysoké hodnoty pamäťových hĺbok pri hodnote 
 parametra $\beta = 1$. V tomto prípade máme v kontexte uloženú kompletne celú históriu vstupov. Čo je dôležité si všimnúť na grafe
 pamäťových hĺbok je, že hodnota parametra $\alpha$ ovplvyvňuje pamäťovú hĺbku siete a výsledky sú konzistentné.
-Na grafe \ref{decay_errors} môžeme vidieť, že kvantizačná chyba pri hodnote parametra $\beta = 1$ je vyššia, ale nemá to negatívny 
-vplyv na pamäťovú hĺbku Decay MSOM a je to z toho dôvodu, že kontext je nezávislý od stavu (natrénovanosti) siete. Môžeme tvrdiť, že kontext je 
-stále rovnako kvalitný. 
+Na grafe \ref{decay_errors} môžeme vidieť, že kvantizačná chyba pri hodnote parametra $\beta = 1$ je najvyššia, ale nemá to negatívny 
+vplyv na pamäťovú hĺbku Decay MSOM a je to z toho dôvodu, že kontext je nezávislý od stavu (natrénovanosti) kontextových váh a závisí čisto iba od zloženia kontextu.
+Na to aby Decay MSOM dosiahla vysoké hodnoty pamäťových hĺbok, musí mať natrénované váhové vektory na danej trénovacej množine, pamäťová hĺbka začína stúpať až
+po niekoľkých epochách.
+Môžeme tvrdiť, že kontext je pri Decay MSOM stále rovnako kvalitný. Čím viac informácii v kontexte máme, tým sú hodnoty pamäťovej hĺbky vyššie.
+Hodnota parametra $\alpha$ má iba veľmi minimálny vplyv na hodnotu pamäťovej hĺbky, ktorá je ovplyvňovaná iba hodnotou parametra $\beta$.
+
 Pri predchádzajúcich rekurentných sieťach kontext obsahuje reprezentáciu vplyvov jednotlivých minulých vstupov na sieť a tu je to kombinácia samotných minulých vstupov siete. 
 Týmto experimentom sme vyskúšali aký vplyv na pamäťovú hĺbku siete má úplne odlišný druh kontextu a či sme s ním schopný sieť natrénovať.
 Naším experimentom sme zistili, že takáto sieť je pri nízkodimenzionálnych vstupoch výpočtovo veľmi efektívna (podobne ako MSOM) a zároveň dosahuje 
@@ -498,18 +502,18 @@ Výsledky pre hodnoty parametra $\alpha = 0.35$
 \begin{itemize}
     \item \textbf{abcd}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{3.12}
+        \item Priemerná kvantizačná chyba: \textbf{0.80}
     \end{itemize}
     \item \textbf{reber}
     \item \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{2.27}
-        \item Priemerná kvantizačná chyba: \textbf{0.82}
+        \item Priemerná pamäťová hĺbka: \textbf{2.476}
+        \item Priemerná kvantizačná chyba: \textbf{0.83}
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{0.6}
-        \item Priemerná kvantizačná chyba: \textbf{0.23}
+        \item Priemerná pamäťová hĺbka: \textbf{0.784}
+        \item Priemerná kvantizačná chyba: \textbf{0.54}
     \end{itemize}
 \end{itemize}
 
@@ -530,24 +534,24 @@ Výsledky pre hodnoty parametra $\alpha = 0.7$ a $\beta = 13.0$
 \begin{itemize}
     \item \textbf{abcd}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{1.312}
+        \item Priemerná kvantizačná chyba: \textbf{0.49}
     \end{itemize}
     \item \textbf{reber}
     \item \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{2.27}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{1,4}
+        \item Priemerná kvantizačná chyba: \textbf{0.51}
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{2,49}
+        \item Priemerná kvantizačná chyba: \textbf{0.48}
     \end{itemize}
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \includegraphics[width=\textwidth]{assets/ra_error_top}
     \caption{Graf klesajúcej kvantizačnej chyby počas trénovania Activity RecSOM}
 \end{figure}
 
@@ -559,24 +563,24 @@ Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
 \begin{itemize}
     \item \textbf{abcd}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
+        \item Priemerná pamäťová hĺbka: \textbf{5.52}
         \item Priemerná kvantizačná chyba: \textbf{0.87}
     \end{itemize}
     \item \textbf{reber}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{5.898}
+        \item Priemerná kvantizačná chyba: \textbf{0.06}
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
+        \item Priemerná pamäťová hĺbka: \textbf{0.232}
         \item Priemerná kvantizačná chyba: \textbf{0.87}
     \end{itemize}
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \includegraphics[width=\textwidth]{assets/m_error_top}
     \caption{Graf klesajúcej kvantizačnej chyby počas trénovania MSOM}
 \end{figure}
 
@@ -587,31 +591,31 @@ Výsledky pre hodnoty parametra $\alpha = $ a $\beta = $
 \begin{itemize}
     \item \textbf{abcd}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{8.22}
+        \item Priemerná kvantizačná chyba: \textbf{1.25}
     \end{itemize}
     \item \textbf{reber}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{8.77}
+        \item Priemerná kvantizačná chyba: \textbf{1.21}    
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{3.14}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{5,794}
+        \item Priemerná kvantizačná chyba: \textbf{1.15}
     \end{itemize}
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+    \includegraphics[width=\textwidth]{assets/dm_error_top}
     \caption{Graf klesajúcej kvantizačnej chyby počas trénovania Decay MSOM}
 \end{figure}
 
 
 
-\section{ Vyhodnotenie experimentu }
-Experimentami sme zistili, že na hĺbku pamäte je najviac ovplyvnená zložením samotného kontextu rekurentnej SOM.
+\section{ Vyhodnotenie experimentu so SOM}
+Experimentami sme zistili, že na hĺbka pamäte je najviac ovplyvnená zložením a dimenziou samotného kontextu rekurentnej SOM.
 Parametre, ktoré sme testovali a ktoré vplývajú na hĺbku pamäte rekurentných SOM sú $\alpha$ a $\beta$
 $\alpha$ vystupuje vo vzťahu pre výpočet vzdialenosti vstupu od určitého neurónu v sieti.
 $\beta$ zase ovplyvňuje výpočet samotného kontextu.
