@@ -14,28 +14,41 @@ Pri modifikácii MSOM sme sa rozhodli, že použijeme úplne odlišný kontext a
 je kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku, v našej modifikovanej 
 verzii je kontext tvorený iba kombináciou minulých vstupov a teda nie je závislý od minulých stavov samotnej siete.
 
+Našimi experimentami sme zistili rôzne zaujímavé súvislosti medzi hodnotami.
+% TODO vysledky, ktore sme dosiahli
+
 Zistili sme, že pri nízkodimenzionálnych vstupoch je vhodnejšie použiť RecSOM.
 
 
-V experimente s Elmanovou sieťou sa nám podarilo nájsť spôsob ako vizualizovať súvislosti medzi 
-aktiváciami neurónov na skrytej vrstve a posuvnými oknami na trénovacej množine.
-
-% vysledky, ktore sme dosiahli
 \section{Limity a nedostatky riešenia}
-V našej práci sa nám nepodarilo nájsť spôsob ako zmerať a porovnať pamäťovú hĺbku Elmanovej siete.
-Otázne je, či takáto sieť má nejakú kvantifikovateľnú pamäťovú hĺbku a či ju vieme odmerať a kvantifikovať.
+V experimente s Elmanovou sieťou sa nám podarilo nájsť spôsob ako vizualizovať súvislosti medzi 
+aktiváciami neurónov na skrytej vrstve a posuvnými oknami na trénovacej množine, avšak 
+nepodarilo sa nám nájsť spôsob ako zmerať a porovnať pamäťovú hĺbku Elmanovej siete s rekurentnými SOM.
+Otázne je, či tento typ siete má kvantifikovateľnú pamäťovú hĺbku a či ju vieme odmerať a kvantifikovať.
+
+Niektoré výsledky (hodnoty pamäťových hĺbok) pre SOM sú čiastočne skreslené
+pamäťovými oknami, ktoré obsahujú iba jednu podpostupnosť.
 
 \section{Možnosti ďaľšej práce}
 \begin{itemize}
-    \item Medzi ďaľšie možnosti patrí vyskúšanie ďaľších modifikácií rekurentných SOM. Napríklad pri Acitivty RecSOM 
-    by sme mohli použiť euklidovskú vzdialenosť neurónu od víťazného neurónu a pozrieť sa na to aký vplyv by to malo 
+    \item Medzi ďaľšie možnosti patrí vyskúšanie ďaľších modifikácií rekurentných SOM. 
+    Napríklad pri Acitivty RecSOM by sme mohli použiť euklidovskú vzdialenosť neurónu od víťazného neurónu a pozrieť sa na to aký vplyv by to malo 
     na pamäťovú hĺbku siete s rôznymi hodnotami parametra $\beta$.
-    \item Experimentovať s ďaľšími kombináciami parametrov
-    \item Vhodné by bolo lepšie kvantifikovať pamäťovú hĺbku v prípade, že neuróny rekurentných SOM majú vo svojom
-    receptívnom poli uloženú iba jednu sekvenciu. Tiež by bolo vhodné analyzovať lepšie súvislosti medzi kvantizačnou chybou a hodnotami pamäťovej hĺbky.
-    \item Spraviť podrobnú matematickú analýzu experimentov
-    \item Hľadanie a skúšanie alternatívnych spôsobov ako zmerať pamäťovú hĺbku Elmanovej siete. Napríklad podrobnejšiou
-    analýzou dendrogramov.
+    \item V našich experimentoch sme skúšali kombinácie parametrov $\alpha$ a $\beta$. Túto množinu parametrov by bolo vhodné rozšíriť o ďalšie parametre, napríklad
+    lepšie preskúmať vplyv veľkosti okolia, či rýchlosti učenia siete.
+    \item Keďže niektoré výsledky boli skreslené, vhodné by bolo lepšie kvantifikovať pamäťovú hĺbku v prípade, že neuróny rekurentných SOM majú vo svojom
+    receptívnom poli uloženú iba jednu sekvenciu. 
+    Tiež by bolo vhodné analyzovať lepšie súvislosti medzi kvantizačnou chybou a hodnotami pamäťovej hĺbky.
+    \item V našej práci sa nevenujeme príliš matematickej analýze pri jednotlivých experimentoch.
+    Preto by bolo vhodné spraviť podrobnú matematickú analýzu jednotlivých experimentov.
+    \item Keďže sme nedokázali nájsť spôsob, ako zmerať pamäťovú hĺbku Elamnovej siete, určite by bolo 
+    v budúcnosti vhodné navrhnúť a vyskúšať viac alternatívnych spôsobov ako zmerať pamäťovú hĺbku Elmanovej siete. 
+    Napríklad podrobnejšiou analýzou dendrogramov, či hľadaním ďaľších súvislostí v stavovom priestore siete.
+    \item Vyskúšať a overiť výsledky nášich experimentov v nejakom konkrétnom modeli strojového učenia, ktorý dokáže 
+    využiť rekurentné neurónové siete na generovanie textu, či reprezentáciu sekvenčných dát.
+    \item Keďže naše implementácie nepatria medzi tie najoptimálnejšie, medzi ďaľšue možnosti práce
+    určite patrí aj optimalizácia rýchlosti implementácii rekurentných SOM. Napríklad upraviť algoritmy tak, aby využívali
+    pararelizmus a teda aby sme mohli vyskúšať väčšie množstvo kombinácii rôznych parametrov.
 \end{itemize}
 
 

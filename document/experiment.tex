@@ -145,13 +145,13 @@ Veľkosť pamäťového okna sme nastavili na hodnotu 10.
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/recsom_memory_span}
+        \includegraphics[width=\textwidth]{assets/r_memory_span}
         \caption{RecSOM hodnoty pamäťových hĺbok}
     \end{figure}
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/recsom_errors}
+        \includegraphics[width=\textwidth]{assets/r_errors}
         \caption{RecSOM hodnoty kvantizačných chýb}
     \end{figure}
 
@@ -257,13 +257,13 @@ Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/activity_recsom_memory_span}
+        \includegraphics[width=\textwidth]{assets/ar_memory_span}
         \caption{Activity RecSOM hodnoty pamäťových hĺbok}
     \end{figure}
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/activity_recsom_errors}
+        \includegraphics[width=\textwidth]{assets/ar_errors}
         \caption{Activity RecSOM hodnoty kvantizačných chýb}
     \end{figure}
     
@@ -356,13 +356,13 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/msom_memory_span}
+        \includegraphics[width=\textwidth]{assets/m_memory_span}
         \caption{MSOM hodnoty pamäťových hĺbok}
     \end{figure}
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/msom_errors}
+        \includegraphics[width=\textwidth]{assets/m_errors}
         \caption{MSOM hodnoty kvantizačných chýb}
     \end{figure}
 
@@ -447,13 +447,13 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $<0, 1>$ s krokom $0.1$.
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/decay_msom_memory_span}
+        \includegraphics[width=\textwidth]{assets/dm_memory_span}
         \caption{Decaying MSOM hodnoty pamäťových hĺbok}
     \end{figure}
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/decay_msom_errors}
+        \includegraphics[width=\textwidth]{assets/dm_errors}
         \caption{Decaying MSOM hodnoty kvantizačných chýb}
     \end{figure}
 
@@ -590,6 +590,8 @@ Prvá časť experimentu s SRN prebiehala v nasledujúcich krokoch:
         \hline
         veľkosť posuvného okna na trénovacej množine & 3  \\
         \hline
+        počet krokov do minulosti (T) & 5 \\
+        \hline
         \end{tabular}
         \caption{Parametre SRN s Elmanovou architektúrou}
         \label{table:1}
@@ -632,8 +634,26 @@ Zaujímavou vlastnosťou SRN je aj to, že si na skrytej vrstve dokáže vytvori
 je trénovaná na trénovacej množine, ktorá je tvorená reťazcom generovaným napríklad reberovým automatom \cite{Servan-Schreiber1991}
 Vďaka tejto vlastnosti by sa mala SRN natrénovať na takejto trénovacej množine s nulovou chybou.
 Túto vlastnosť sme sa rozhodli overiť.
-Vytvorili sme si podobnú trénovaciu množinu ako pri prvom experimente a skutočne sa sieť bola
-schopná natrénovať takmer s nulovou chybou na sekvenciách generovaných reberovým automatom.
+Vytvorili sme si podobnú trénovaciu množinu ako pri prvom experimente.
+Parametre, ktoré sme použili na natrénovanie siete na takejto množine dát:
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|} 
+    \hline
+    Parameter & Hodnota \\ 
+    \hline
+    veľkosť skrytej vrstvy & 30  \\
+    \hline
+    počet epôch & 100  \\
+    \hline
+    počet krokov do minulosti (T) & 5 \\
+    \end{tabular}
+    \caption{Parametre SRN s Elmanovou architektúrou - reberové reťazce}
+    \label{table:1}
+\end{table}
+Výsledkom tohto trénovania je potvrdenie skutočnosti, že sieť sa dokázala 
+natrénovať po 100 epochách s nulovou trénovacou chybou na reťazcoch generovaných reberovým automatom, 
+čiže si na svojej skrytej vrstve dokázala vytvoriť reprezentáciu stavového automatu.
 
 
 
