@@ -14,11 +14,11 @@ lambda_s = metric(top_left, bottom_right) * 0.5
 
 train_data = DataLoader.load_data('abcd_short')
 
-for i in range(5):
+for i in range(1):
     model = DecayMergeSom(dim, rows, cols)
     model.train(train_data, metric=metric, alpha_s=1.0, alpha_f=0.05, lambda_s=lambda_s,
                         lambda_f=1, eps=20, in3d=False, trace=True, trace_interval=5, sliding_window_size=10, log=True,
-                        log_file_name='top_abcd_test.csv', alpha=0.5, beta=1.0)
+                        log_file_name='top_corpus_test.csv', alpha=0.5, beta=1.0)
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())
 

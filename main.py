@@ -67,7 +67,7 @@ quit()
 """
 
 
-with open('decay_msom/abs.csv_errors', 'r') as file:
+with open('decay_msom/abs1.csv_errors', 'r') as file:
     rows = file.read().split('\n')
     x = []
     y = []
@@ -77,8 +77,7 @@ with open('decay_msom/abs.csv_errors', 'r') as file:
             values = row.split(',')
             x.append(float(values[0])*10)
             y.append(float(values[1])*10)
-            scaled_value = (float(values[2]) * 30 * 30) / 100
-            z.append(round(scaled_value, 2))
+            z.append(round(float(values[2]), 2))
 
     y_ticks = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     x_ticks = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]

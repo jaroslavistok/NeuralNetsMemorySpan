@@ -187,6 +187,7 @@ class RecSom:
                 if not sequences:
                     continue
                 longest_common_subsequence = lcs.get_longest_subsequence(sequences)
+                print(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence
 
     def calculate_memory_span_of_net(self):

@@ -18,11 +18,11 @@ lambda_s = metric(top_left, bottom_right) * 0.5
 
 train_data = DataLoader.load_data('abcd_short')
 
-for i in range(5):
+for i in range(1):
     model = RecSom(dim, rows, cols)
     model.train(train_data, metric=metric, alpha_s=1.0, alpha_f=0.05, lambda_s=lambda_s,
                         lambda_f=1, eps=20, in3d=False, trace=True, trace_interval=20, sliding_window_size=10, log=True,
-                        log_file_name='top_corpus.csv'.format(i), alpha=0.35)
+                        log_file_name='alpha_test.csv'.format(i), alpha=0.35)
 
 
 # print(model.distances_between_adjacent_neurons_horizontal())

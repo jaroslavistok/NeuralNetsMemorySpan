@@ -135,9 +135,9 @@ class DecayMergeSom:
             print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
 
             # receptive field
-            # self.create_receptive_field()
-            # print("Receptive field")
-            # print(np.matrix(self.receptive_field))
+            self.create_receptive_field()
+            print("Receptive field")
+            print(np.matrix(self.receptive_field))
 
             sum_of_memory_spans += memory_span
             if ep == eps - 1:

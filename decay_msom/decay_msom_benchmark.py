@@ -21,7 +21,7 @@ alpha_values = [x * .1 for x in range(0, 11)]
 beta_values = [x * .1 for x in range(0, 11)]
 for alpha in alpha_values:
     for beta in beta_values:
-        log_file_name = 'abs.csv'
+        log_file_name = 'abs1.csv'
         model = DecayMergeSom(input_dimension=dimension, rows_count=number_of_rows, columns_count=number_of_columns)
 
         model.train(train_data, metric=metric, alpha_s=1.0, alpha_f=0.05, lambda_s=lambda_s,
