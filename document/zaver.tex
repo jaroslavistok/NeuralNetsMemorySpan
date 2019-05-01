@@ -16,9 +16,9 @@ verzii je kontext tvorený iba kombináciou minulých vstupov a teda nie je záv
 
 Našimi experimentami sme zistili rôzne zaujímavé súvislosti medzi hodnotami pamäťovej hĺbky a kvantizačnými chybami.
 Pri Activity RecSOM sme zistili, že zmenou priebehu funkcie na výpočet aktivácie neurónu vieme znížiť 
-veľkosť kvantizačnej chyby.
-Decay MSOM nám ukázala, že s použitím kontextu nezávislého od stavov siete vieme dosiahnuť najvyššie hodnoty pamäťových hĺbok, pričom nezáleži od
-hodnoty kvantizačnej chyby.
+veľkosť kvantizačnej chyby, čiže zlepšiť trénovanie siete.
+Decay MSOM nám ukázala, že s použitím kontextu nezávislého od stavov siete vieme dosiahnuť \textbf{najvyššie hodnoty pamäťových hĺbok}, pričom nezávisí od
+natrénovanosti kontextových váh.
 Z vlastností kontextov jednotlivých typov sietí vyplýva, že pre nízkodimenzionálne vstupy nemá zmysel používať RecSOM alebo Activity RecSOM, pretože 
 MSOM a Decay MSOM sú výpočtovo ďaleko efektívnejšie (vďaka nízkej dimenzii kontextu) a tiež dosahujú vyššie hodnoty pamäťovej hĺbky pri použití optimálnych parametrov.
 

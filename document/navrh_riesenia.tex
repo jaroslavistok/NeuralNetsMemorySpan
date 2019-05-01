@@ -52,7 +52,7 @@ ktorá nám vizualizuje, pre ktoré vstupy (resp. posuvné okná) boli neuróny 
 
 \section{Pamäťová hĺbka SRN s Elmanovou architektúrou}
 SRN s Elmanovou architektúrou sme chceli porovnať s rekurentnými SOM najmä z toho dôvodu, že má niektoré vlastnosti spoločné 
-so SOM. Napríklad skrytú v SRN si môžeme predstaviť ako viacrozmernú SOM, na ktorú sa zobrazujú vstupy do vysokorozmerného priestoru.
+so SOM. Ak by sme odstránili výstupnú vrstvu, tak dostaneme architektúru rekurentnej SOM.
 Prekážkou je, že odmerať a hlavne porovnať pamäťovú hĺbku takejto siete s inými sieťami nie je jednoduché, keďže má úplne odlišnú architektúru.
 Pokúšali sme sa nájsť spôsob ako odmerať pamäťovú hĺbku takejto siete.
 Navrhli sme riešenie, pomocou ktorého vieme vizualizovať vzdialenosti medzi stavmi na kontextovej vrstve siete, ale
@@ -87,38 +87,16 @@ použitím optimálnych váh a fixnou inicializáciou váh.
 V druhej časti experimentu sa venujeme pokusu s SRN a vizualizácii vnútorných stavov siete vo forme 
 dendogramu a vyhodnoteniu výsledkov.
 
-Experiment prebieha nasledujúcim spôsobom:
+Experiment so rekurentnými SOM prebieha nasledujúcim spôsobom:
 \begin{itemize}
     \item Výber vhodnej trénovacej sekvencie, počtu epôch trénovania a vhodnú veľkosť pamäťového okna
     \item Trénovanie siete na všetkých kombináciach týchto dvoch parametrov
-    \item Ukladanie hodnot pamäťovej hĺbky do súboru
+    \item Ukladanie hodnot pamäťovej hĺbky a kvantizačných chýb do súboru
     \item Vykreslenie heatmapy, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
+    \item Testovanie pamäťovej hĺbky sietí s optimálnymi parametrami na rôznych trénovacích dátach.
     \item Vyhodnotenie a analýza výsledkov
 \end{itemize}
 
-%
-%\section{Hľadanie ideálnych (hyper) parametrov}
-%Ako prvé je potrebné zvoliť vhodnú veľkosť posuvného okna na trénovacej množine, tak aby bolo väčšie ako
-%najdlhšia nájdená spoločná podpostupnosť znakov. 
-%Toto je jednoducho docieliteľné postupným zvyšovaním veľkosti tohto pamäťového okna až pokým pamäťová hĺbka stúpa.
-
-%Ďaľšie dôležité parametre, ktoré potrebujem optimalizovať sú $alpha$ a $beta$ parametre, ktoré
-%sa používajú pri počítaní výslednej vzdialenosti vstupného vektora od váhového vektora neurónu.
-%Táto vzdialenosť je pri rekurentných SOM určená ako kombinácia vzdialenosti vstupu od váhového vektora neurónu a vzdialenosti
-%kontextu od contextového vektora neurónu.
-%Jednotlivé parametre určujú akú váhu má aktuálny vstup a akú váhu má kontext pri výpočte výslednej vzdialenosti.
-%Toto neviem spraviť nijak inak, iba postupním skúšaním rôznych kombinácii týchto parametrov. 
-%$alpha$ aj $beta$.
-
-%Optimálne $alpha$ a $beta$ parameters, ktoré dávajú najlepšie výsledky som hľadal nasledujúcim
-%spôsobom:
-
-%Naprogramoval som si skript, pomocou ktorého trénujem sieť s rôznymi parametrami.
-%Výsledky som si počas trénovania zaznamenával.
-%Následne som si vykreslil 3D grafy pre každý typ trénovanej siete (msom, recsom, vmsom), 
-%kde na x-ovej osy sú hodnoty alpha parametra, na y-ovej osy sú hodnoty beta parametra a
-%na z-ovej osy sú hodnoty pamäťových hĺbok.
-%Na začiatok som zvyšoval parameters po hodnote $0.1$.
 
 
 
