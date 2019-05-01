@@ -358,6 +358,7 @@ Pustili sme trénovanie na všetkých kombináciach parametrov $\alpha$ a $\beta
         \caption{Activity RecSOM hodnoty kvantizačných chýb}
         \label{errors_activity_recsom}
     \end{figure}
+
     
 \subsection{Analýza výsledkov Activity RecSOM}
 Na x-ovej osi sú hodnoty parametra $\alpha$ a na y-ovej osi sú hodnoty parametra $\beta$.
@@ -370,7 +371,7 @@ Activity RecSOM dosahuje v priemere o niečo nižšie hodnoty pamäťovej hĺbky
 Na grafe kvantizačných chýb (obr. \ref{errors_activity_recsom}) môžeme vidieť, že sieť sa najlepšie trénuje, keď je hodnota 
 parametra $\alpha$ nízka a hodnota parametra $\beta$ vysoká. Čiže keď je vplyv kontextu nízky, tak sa sieť lepšie trénuje.
 Keď porovnáme kvantizačnú chybu s obyčajnou RecSOM tak Activity RecSOM má nižšie hodnoty kvantizačnej chyby. 
-Našou modifikáciou RecSOm sme síce nedosiahli vyššie hodnoty pamäťovej hĺbky, ale znížili sme kvantizačnú chybu siete.
+Našou modifikáciou RecSOM sme síce nedosiahli vyššie hodnoty pamäťovej hĺbky, ale znížili sme kvantizačnú chybu siete.
 Zvyšovanie hodnoty $\beta$ parametra teda znižuje kvantizačnú chybu siete, čiže schopnosť siete správne sa natrénovať.
 Pri vyšších hodnotách parametra $\beta$ majú neuróny blízke víťazovi výrazne vyššiu hodnotu aktivácie vďaka strmšiemu priebehu funkcie na výpočet aktivácie. 
 Inými slovami, informácie uložené v kontexte sú viac sústredené na aktivitu víťazného neurónu. 
@@ -524,8 +525,11 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $\langle0, 1\rangle$ s kro
     
 Na x-ovej osi sú hodnoty parametra $\beta$ a na y-ovej osi sú hodnoty parametra $\alpha$.
 Ako môžeme vidieť na grafe (obr. \ref{decay_memory_span}) Decaying MSOM dosahuje veľmi vysoké hodnoty pamäťových hĺbok pri hodnote 
-parametra $\beta = 1$. V tomto prípade máme v kontexte uloženú kompletne celú históriu vstupov. Čo je dôležité si všimnúť na grafe
-pamäťových hĺbok je, že hodnota parametra $\alpha$ ovplyvňuje pamäťovú hĺbku siete a výsledky sú konzistentné.
+parametra $\beta = 1$. V tomto prípade máme v kontexte uloženú kompletne celú históriu vstupov. Pri MSOM sme v tomto prípade mali síce tiež kompletnú históriu vstupov, ale kontext ako taký bol prázdny.
+Pri Decay SOM sa nám kontext nestráca pri $\beta = 1$, preto dosahuje veľmi dobré výsledky.
+Čo je dôležité si všimnúť na grafe
+pamäťových hĺbok je, že hodnota parametra $\alpha$ iba mierne ovplyvňuje pamäťovú hĺbku siete. Keď je $\alpha = 0$, tak sieť nepracuje s kontextom, takže nemá žiadnu pamäťovú hĺbku,
+v podstate je to nerekurentná SOM. Preto je ak kvantizačná chyba v tomto prípade nulová.
 Na grafe (obr. \ref{decay_errors}) môžeme vidieť, že kvantizačná chyba pri hodnote parametra $\beta = 1$ je najvyššia, ale nemá to negatívny 
 vplyv na pamäťovú hĺbku Decay MSOM a je to z toho dôvodu, že kontext je nezávislý od stavu (natrénovanosti) kontextových váh a závisí čisto iba od zloženia kontextu.
 Na to aby Decay MSOM dosiahla vysoké hodnoty pamäťových hĺbok, musí mať natrénované váhové vektory na danej trénovacej množine, pamäťová hĺbka začína stúpať až
@@ -653,18 +657,18 @@ Výsledky pre hodnoty parametra $\alpha = 0.5$ a $\beta = 1.0$
 \begin{itemize}
     \item \textbf{abcd}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{8.22}
+        \item Priemerná pamäťová hĺbka: \textbf{8.44}
         \item Priemerná kvantizačná chyba: \textbf{1.25}
     \end{itemize}
     \item \textbf{reber}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{8.77}
+        \item Priemerná pamäťová hĺbka: \textbf{7.57}
         \item Priemerná kvantizačná chyba: \textbf{1.21}    
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{5,794}
-        \item Priemerná kvantizačná chyba: \textbf{1.15}
+        \item Priemerná pamäťová hĺbka: \textbf{6.36}
+        \item Priemerná kvantizačná chyba: \textbf{1.02}
     \end{itemize}
 \end{itemize}
 
