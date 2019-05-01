@@ -41,8 +41,8 @@ class DecayMergeSom:
 
         for i in range(len(self.weights)):
             for j in range(len(self.weights[i])):
-                current_distance = (1 - self.beta) * np.linalg.norm(x - self.weights[i][j]) + \
-                                   self.beta * np.linalg.norm(self.previous_winner_context - self.context_weights[i][j])
+                current_distance = (1 - self.alpha) * np.linalg.norm(x - self.weights[i][j]) + \
+                                   self.alpha * np.linalg.norm(self.previous_winner_context - self.context_weights[i][j])
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
