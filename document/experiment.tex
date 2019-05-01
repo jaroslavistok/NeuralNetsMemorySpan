@@ -267,9 +267,8 @@ Zvyšné políčka zobrazujú najdlhšiu spoločnú podpostupnosť spoločne s c
 v danom pamäťovom okne neurónu. Na receptívnom poli môžeme dobre vidieť ako sieť rozmiestňuje posuvné okná medzi jednotlivé pamäťové okná neurónov.
 Konkrétne v tomto prípade bola výsledná hodnota pamäťovej hĺbky siete $3.67$.
 
-Vidíme, že pri vysokej hodnote parametra $\alpha$ sa nám väčšina postupností zobrazí na menší počet neurónov do jednej 
-oblasti.
-
+Vidíme, že pri vysokej hodnote parametra $\alpha$ sa nám väčšina posuvných okien zobrazí na menší počet neurónov a do jednej 
+oblasti. V prípade, že je $\alpha$ nižšia, posuvné okná sú zobrazené na väčší počet neurónov po celej mape.
 
 \subsection{Activity RecSOM}
 Pri obyčajnej verzii RecSOM nevieme ovplyvniť žiadnym parametrom výpočet a vlastnosti kontextu. 
@@ -440,12 +439,14 @@ vyššej rýchlosti učenia, vďaka zredukovanej dimenzie kontextu.
  Keď je $\beta = 1$ tak máme prakticky neobmedzený kontext do minulosti, ale kontext je prázdny (nie je v ňom žiadna informácia), preto je 
  pamäťová hĺbka v tomto prípade nulová. Môžeme tvrdiť, že čím je parameter $\beta$ väčší, tým väčší kontext do minulosti máme.
  
- Zaujímavý je prípad, keď je $\alpha = 1$, vtedy sieť pracuje iba s kontextom bez aktuálnych vstupov. 
- Na grafe (obr. \ref{msom_errors}) môžeme vidieť, že pri tejto hodnote parametra má sieť nízku kvantizačnú chybu, čiže sa aj správne učí.
+ Zaujímavý je prípad, keď je $\alpha = 1$, vtedy sieť pracuje iba s kontextom bez aktuálnych vstupov a dosahuje na jednoduchej trénovacej množine (abcd)
+ vysoké hodnoty pamäťových hĺbok.
+ Na grafe (obr. \ref{msom_errors}) môžeme vidieť, že pri tejto hodnote parametra má sieť nízku kvantizačnú chybu, čiže sa aj správne učí, ale je kompletne 
+ zanedbaná nekontextová časť. Najvyššiu kvantizačnú chybu má MSOM v prípade ak je váha kontextovej zložky vysoká a zároveň sieť nemá žiadny kontext do minulosti($\beta = 0$).
 
- MSOM dosahuje v našom experimente priemere vysoké hodnoty pamäťovej hĺbky, pričom je to zároveň 
+ MSOM dosahuje v našom experimente priemerne vysoké hodnoty pamäťovej hĺbky, pričom je to zároveň 
  výpočtovo najefektívnejšia verzia rekurentnej SOM pri nízko dimenzionálnych vstupoch. 
- Ukazuje sa, že kontext redukovaný na vlastnosti víťaza z predchádzajúceho kroku neovplyvňuje negatívne pamäťvú hĺbku siete na jednoduchej trénovacej množine.
+ Ukazuje sa, že kontext redukovaný na vlastnosti víťaza z predchádzajúceho kroku neovplyvňuje negatívne pamäťovú hĺbku siete na jednoduchej trénovacej množine.
 
 \subsection{Decaying MSOM}
 Pre potreby nášho experimentu sme si vytvorili ďalšiu modifikovanú verziu % prida poznamku pod ciarou
@@ -466,7 +467,7 @@ ktorý v rozvinutej forme môžeme zapísať ako:
 	\beta^{2} \cdot x_{t-2} \ddots \beta^{n} \cdot x_{t-n}
 \end{equation}
 
-$\beta$ parameter je číslo z intervalu $\beta < 1 \wedge \beta > 0$ a
+$\beta$ parameter je číslo z intervalu $\beta \in (0, 1)$ a
 $x_t, x_{t-1}, x_{t-2} ...$ sú vstupné vektory z predchádzajúcich krokov.
 $t$ je číslo aktuálneho kroku a $n$ je veľkosť trénovacej množiny.
 
@@ -524,7 +525,7 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $\langle0, 1\rangle$ s kro
 Na x-ovej osi sú hodnoty parametra $\beta$ a na y-ovej osi sú hodnoty parametra $\alpha$.
 Ako môžeme vidieť na grafe (obr. \ref{decay_memory_span}) Decaying MSOM dosahuje veľmi vysoké hodnoty pamäťových hĺbok pri hodnote 
 parametra $\beta = 1$. V tomto prípade máme v kontexte uloženú kompletne celú históriu vstupov. Čo je dôležité si všimnúť na grafe
-pamäťových hĺbok je, že hodnota parametra $\alpha$ ovplvyvňuje pamäťovú hĺbku siete a výsledky sú konzistentné.
+pamäťových hĺbok je, že hodnota parametra $\alpha$ ovplyvňuje pamäťovú hĺbku siete a výsledky sú konzistentné.
 Na grafe (obr. \ref{decay_errors}) môžeme vidieť, že kvantizačná chyba pri hodnote parametra $\beta = 1$ je najvyššia, ale nemá to negatívny 
 vplyv na pamäťovú hĺbku Decay MSOM a je to z toho dôvodu, že kontext je nezávislý od stavu (natrénovanosti) kontextových váh a závisí čisto iba od zloženia kontextu.
 Na to aby Decay MSOM dosiahla vysoké hodnoty pamäťových hĺbok, musí mať natrénované váhové vektory na danej trénovacej množine, pamäťová hĺbka začína stúpať až
@@ -544,7 +545,7 @@ Kontext tvorený kombináciou minulých vstupov je teda veľmi dobrý.
 
 \section {Porovnanie výsledkov SOM}
 Po nájdení optimálnych parametrov pre všetky 4 typy sietí, sme spustili 5 behov pre tieto kombinácie parametrov a všetky 3 trénovacie množiny,
-pričom sme použili rovnakú počiatočnú inicializáciu váh a spravili priemer týchto hodnôt. Zvyšné hodnoty parametrov sme ponechali
+pričom sme použili náhodnú inicializáciu váh a spravili priemer týchto hodnôt. Zvyšné hodnoty parametrov sme ponechali
 rovnaké ako pri hľadaní optimálnych parametrov.
 
 Výsledky pre hodnoty parametra $\alpha = 0.35$
@@ -622,13 +623,13 @@ Výsledky pre hodnoty parametra $\alpha = 0.5$ a $\beta = 0.9$
     \end{itemize}
     \item \textbf{reber}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{5.898}
+        \item Priemerná pamäťová hĺbka: \textbf{5.72}
         \item Priemerná kvantizačná chyba: \textbf{0.06}
     \end{itemize}
     \item \textbf{corpus}
     \begin{itemize}
-        \item Priemerná pamäťová hĺbka: \textbf{0.232}
-        \item Priemerná kvantizačná chyba: \textbf{0.87}
+        \item Priemerná pamäťová hĺbka: \textbf{1.89}
+        \item Priemerná kvantizačná chyba: \textbf{0.08}
     \end{itemize}
 \end{itemize}
 
@@ -639,10 +640,12 @@ Výsledky pre hodnoty parametra $\alpha = 0.5$ a $\beta = 0.9$
 \end{figure}
 
 Zvolili sme hodnoty parametrov, pri ktorých MSOM dosiahla vysokú pamäťovú hĺbku, ale nie najvyššiu, pretože 
-najvyššiu dosiahla pri hodnote $\alpha = 1$, čo je špecifický prípad, kedy sieť nepracuje s nekotextovou zložkou.
-MSOM sa dokáže natrénovať veľmi dobre na jednoduchých trénovacích množinách. 
-Na reálnom texte však dosahuje veľmi nízke hodnoty pamäťovej hĺbky, pravdepodobne 
-potrebuje väčšiu veľkosť mapy (viac neurónov).
+najvyššiu dosiahla pri hodnote $\alpha = 1$, čo je špecifický prípad, kedy sieť nepracuje s nekotextovou zložkou a chceli 
+sme sa pri testoch vyhnúť špeciálnym prípadom.
+MSOM sa dokáže natrénovať veľmi dobre na jednoduchých trénovacích množinách, ale so stúpajúcou komplexitou trénovacej 
+množiny klesá pamäťová hĺbka.
+Na reálnom texte však dosahuje nízke hodnoty pamäťovej hĺbky, pravdepodobne 
+potrebuje väčšiu veľkosť mapy (viac neurónov), aby sa dokázala správne natrénovať.
 
 
 \subsection{Decay MSOM}
@@ -784,6 +787,7 @@ Parametre, ktoré sme použili na natrénovanie siete na takejto množine dát:
     počet epôch & 100  \\
     \hline
     počet krokov do minulosti (T) & 5 \\
+    \hline
     \end{tabular}
     \caption{Parametre SRN s Elmanovou architektúrou - reberové reťazce}
     \label{table:1}
