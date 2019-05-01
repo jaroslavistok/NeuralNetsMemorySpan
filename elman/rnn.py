@@ -22,7 +22,7 @@ class Model:
     '''
     def forward_propagation(self, x):
         # The total number of time steps
-        T = len(x)
+        T = 5
         layers = []
         prev_s = np.zeros(self.hidden_dim)
         # For each time step...
@@ -33,6 +33,7 @@ class Model:
             layer.forward(input, prev_s, self.U, self.W, self.V)
             prev_s = layer.s
             layers.append(layer)
+        # print(prev_s)
         return layers
 
     def predict(self, x):
@@ -43,7 +44,8 @@ class Model:
     def get_context(self, x):
         output = Softmax()
         layers = self.forward_propagation(x)
-        return layers[len(layers)-1].s
+        print(len(layers))
+        return layers[len(layers) - 2].s
 
 
     def calculate_loss(self, x, y):

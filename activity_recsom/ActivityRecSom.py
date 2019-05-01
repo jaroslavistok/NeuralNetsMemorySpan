@@ -129,8 +129,8 @@ class ActivityRecSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
-                        current_context_weight_adjustment = base_learning_rate * (self.previous_step_activities -
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
                                                                        self.context_weights[
                                                                            row_index, column_index]) * h
 
@@ -139,7 +139,7 @@ class ActivityRecSom:
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
                 base_learning_rate -= 0.001
 
-            quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
+            quantization_error = sum_of_distances / (count - sliding_window_size)
 
             quantizations_errors.append(quantization_error)
             memory_spans.append(self.calculate_memory_span_of_net())
@@ -206,8 +206,6 @@ class ActivityRecSom:
                 if not sequences:
                     continue
                 longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
-                if longest_common_subsequence_length == 0:
-                    continue
                 weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length

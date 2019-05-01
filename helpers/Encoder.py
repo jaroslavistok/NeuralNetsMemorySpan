@@ -2,7 +2,6 @@ import numpy as np
 
 """
 Simple helper for encoding characters
-
 """
 
 

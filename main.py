@@ -24,28 +24,50 @@ quit()
 
 
 """
-sequences = ["brownasdfoersjumps",
-             "foxsxzxasis12sa[[#brown",
-             "thissasbrownxc-34a@s;"]
+sequences = []
 
 lcs = LongestCommonSubsequence()
-print(lcs.get_longest_subsequence(sequences))
-print(lcs.get_longest_subsequence_length(sequences))
+print(lcs.lcs_test(sequences))
+quit()
 """
-
 #lcs = LCS()
 
+"""
 lcs = LongestCommonSubsequence()
-sequences = ['abbbbbbccb', 'ccbbb']
+sequences = ['sadada', 'qsdada', 'ssdada']
 print(lcs.get_longest_subsequence_length(sequences))
 quit()
-
+"""
 
 # Alpha - y
 # Beta - x
+"""
+with open('recsom/abs.csv_errors', 'r') as file:
+        rows = file.read().split('\n')
+        x = []
+        y = []
+        for row in rows:
+            if row:
+                values = row.split(',')
+                x.append(float(values[0]))
+                scaled_value = (float(values[2]) * 30 * 30) / 100
+                y.append(round(scaled_value, 2))
+
+        plt.figure(1)
+        plt.clf()
+        plt.plot(x, y)
+
+        plt.xlabel('alpha')
+        plt.ylabel('kvantizačná chyba')
+        plt.xlim(0, 1)
+        plt.tight_layout()
+        plt.gcf().canvas.set_window_title('recsom memory span')
+        plt.show()
+quit()
+"""
 
 
-with open('results/recsom/final1.csv_max', 'r') as file:
+with open('decay_msom/abs.csv_errors', 'r') as file:
     rows = file.read().split('\n')
     x = []
     y = []
@@ -55,8 +77,12 @@ with open('results/recsom/final1.csv_max', 'r') as file:
             values = row.split(',')
             x.append(float(values[0])*10)
             y.append(float(values[1])*10)
-            z.append(round(float(values[2]), 2))
-    PlottingHelper.plot_memory_span_heatmap(z, 10, 'rec_fig.png')
+            scaled_value = (float(values[2]) * 30 * 30) / 100
+            z.append(round(scaled_value, 2))
+
+    y_ticks = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    x_ticks = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    PlottingHelper.plot_memory_span_heatmap(z, 10, 'rec_fig.png', x_ticks, y_ticks)
 
 """
 with open('random_text_benchmark_merge.csv', 'r') as file:

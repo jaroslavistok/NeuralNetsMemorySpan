@@ -116,15 +116,15 @@ class DecayMergeSom:
                         argument = -((distance_from_winner ** 2) / lambda_t ** 2)
                         h = np.exp(argument)
 
-                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
-                        current_context_weight_adjustment = base_learning_rate * \
+                        current_context_weight_adjustment = alpha_t * \
                                                             (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
                         self.weights[row_index, column_index] += current_weight_adjustment
                         self.context_weights[row_index, column_index] += current_context_weight_adjustment
                 base_learning_rate -= 0.001
-            quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
+            quantization_error = sum_of_distances / (count - sliding_window_size)
 
             quantization_errors.append(quantization_error)
 
@@ -159,7 +159,8 @@ class DecayMergeSom:
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                plot_errors('Quantization error', quantization_error, block=False)
+                plot_errors('chyba', quantization_errors, block=False)
+                plot_errors('pamäťová hĺbka', memory_spans, block=False)
 
         if trace:
             ioff()
@@ -181,8 +182,6 @@ class DecayMergeSom:
                 if not sequences:
                     continue
                 longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
-                if longest_common_subsequence_length == 0:
-                    continue
                 weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
@@ -202,5 +201,5 @@ class DecayMergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence

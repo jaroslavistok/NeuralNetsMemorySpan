@@ -17,15 +17,15 @@ hidden_dim = 100
 X_train, y_train = getSentenceData('../data/reddit-comments-2015-08.csv', word_dim)
 """
 
-# data_string = "bbadcbdacdccaaaacacabdcddadbdbabaabccbbabacaadabdccccdcdaaacbaadcddbbbbbdcbaccdacbcaadabbbcaacbdcccbbabbdcdabdcbdabdadadbabcbbdbcbcdaaaccbacbcbaccaacaddbdaabaaaddcabdcbbbbdccaccbaaccccbcabacadddbbaabdbbcacbbbbdcccbbaaabacdccbcdcacacbdbadaaaacaddcbdcbabdbdcbbddaadcbbbdbbccabdabbabcddcbdaddbbdbbbabddbacddacccbabdcbbbdbbcacaddabaabadbcadbccccdaccbacacabacaadbcaddddbaabbdaabdbcdccdacacbcdacbaccdacbcbdaabcbaaadccdaaabcbbadbbbdddacbcbcdbadcadcdbccdcbccabbcbccbddbbabbaccabbccbdccdabaddacacaddabccdcabdbdbcbdcbdbaccccddcbcdbcddbdcdabbacccdbadaadddcdaabcbaadbbccccbaddcaacdcaacdacbddaddcbdddbbbadabbdbaddacadcdbacbaaddcbacbcaadbaccbacbcdcdddccdbbddbdbaccdcaddcbddbacbcddbdccbbabacaaccdbcbdbadaaaabccccdbcacacbacabcdbcdaabcacbddcabddbaacbbabdaadbbccadcdadcbcbcacbcbbdcbdbcbcbbbaabbdbddccacbccccddddcacbbcddacbcadcbbbddacdaacacbadbcdbcddccccbccacabbacbbaabdcbaccaaadcbddcdabacddaadbbdcdbbacaaabccabcaaacabddabdbbdaadddaabbdbddabdbcadabacbbdcbbbcadaaabbbccbccddbadadaabcaaaddccbccdbcadacdabcbdbacababcaacdcc"
-data_string = 'bbadcbdacdccaaaacacabdcddadbdbabaabccbbabacaadabdccccdcdaaacbaadcddbbbbbdcbaccdacbcaadabbbcaacbdccc'
+data_string = "PTTVPXTVPSEPVPXVVETXSETXXVPXTTVVETSXXVPXTVVEPTTVVETXXTTTVPSETSSXXTVPXVVETXSETSXSETXXTVPXTVVETXSETXXVPXTTV"
+#data_string = 'bbadcbdacdccaaaacacabdcddadbdbabaabccbbabacaadabdccccdcdaaacbaadcddbbbbbdcbaccdacbcaadabbbcaacbdcccbbabbdc'
 
 
 X_train, Y_train = DataWrangler.get_training_data(data_string)
 np.random.seed(10)
 rnn = Model(26, 30)
 
-losses = rnn.train(X_train, Y_train, learning_rate=0.5, nepoch=10, evaluate_loss_after=1)
+losses = rnn.train(X_train, Y_train, learning_rate=0.5, nepoch=100, evaluate_loss_after=1)
 
 hidden_activations = dict()
 sliding_window_size = 3
@@ -39,7 +39,7 @@ data_frame = pd.DataFrame.from_dict(hidden_activations).transpose()
 data_frame.index = list(hidden_activations.keys())
 distances = squareform(pdist(data_frame, metric='euclidean'))
 distances = pd.DataFrame(data=distances, index=list(hidden_activations.keys()))
-print(distances.to_string())
+# print(distances.to_string())
 string_representation = str(distances)
 
 with open('file.txt', 'w') as file:

@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.preprocessing import OneHotEncoder
 
 from helpers.Encoder import Encoder
 

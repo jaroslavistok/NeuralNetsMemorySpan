@@ -1,4 +1,3 @@
-import numpy as np
 from plotting_helpers.plot_utils import *
 
 
@@ -116,6 +115,9 @@ class Som:
 
             for i in np.random.permutation(count):
                 x = inputs[:, i]
+
+                print("x dimension")
+                print(x.shape)
 
                 winner_row, winner_column = self.find_winner_for_given_input(x)
 

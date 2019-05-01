@@ -13,7 +13,7 @@ class RecSom:
 
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
-        # weights vectors
+        # weights vector
         self.weights = np.random.rand(rows_count, columns_count, input_dimension)
         self.context_weights = np.random.rand(rows_count, columns_count, self.number_of_neurons_in_map)
 
@@ -59,11 +59,11 @@ class RecSom:
 
         count = len(inputs)
 
-        if trace:
-            ion()
-            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
-            (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.context_weights, block=False)
-            redraw()
+        # if trace:
+        #     ion()
+            # (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
+            # (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.context_weights, block=False)
+            # redraw()
 
         quantizations_errors = []
         memory_spans = []
@@ -102,6 +102,7 @@ class RecSom:
                 sum_of_distances += (1 - self.alpha) * np.linalg.norm(x - self.weights[winner_row][winner_column]) + \
                                     self.alpha * np.linalg.norm(self.previous_step_activities - self.context_weights[winner_row][winner_column])
 
+
                 winner_position = np.array([winner_row, winner_column])
                 for row_index in range(self.rows_count):
                     for column_index in range(self.columns_count):
@@ -114,8 +115,8 @@ class RecSom:
                         # print("labmda {}".format(lambda_t))
                         # print("H: {}".format(h))
 
-                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
-                        current_context_weight_adjustment = base_learning_rate * (self.previous_step_activities -
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = alpha_t * (self.previous_step_activities -
                                                                        self.context_weights[
                                                                            row_index, column_index]) * h
 
@@ -125,13 +126,15 @@ class RecSom:
 
                         adjustment_deltas.append(current_weight_adjustment - last_adjustment)
                         last_adjustment = current_weight_adjustment
-                base_learning_rate -= 0.001
+                base_learning_rate -= 0.01
 
-            quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
+            quantization_error = sum_of_distances / (count - sliding_window_size)
 
             quantizations_errors.append(quantization_error)
 
+            print("calculating")
             memory_span = self.calculate_memory_span_of_net()
+            print("end calculating")
 
             memory_spans.append(memory_span)
 
@@ -140,7 +143,7 @@ class RecSom:
             print("Memory span of the net {}:".format(memory_span))
 
             # receptive field
-            # self.create_receptive_field()
+            self.create_receptive_field()
             print("Receptive field")
             print(np.matrix(self.receptive_field))
 
@@ -149,12 +152,12 @@ class RecSom:
             if log:
                 if ep == eps - 1:
                     with open(log_file_name, 'a') as file:
-                        file.write('{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                        file.write('{},{}'.format(round(self.alpha, 2),
                                                     round(memory_span, 2)))
                         file.write('\n')
 
-                    with open(log_file_name + '_max', 'a') as file:
-                        file.write('{},{},{}'.format(round(1 - self.alpha, 2), round(self.alpha, 2),
+                    with open(log_file_name + 'one_minus_alpha', 'a') as file:
+                        file.write('{},{}'.format(round(1 - self.alpha, 2),
                                                      round(max(memory_spans), 2)))
                         file.write('\n')
 
@@ -163,14 +166,12 @@ class RecSom:
                                                     round(quantization_error, 2)))
                         file.write('\n')
 
-
-
             if trace and ((ep + 1) % trace_interval == 0):
                 (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
                 redraw()
-                plot_errors('Quantization error', quantizations_errors, block=False)
-                plot_errors('Memory spans over time', memory_spans, block=False)
-                plot_receptive_field(self.receptive_field)
+                plot_errors('chyba', quantizations_errors, block=False)
+                # plot_errors('Memory spans over time', memory_spans, block=False)
+                # plot_receptive_field(self.receptive_field)
 
         if trace:
             ioff()
@@ -185,7 +186,7 @@ class RecSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence
 
     def calculate_memory_span_of_net(self):
@@ -199,13 +200,10 @@ class RecSom:
                 if not sequences:
                     continue
                 longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
-                if longest_common_subsequence_length == 0:
-                    continue
                 weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
                 sum_of_weigths += weight
-
         if sum_of_weigths == 0:
             return sum_of_weighted_lcs
         return sum_of_weighted_lcs / sum_of_weigths

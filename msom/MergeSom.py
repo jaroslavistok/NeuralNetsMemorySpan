@@ -12,7 +12,6 @@ class MergeSom:
         self.columns_count = columns_count
         self.number_of_neurons_in_map = self.rows_count * self.columns_count
 
-        # weight vectors
         self.weights = np.random.randn(rows_count, columns_count, input_dimension)
         self.context_weights = np.random.randn(rows_count, columns_count, input_dimension)
 
@@ -65,6 +64,8 @@ class MergeSom:
         if trace:
             ion()
             (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.weights, block=False)
+            redraw()
+            ion()
             (plot_grid_3d if in3d else plot_grid_2d)(Encoder.transform_input(inputs), self.context_weights, block=False)
             redraw()
 
@@ -115,10 +116,10 @@ class MergeSom:
                         h = np.exp(argument)
 
                         # current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
-                        current_weight_adjustment = base_learning_rate * (x - self.weights[row_index, column_index]) * h
+                        current_weight_adjustment = alpha_t * (x - self.weights[row_index, column_index]) * h
 
                         # current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
-                        current_context_weight_adjustment = base_learning_rate * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
+                        current_context_weight_adjustment = alpha_t * (self.previous_winner_context - self.context_weights[row_index, column_index]) * h
 
 
                         self.weights[row_index, column_index] += current_weight_adjustment
@@ -128,18 +129,20 @@ class MergeSom:
 
                 base_learning_rate -= 0.001
 
-            quantization_error = sum_of_distances / (self.rows_count * self.columns_count)
+            quantization_error = sum_of_distances / (count - sliding_window_size)
 
             quantization_errors.append(quantization_error)
 
+
             memory_span = self.calculate_memory_span_of_net()
+
             memory_spans.append(memory_span)
 
             print("Quantization error: {}".format(quantization_error))
-            print("Memory span of the net {}:".format(self.calculate_memory_span_of_net()))
+            print("Memory span of the net {}:".format(memory_span))
 
             # receptive field
-            self.create_receptive_field()
+            # self.create_receptive_field()
             # print("Receptive field")
             # print(np.matrix(self.receptive_field))
             sum_of_memory_spans += memory_span
@@ -180,8 +183,6 @@ class MergeSom:
                 if not sequences:
                     continue
                 longest_common_subsequence_length = longest_common_subsecquence.get_longest_subsequence_length(sequences)
-                if longest_common_subsequence_length == 0:
-                    continue
                 weight = len(sequences)
                 longest_common_subsequence_length *= weight
                 sum_of_weighted_lcs += longest_common_subsequence_length
@@ -201,5 +202,5 @@ class MergeSom:
                 sequences = list(filter(str.strip, self.memory_window[i][j]))
                 if not sequences:
                     continue
-                longest_common_subsequence = lcs.get_longest_subsequence_length(sequences)
+                longest_common_subsequence = lcs.get_longest_subsequence(sequences)
                 self.receptive_field[i][j] = longest_common_subsequence

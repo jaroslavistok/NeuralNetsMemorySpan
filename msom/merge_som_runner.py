@@ -9,8 +9,8 @@ from helpers.norms import *
 
 
 dim = 26
-rows = 5
-cols = 5
+rows = 30
+cols = 30
 metric = euclidean_distance
 
 top_left = np.array((0, 0))
@@ -18,12 +18,13 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-train_data = DataLoader.load_data('simple_sequences')
+train_data = DataLoader.load_data('random_strings')
 
-model = MergeSom(dim, rows, cols)
-model.train(train_data, discrete=False, metric=metric, alpha_s=0.6, alpha_f=0.01, lambda_s=lambda_s,
-            lambda_f=0.8, eps=50, in3d=False, trace=False, trace_interval=1, sliding_window_size=30,
-            log=True)
+for i in range(5):
+    model = MergeSom(dim, rows, cols)
+    model.train(train_data, metric=metric, alpha_s=1.0, alpha_f=0.05, lambda_s=lambda_s,
+                        lambda_f=1, eps=20, in3d=False, trace=True, trace_interval=5, sliding_window_size=10, log=True,
+                        log_file_name='top_corpus.csv', alpha=1.0, beta=0.3)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())

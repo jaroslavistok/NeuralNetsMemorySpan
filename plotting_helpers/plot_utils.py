@@ -25,6 +25,8 @@ def plot_errors(title, errors, test_error=None, block=True):
         plt.plot([test_error] * len(errors))
 
     plt.tight_layout()
+    plt.xlabel("epochy")
+    plt.ylabel(title)
     plt.gcf().canvas.set_window_title(title)
     plt.show(block=block)
 
