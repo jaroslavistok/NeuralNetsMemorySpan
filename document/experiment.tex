@@ -528,7 +528,7 @@ Hodnoty pre oba parametre sú z uzavretého intervalu $\langle0, 1\rangle$ s kro
 Na x-ovej osi sú hodnoty parametra $\beta$ a na y-ovej osi sú hodnoty parametra $\alpha$.
 Ako môžeme vidieť na grafe (obr. \ref{decay_memory_span}) Decaying MSOM dosahuje veľmi vysoké hodnoty pamäťových hĺbok pri hodnote 
 parametra $\beta = 1$ (viď. rovnicu \ref{dm_recursive}). V tomto prípade máme v kontexte uloženú kompletne celú históriu vstupov. Pri MSOM sme v tomto prípade mali síce tiež kompletnú históriu vstupov, ale kontext ako taký bol prázdny.
-Pri Decay SOM sa nám kontext nestráca pri $\beta = 1$, preto dosahuje veľmi dobré výsledky.
+Pri Decay MSOM sa nám kontext nestráca pri $\beta = 1$, preto dosahuje veľmi dobré výsledky.
 Čo je dôležité si všimnúť na grafe pamäťových hĺbok je, že pre $\beta = 1$ sú najlepšie $\alpha \in \lbrace 0.5, 0.7 \rbrace$, čiže keď kontextová zložka má mierne vyššiu váhu ako nekontextová zložka vo funkcii vzdialenosti. 
 Keď je $\alpha = 0$, tak sieť nepracuje s kontextom, takže nemá žiadnu pamäťovú hĺbku,
 v podstate je redukovaná na nerekurentnú SOM. Preto je aj kvantizačná chyba v tomto prípade nulová.
@@ -538,7 +538,7 @@ Na to aby Decay MSOM dosiahla vysoké hodnoty pamäťových hĺbok, musí mať n
 po niekoľkých epochách.
 Môžeme tvrdiť, že kontext je pri Decay MSOM stále rovnako kvalitný. Čím viac informácii v kontexte máme, tým sú hodnoty pamäťovej hĺbky vyššie.
 
-Keď sa pozrieme na receptívne pole Decay SOM, tak vidíme dôvod:
+Keď sa pozrieme na receptívne pole Decay MSOM, tak vidíme dôvod:
 
 \begin{lstlisting}[basicstyle=\footnotesize]
     [.....'dacdccaaaa1'.'cdccaaaaca1'.'ccaaaacaca1''caaaacacab1'.
