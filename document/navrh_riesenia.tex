@@ -83,15 +83,15 @@ optimálnych parametrov, pri ktorých dosahujú najvyššie hodnoty pamäťovýc
 V tejto časti sa venujeme tiež analýze výsledkov a hľadaniu súvislostí medzi veľkosťou pamäťovej hĺbky 
 a hodnotami parametrov. 
 Na záver sme spravili porovnanie pamäťových hĺbok všetkých testovaných typov rekurentných SOM s 
-použitím optimálnych váh a fixnou inicializáciou váh.
+použitím optimálnych váh a náhodnou inicializáciou váh.
 V druhej časti experimentu sa venujeme pokusu s SRN a vizualizácii vnútorných stavov siete vo forme 
 dendogramu a vyhodnoteniu výsledkov.
 
-Experiment so rekurentnými SOM prebieha nasledujúcim spôsobom:
+Experiment s rekurentnými SOM prebieha nasledujúcim spôsobom:
 \begin{itemize}
-    \item Výber vhodnej trénovacej sekvencie, počtu epôch trénovania a vhodnú veľkosť pamäťového okna
-    \item Trénovanie siete na všetkých kombináciach týchto dvoch parametrov
-    \item Ukladanie hodnot pamäťovej hĺbky a kvantizačných chýb do súboru
+    \item Výber trénovacej sekvencie, počtu epôch trénovania a správnu veľkosť pamäťového okna
+    \item Trénovanie siete na rôznych kombináciach parametrov
+    \item Ukladanie hodnôt pamäťovej hĺbky a kvantizačných chýb do súboru
     \item Vykreslenie heatmapy, ktorá znázorňuje aká bola pamäťová hĺbka pre rôzne kombinácie parametrov.
     \item Testovanie pamäťovej hĺbky sietí s optimálnymi parametrami na rôznych trénovacích dátach.
     \item Vyhodnotenie a analýza výsledkov

@@ -9,7 +9,7 @@ V našich experimentoch sme porovnávali pamäťovú hĺbku dvoch základných t
 SOM --- RecSOM a MSOM. Okrem toho sme si vytvorili z oboch modelov modifikované verzie --- Activity RecSOM a Decaying MSOM.
 Activity RecSOM umožňuje experimentovať s hodnotami aktivít neurónov, ktoré tvoria kontext siete. Upravili sme v nej
 vzorec na výpočet aktivity, tak aby obsahoval meniteľný parameter, ktorý môžeme nastavovať na rôzne hodnoty.
-To nám umožnilo preskúmať ďaľšie vlastnosti RecSOM a vplyv zloženia kontextu na hĺbku pamäte RecSOM.
+To nám umožnilo preskúmať ďalšie vlastnosti RecSOM a vplyv zloženia kontextu na hĺbku pamäte RecSOM.
 Pri modifikácii MSOM sme sa rozhodli, že použijeme úplne odlišný kontext ako používa MSOM. Pri klasickej MSOM
 je kontext tvorený lineárnou kombináciou vlastností víťazného neurónu z predchádzajúceho kroku, v našej modifikovanej 
 verzii je kontext tvorený iba kombináciou minulých vstupov a teda nie je závislý od minulých stavov samotnej siete.
@@ -29,10 +29,10 @@ aktiváciami neurónov na skrytej vrstve a posuvnými oknami na trénovacej mno�
 nepodarilo sa nám nájsť spôsob ako zmerať a porovnať pamäťovú hĺbku Elmanovej siete s rekurentnými SOM.
 Otázne je, či tento typ siete má kvantifikovateľnú pamäťovú hĺbku a či ju vieme odmerať a kvantifikovať.
 
-\section{Možnosti ďaľšej práce}
+\section{Možnosti ďalšej práce}
 \begin{itemize}
-    \item Medzi ďaľšie možnosti patrí vyskúšanie ďaľších modifikácií rekurentných SOM. 
-    Napríklad pri Acitivty RecSOM by sme mohli použiť euklidovskú vzdialenosť neurónu od víťazného neurónu a pozrieť sa na to aký vplyv by to malo 
+    \item Medzi ďalšie možnosti patrí vyskúšanie ďalších modifikácií rekurentných SOM. 
+    Napríklad pri Acitivty RecSOM by sme mohli použiť lokálny gaussovský tvar aktivity okolo víťazného neurónu a pozrieť sa na to aký vplyv by to malo 
     na pamäťovú hĺbku siete s rôznymi hodnotami parametra $\beta$.
     \item V našich experimentoch sme skúšali kombinácie parametrov $\alpha$ a $\beta$. Túto množinu parametrov by bolo vhodné rozšíriť o ďalšie parametre, napríklad
     lepšie preskúmať vplyv veľkosti okolia, či rýchlosti učenia siete.
@@ -43,10 +43,10 @@ Otázne je, či tento typ siete má kvantifikovateľnú pamäťovú hĺbku a či
     Preto by bolo vhodné spraviť podrobnú matematickú analýzu jednotlivých experimentov.
     \item Keďže sme nedokázali nájsť spôsob, ako zmerať pamäťovú hĺbku Elamnovej siete, určite by bolo 
     v budúcnosti vhodné navrhnúť a vyskúšať viac alternatívnych spôsobov ako zmerať pamäťovú hĺbku Elmanovej siete. 
-    Napríklad podrobnejšiou analýzou dendrogramov, či hľadaním ďaľších súvislostí v stavovom priestore siete.
+    Napríklad podrobnejšiou analýzou dendrogramov, či hľadaním ďalších súvislostí v stavovom priestore siete.
     \item Vyskúšať a overiť výsledky nášich experimentov v nejakom konkrétnom modeli strojového učenia, ktorý dokáže 
     využiť rekurentné neurónové siete na generovanie textu, či reprezentáciu sekvenčných dát.
-    \item Keďže naše implementácie nepatria medzi tie optimálne, medzi ďaľšie možnosti práce
+    \item Keďže naše implementácie nepatria medzi tie optimálne, medzi ďalšie možnosti práce
     určite patrí aj optimalizácia rýchlosti implementácii rekurentných SOM. Napríklad upraviť algoritmy tak, aby využívali
     pararelizmus a teda aby sme mohli vyskúšať väčšie množstvo kombinácii rôznych parametrov.
 \end{itemize}
