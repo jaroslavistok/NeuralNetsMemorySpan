@@ -67,7 +67,7 @@ quit()
 """
 
 
-with open('decay_msom/abs1.csv_errors', 'r') as file:
+with open('activity_recsom/distance.csv', 'r') as file:
     rows = file.read().split('\n')
     x = []
     y = []

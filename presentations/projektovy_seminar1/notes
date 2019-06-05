@@ -1,0 +1,25 @@
+1. Slide - uvodny slide
+- nazov diplomovej prace
+- meno
+
+2. Slide
+- obsah prezentacie
+
+3. Slide
+- SOM (self organizing map) - iba nadpis
+
+4. Slide
+- informacie o tom, co to je a na co to je
+- ako to vyzera, nejake vztahy a proces trenovania takejto siete
+
+5. Slide - Reccurent SOM
+- rekurentna verzia som
+- rozdiel oproti regularnej som + pamatovy efekt (memory span)
+
+6. Slide - rozne verzie SOM (jednoduche porovnanie rec vs merge som)
+
+7. Slide - elmanova siet
+
+8. Slide - vyhodnocovanie vysledkov
+
+9. Slide - co mam naimplementovane - gitlab ...

@@ -17,13 +17,13 @@ bottom_right = np.array((rows - 1, cols - 1))
 
 lambda_s = metric(top_left, bottom_right) * 0.5
 
-train_data = DataLoader.load_data('random_strings')
+train_data = DataLoader.load_data('abcd_short')
 
 for i in range(5):
     model = ActivityRecSom(dim, rows, cols)
     model.train(train_data, metric=metric, alpha_s=1.0, alpha_f=0.05, lambda_s=lambda_s,
                         lambda_f=1, eps=20, in3d=False, trace=False, trace_interval=5, sliding_window_size=10, log=True,
-                        log_file_name='top_corpus_new.csv'.format(i), alpha=0.7, beta=13.0)
+                        log_file_name='distance.csv'.format(i), alpha=0.7, beta=13.0)
 
 # print(model.distances_between_adjacent_neurons_horizontal())
 # print(model.distances_between_adjacent_neurons_vertical())

@@ -49,13 +49,22 @@ class ActivityRecSom:
                 # self.current_step_activities = np.append(self.current_step_activities,
                 #                                  (np.exp(-self.beta * (current_distance ** 2)) / sum_of_activities))
 
-                self.current_step_activities = np.append(self.current_step_activities,
-                                                         np.exp(-self.beta * (current_distance ** 2)))
+                # Commented out for testing purposes
+                #self.current_step_activities = np.append(self.current_step_activities,
+                #                                         np.exp(-self.beta * (current_distance ** 2)))
 
                 if current_distance < distance_from_winner:
                     distance_from_winner = current_distance
                     winner_row = i
                     winner_column = j
+
+        winner_position = np.array([winner_row, winner_column])
+        for i in range(len(self.weights)):
+            for j in range(len(self.weights[i])):
+                current_position = np.array([i, j])
+                current_distance = np.linalg.norm(winner_position - current_position)
+                self.current_step_activities = np.append(self.current_step_activities,
+                                                         np.exp(-self.beta * (current_distance ** 2)))
 
         return winner_row, winner_column
 

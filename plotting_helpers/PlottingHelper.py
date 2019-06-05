@@ -8,11 +8,11 @@ class PlottingHelper:
 
     @staticmethod
     def plot_memory_span_heatmap(z, number_of_values, fig_name, x_tick, y_tick):
-        plot_data = np.zeros((11, 11))
+        plot_data = np.zeros((10, 10))
         print(z)
         iterator = 0
-        for i in range(11):
-            for j in range(11):
+        for i in range(10):
+            for j in range(10):
                 plot_data[i][j] = z[iterator]
                 iterator += 1
 
